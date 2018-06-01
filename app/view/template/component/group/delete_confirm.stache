@@ -1,0 +1,5 @@
+{{#if(resources.length > 0)}}
+    {{ __('This group is associated with %s passwords. All users in this group will lose access to these passwords.', resources.length) }}
+{{#else}}
+    {{ __('This group is not associated with any password. You are good to go!') }}
+{{/if}}

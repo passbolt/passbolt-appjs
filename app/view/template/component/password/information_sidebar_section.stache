@@ -1,0 +1,43 @@
+<div class="accordion-header">
+    <h4><a role="button">{{ __('Information') }}</a></h4>
+</div>
+
+<ul class="accordion-content">
+    <li class="username">
+        <span class="label">{{ __('Username') }}</span>
+        <span class="value">{{ resource.username }}</span>
+    </li>
+    <li class="password">
+        <div class="label">{{ __('Password') }}</div>
+        <div class="value">
+            <div class="secret-copy">
+                <a id="sidebar_secret_copy_{{ resource.id }}">
+                    <span>copy password to clipboard</span>
+                </a>
+                <pre>{{ resource.secrets[0].data }}</pre>
+            </div>
+        </div>
+    </li>
+    <li class="uri">
+        <span class="label">{{ __('URL') }}</span>
+        <span class="value">
+            <a href="{{ resource.safeUri() }}" target="_blank" rel="noopener">{{ resource.uri }}</a>
+        </span>
+    </li>
+    <li class="created">
+        <span class="label">{{ __('Created') }}</span>
+        <span class="value">{{ getTimeAgo(resource._data.created) }}</span>
+    </li>
+    <li class="created-by">
+        <span class="label">{{ __('Created by') }}</span>
+        <span class="value">{{ resource.creator.username }}</span>
+    </li>
+    <li class="modified">
+        <span class="label">{{ __('Last modified') }}</span>
+        <span class="value">{{ getTimeAgo(resource.modified) }}</span>
+    </li>
+    <li class="modified-by">
+        <span class="label">{{ __('Modified by') }}</span>
+        <span class="value">{{ resource.modifier.username }}</span>
+    </li>
+</ul>

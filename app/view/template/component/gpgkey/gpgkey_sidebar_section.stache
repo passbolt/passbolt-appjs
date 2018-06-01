@@ -1,0 +1,33 @@
+<div class="accordion-header">
+    <h4><a role="button">{{ __('Public Key') }}</a></h4>
+</div>
+
+<ul class="accordion-content">
+    <li class="keyid">
+        <span class="label">{{ __('Key id') }}</span>
+        <span class="value">{{ gpgkey.key_id }}</span>
+    </li>
+    <li class="type">
+        <span class="label">{{ __('Type') }}</span>
+        <span class="value">{{ gpgkey.type }}</span>
+    </li>
+    <li class="created">
+        <span class="label">{{ __('Created') }}</span>
+        <span class="value">{{ gpgkey.key_created }}</span>
+    </li>
+    <li class="expires">
+        <span class="label">{{ __('Expires') }}</span>
+        <span class="value">{{ gpgkey.expires }}</span>
+    </li>
+    <li class="key">
+        <span class="label">{{ __('Public key') }}</span>
+				<span class="value">
+					<a class="button copy-public-key">
+                        <span>copy</span>
+                    </a>
+				</span>
+    </li>
+    <li class="gpgkey">
+        <textarea class="code">{{ gpgkey.armored_key }}</textarea>
+    </li>
+</ul>

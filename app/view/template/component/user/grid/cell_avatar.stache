@@ -1,0 +1,1 @@
+<img src="{{ item.profile.avatarPath('small') }}" alt="{{ __('Picture of: %s', mappedItem.profile.fullName())}}" width="30" height="30">

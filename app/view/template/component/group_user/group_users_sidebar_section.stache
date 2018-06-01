@@ -1,0 +1,14 @@
+<div class="accordion-header">
+    <h4><a role="button">{{ __('Group Members') }}</a></h4>
+</div>
+
+<div class="accordion-content">
+    {{#if(editable)}}
+    <a id="js_edit_members_button" class="section-action" href="#">
+        <i class="fa fa-fw fa-edit"></i>
+        <span class="visuallyhidden">{{ __('modify') }}</span>
+    </a>
+    {{/if}}
+
+    <ul id="js_group_details_group_members_list" class="shared-with"></ul>
+</div>

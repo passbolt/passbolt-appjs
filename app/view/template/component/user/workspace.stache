@@ -1,0 +1,19 @@
+<div class="js_users_workspace">
+
+    <div id="js_user_workspace_primary_sidebar" class="panel left">
+    </div>
+
+    <div class="panel middle">
+        <div id="js_wsp_users_breadcrumb" class="breadcrumbs">
+        </div>
+        <div id="js_wsp_users_browser" class="tableview">
+        </div>
+    </div>
+
+    <div class="panel aside js_wsp_users_sidebar_second">
+    </div>
+
+    <div class="panel aside js_wsp_groups_sidebar_second">
+    </div>
+
+</div>

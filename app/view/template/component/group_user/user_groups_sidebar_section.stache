@@ -1,0 +1,5 @@
+<div class="accordion-header">
+    <h4><a role="button">{{ __('Groups') }}</a></h4>
+</div>
+
+<ul class="accordion-content shared-with" id="js_user_groups_list"></ul>

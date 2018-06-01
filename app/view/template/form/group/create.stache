@@ -1,0 +1,8 @@
+<div class="form-content">
+    <div class="input text required clearfix js_form_element_wrapper">
+        <label for="js_field_name">{{ __('Group name') }}</label>
+        <input name="Group.name" class="required" maxlength="50" type="text" id="js_field_name" placeholder="group name"/>
+        <div id="js_field_name_feedback" class="message">
+        </div>
+    </div>
+</div>

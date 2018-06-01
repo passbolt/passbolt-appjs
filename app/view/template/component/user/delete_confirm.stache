@@ -1,0 +1,1 @@
+{{ __('Please confirm you really want to delete the user. After clicking ok, the user will be') }} <strong>{{ __('deleted permanently') }}</strong>.

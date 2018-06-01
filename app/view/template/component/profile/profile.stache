@@ -1,0 +1,51 @@
+<div class="grid grid-responsive-12">
+	<div class="row">
+		<div class="profile col8">
+			<h3>{{ __('Profile') }}</h3>
+			<div class="section profile-detailed-information">
+				<div class="avatar">
+					<div class="value">
+						<img src="{{ user.profile.avatarPath('medium') }}" alt="profile picture" />
+					</div>
+					<div class="edit">
+						<a class="edit-avatar-action" title="{{ __('Change Avatar') }}">
+							<i class="fa fa-camera"></i>
+							<span class="help-text">Click here to upload a new picture.</span>
+						</a>
+					</div>
+				</div>
+				<table class="table-info profile">
+					<tbody>
+					<tr class="name">
+						<td class="label">{{ __('Name') }}</td>
+						<td class="value">{{ user.profile.first_name }} {{ user.profile.last_name }}</td>
+					</tr>
+					<tr class="email">
+						<td class="label">{{ __('Email') }}</td>
+						<td class="value">{{ user.username }}</td>
+					</tr>
+					<tr class="role">
+						<td class="label">{{ __('Role') }}</td>
+						<td class="value">{{ user.role.name }}</td>
+					</tr>
+					<tr class="modified">
+						<td class="label">{{ __('Modified') }}</td>
+						<td class="value">{{ getTimeAgo(user.profile.modified) }}</td>
+					</tr>
+					<tr class="created">
+						<td class="label">{{ __('Created') }}</td>
+						<td class="value">{{ getTimeAgo(user.profile.created) }}</td>
+					</tr>
+					<tr class="publickey_keyid">
+						<td class="label">{{ __('Public key') }}</td>
+						<td class="value">
+							{{ user.gpgkey.key_id }}
+							<p><em>Note: Sorry, it is not possible to change your key at the moment. <!--<a>learn more ›</a>--></em></p>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

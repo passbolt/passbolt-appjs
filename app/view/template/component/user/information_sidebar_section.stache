@@ -1,0 +1,18 @@
+<div class="accordion-header">
+    <h4><a role="button">{{ __('Information') }}</a></h4>
+</div>
+
+<ul class="accordion-content">
+    <li class="role">
+        <span class="label">{{ __('Role') }}</span>
+        <span class="value capitalize">{{ capitalize(user.role.name) }}</span>
+    </li>
+    <li class="modified">
+        <span class="label">{{ __('Modified') }}</span>
+        <span class="value">{{ getTimeAgo(user.modified) }}</span>
+    </li>
+    <li class="status">
+        <span class="label">{{ __('Status') }}</span>
+        <span class="value">{{#if(user.active)}}{{ __('Activated') }}{{#else}}{{ __('Activation pending') }}{{/if}}</span>
+    </li>
+</ul>

@@ -1,0 +1,19 @@
+<div id="js_edit_tags_form" class="tags-edit-wrapper hidden form">
+    <div class="form-content">
+        <div id="js_tags_editor" class="input tag-editor">
+            <div class="tag-editor-input-wrapper">
+                <div class="tags">
+                </div>
+                <div id="js_tag_editor_input_text" class='tag-editor-input' contenteditable="true"></div>
+            </div>
+            <div class="message notice">
+                <i class="fa fa-fw fa-info-circle"></i>
+                <strong>{{ __('Pro tip') }}:</strong> {{ __('Tags starting with # are shared with all users who have access. Separate tags using comas.') }}
+            </div>
+        </div>
+        <div class="actions">
+            <a id="js_tags_editor_submit" class="button tag-editor-submit" href="#"><span>{{ __('save') }}</span></a>
+            <a id="js_tags_editor_cancel" class="button cancel tag-editor-cancel" role="button"><span>cancel</span></a>
+        </div>
+    </div>
+</div>

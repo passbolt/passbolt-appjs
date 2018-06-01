@@ -1,0 +1,25 @@
+<div class="sidebar user">
+	<div class="sidebar-header">
+		<img src="{{ user.profile.avatarPath('small')}}" alt="{{ user.profile.first_name }} {{ user.profile.last_name }} picture"/>
+		<h3>
+			<span class="name sidebar-header-title">{{ user.profile.first_name }} {{ user.profile.last_name }}</span>
+			<span class="username sidebar-header-subtitle">{{ user.username }}</span>
+		</h3>
+		<a class="js_sidebar_close dialog-close">
+			<i class="fa fa-close"></i>
+			<span class="visuallyhidden">close</span>
+		</a>
+	</div>
+
+	<!-- User detailed information -->
+	<div class="detailed-information accordion sidebar-section" id="js_user_details_information"></div>
+
+	{{#if(user.active)}}
+	<!-- User groups list -->
+	<div class="groups accordion sidebar-section" id="js_user_groups"></div>
+
+	<!-- User key information -->
+	<div class="key-information accordion sidebar-section" id="js_user_gpgkey"></div>
+	{{/if}}
+
+</div>

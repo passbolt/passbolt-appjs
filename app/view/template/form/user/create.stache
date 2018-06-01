@@ -1,0 +1,44 @@
+<div class="form-content">
+
+	<input type="hidden" name="User.id" id="js_field_user_id" class="form_field" />
+	<input type="hidden" name="User.role_id" id="js_field_role_id" class="form_field" />
+
+	<div class="input text required">
+		<label for="js_field_first_name">{{ __('First Name') }}</label>
+		<input name="User.profile.first_name" class="required" type="text" id="js_field_first_name" placeholder="first name"/>
+		<div id="js_field_first_name_feedback" class="message">
+		</div>
+	</div>
+
+	<div class="input text required">
+		<label for="js_field_last_name">{{ __('Last Name') }}</label>
+		<input name="User.profile.last_name" class="required" type="text" id="js_field_last_name" placeholder="last name"/>
+		<div id="js_field_last_name_feedback" class="message">
+		</div>
+	</div>
+
+	<div class="input text required clearfix">
+		<label for="js_field_username">{{ __('Username / Email') }}</label>
+		<input name="User.username" class="required {{ action }}" type="text" id="js_field_username" placeholder="email" {{#unless(create)}}disabled{{/unless}} />
+		<div id="js_field_username_feedback" class="message">
+		</div>
+	</div>
+
+    {{#if(isAdmin}}
+	<div class="input text required">
+		<label for="js_field_is_admin">{{ __('Role') }}</label>
+		<div id="js_field_is_admin">
+			<input id="js_field_is_admin_checkbox" name="is_admin" type="checkbox" />
+			<span>{{ __('This user is an administrator') }}</span>
+		</div>
+		{{#if(action == 'create')}}
+		<div class="message helptext">{{ __('Note: Administrators can add and delete users. They can also create groups and assign group managers. Admin can not see all passwords.') }}</div>
+		{{/if}}
+	</div>
+	{{/if}}
+</div>
+
+<div class="submit-wrapper clearfix">
+    <input type="submit" class="button primary" value="{{ __('save')}}" />
+    <a class="js-dialog-cancel cancel">{{ __('cancel')}}</a>
+</div>

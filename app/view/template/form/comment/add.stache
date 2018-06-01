@@ -1,0 +1,32 @@
+<ul>
+	<li class="comment-wrapper">
+        <form id="js_comment_add_form" class="form comment add">
+            <div class="wrap-right-column">
+                <div class="right-column">
+                    <div class="form-content">
+                        <input name="data[comment][parent_id]" class="js_comment_parent_id required" type="hidden" />
+                        <input name="data[comment][foreign_key]" class="js_comment_foreign_key required" type="hidden" />
+                        <input name="data[comment][foreign_model]" class="js_comment_foreign_model required" type="hidden" />
+                        <div class="input textarea required">
+                            <label for="js_field_comment_content">Add a comment</label>
+                            <textarea id="js_field_comment_content" name="data[comment][content]" class="js_comment_content required" maxlength="255"  placeholder="{{ __('add a comment' }}"></textarea>
+                            <div class="js_comment_content_feedback message"></div>
+                        </div>
+                        <div class="metadata">
+                            <span class="author username"><a>{{ __('You') }}</a></span>
+                            <span class="modified">{{ __('right now') }}</span>
+                        </div>
+                        <div class="actions">
+                            <a class="button comment-submit"><span>{{ __('send') }}</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="left-column">
+                {{#if(user.profile.avatar)}}
+                <div class="author profile picture"><a><img src="{{ user.profile.avatar.url.small }}" alt="{{ user.profile.first_name }} {{ user.profile.last_name }} avatar"></a></div>
+                {{/if}}
+            </div>
+        </form>
+	</li>
+</ul>

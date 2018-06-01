@@ -1,0 +1,1 @@
+{{ __('Please confirm you really want to delete the password. After clicking ok, the password will be') }} <strong>{{ __('deleted permanently') }}</strong>.

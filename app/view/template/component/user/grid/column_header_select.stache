@@ -1,0 +1,4 @@
+<div class="input checkbox">
+    <input type="checkbox" name="select all" value="checkbox-select-all" id="checkbox-select-all-people" disabled="disabled">
+    <label for="checkbox-select-all-people">{{ __('select all') }}</label>
+</div>

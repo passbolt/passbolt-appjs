@@ -1,0 +1,9 @@
+<% if(resources && resources.length > 0) { %>
+    <%= __('This group is associated with %s %s. All users in this group will lose access to %s.',
+        resources.length,
+        resources.length > 1 ? __('passwords') : __('password'),
+        resources.length > 1 ? __('these passwords') : __('this password')
+    ); %>
+<% } else { %>
+    <%= __('This group is not associated with any password. You are good to go!'); %>
+<% } %>

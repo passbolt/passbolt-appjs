@@ -1,0 +1,14 @@
+<div class="accordion-header">
+	<h4><a role="button">{{ __('Tags') }}</a></h4>
+</div>
+
+<div class="accordion-content">
+	<a class="edit_tags_button section-action" id="js_edit_tags_button">
+		<i class="fa fa-fw fa-edit"></i>
+		<span class="visuallyhidden">{{ __('edit') }}</span>
+	</a>
+
+	<ul id="js_rs_details_tags_list" class="tags tags-list">
+	</ul>
+	<em id="js_tag_sidebar_section_empty_message" class="hidden">{{ __('There is no tag') }}</em>
+</div>

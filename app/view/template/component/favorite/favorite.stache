@@ -1,0 +1,4 @@
+<a class="no-text">
+	<i class="icon {{#if(instance.isFavorite())}} unfav {{#else}} fav {{/if}}"></i>
+	<span class="visuallyhidden">fav</span>
+</a>

@@ -1,0 +1,3 @@
+<li id="{{ mappedItem.id }}">
+	<a class="tag">{{ mappedItem.label }}</a>
+</li>

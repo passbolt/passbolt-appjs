@@ -1,0 +1,22 @@
+<div class="accordion-header">
+    <h4><a role="button">{{ __('Information') }}</a></h4>
+</div>
+
+<ul class="accordion-content">
+    <li class="created">
+        <span class="label">Created</span>
+        <span class="value">{{ getTimeAgo(group._data.created) }}</span>
+    </li>
+    <li class="modified">
+        <span class="label">Modified</span>
+        <span class="value">{{ getTimeAgo(group.modified) }}</span>
+    </li>
+    <li class="modified_by">
+        <span class="label">Modified By</span>
+        <span class="value">{{#if(group.modifier)}}{{ group.modifier.profile.fullName() }}{{/if}}</span>
+    </li>
+    <li class="members">
+        <span class="label">Members</span>
+        <span class="value">{{#if(group.groups_users)}}{{ group.groups_users.length }}{{/if}}</span>
+    </li>
+</ul>

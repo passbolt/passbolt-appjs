@@ -1,0 +1,1 @@
+<a href="{{ mappedItem.safeUri }}" target="_blank" rel="noopener">{{ cellValue }}</a>

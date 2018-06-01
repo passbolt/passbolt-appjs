@@ -1,0 +1,15 @@
+{{#if(isAdmin)}}
+<li>
+	<a id="js_user_wk_menu_edition_button" class="button">
+		<i class="fa fa-fw fa-edit"></i>
+		<span>{{ __('edit') }}</span>
+	</a>
+</li>
+<li>
+	<a id="js_user_wk_menu_deletion_button" class="button">
+		<i class="fa fa-fw fa-trash"></i>
+		<span>{{ __('delete') }}</span>
+	</a>
+</li>
+
+{{/if}}

@@ -1,0 +1,26 @@
+<li id="{{ mappedItem.id }}" class="row {{ cssClasses.join(' ') }}">
+
+    <div class="avatar">
+        <img src="{{ mappedItem.aroAvatarPath }}"/>
+    </div>
+
+    <div class="group">
+        <span class="name">{{ mappedItem.acoLabel }}</span>
+        <span class="details"><a>{{ mappedItem.acoDetails }}</a></span>
+    </div>
+
+    <div class="select rights">
+        <form id="js_share_rs_perm_{{ mappedItem.id }}" class="js_perm_edit_form">
+            <select class="js_share_rs_perm_type permission">
+            </select>
+        </form>
+    </div>
+
+    <div id="js_actions_rs_perm_{{ mappedItem.id }}" class="actions">
+        <a class="js_perm_delete close" title="{{ __('remove') }}">
+            <i class="fa fa-times-circle"></i>
+            <span class="visuallyhidden">{{ __('remove') }}</span>
+        </a>
+    </div>
+
+</li>

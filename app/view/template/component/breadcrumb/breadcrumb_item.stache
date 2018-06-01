@@ -1,0 +1,5 @@
+<li id="{{ mappedItem.id }}" class="{{ cssClasses.join('') }}">
+    <div class="main-cell">
+        <a><span>{{ mappedItem.label }}</span></a>
+    </div>
+</li>

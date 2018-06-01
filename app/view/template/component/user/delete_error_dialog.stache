@@ -1,0 +1,15 @@
+{{#if(resources)}}
+{{ __('This user is the sole owner of') }} {{ resources.length }} {{#if(resources.length>1)}}{{ __('passwords') }}{{#else}}{{__('password')}}{{/if}}:
+{{#resources}}{{#if(scope.index)}}, {{/if}}{{ Resource.name }}{{/each}}.
+<br/>
+{{/if}}
+
+{{#if(groups)}}
+{{ __('This user is the sole manager of') }} {{ groups.length }} {{#if(groups.length>1)}}{{ __('groups') }}{{#else}}{{__('group')}}{{/if}}:
+{{#groups}}{{#if(scope.index)}}, {{/if}}{{ Group.name }}{{/each}}.
+<br/>
+{{/if}}
+
+<br/>
+
+{{ __('You need to transfer the ownership to other users before you can proceed.') }}
