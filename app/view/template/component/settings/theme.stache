@@ -1,0 +1,11 @@
+<div class="grid grid-responsive-12">
+	<div class="row">
+        <h3>{{ __('Theme') }}</h3>
+        <div class="row themes">
+            <div class="col12">
+                <ul id="js_theme_tree">
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

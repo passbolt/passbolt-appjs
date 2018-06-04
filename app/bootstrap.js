@@ -13,6 +13,7 @@
  */
 import moment from 'moment/moment';
 import 'moment-timezone/builds/moment-timezone-with-data';
+import AccountSetting from 'app/model/map/accountSetting';
 import baseUrl from 'can-util/js/base-url/base-url';
 import Bootstrap from 'passbolt-mad/bootstrap';
 import Config from 'passbolt-mad/config/config';
@@ -32,9 +33,7 @@ var AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 		// Load mad bootstrap.
 		this._super(options);
 
-        // Load the application.
-		this._loadUser()
-			.then(this._loadRoles)
+		Promise.all([this._loadUser(), this._loadRoles(), this._loadAccountSettings()])
 			.then(this._loadApp)
 			.then(null, (e) => {throw e;} );
 	},
@@ -60,6 +59,21 @@ var AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 		});
 	},
 
+	/**
+	 * Load the account settings
+	 */
+	_loadAccountSettings: function() {
+		var plugins = Config.read('server.passbolt.plugins');
+		if (plugins && plugins.accountSettings) {
+			return AccountSetting.findAll()
+                .then(accountSettings => {
+                    AccountSetting.saveInConfig(accountSettings);
+                });
+		}
+
+		return null;
+	},
+
     /**
      * Load the application
      */
@@ -69,5 +83,6 @@ var AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
     }
 
 });
+
 
 export default AppBootstrap;

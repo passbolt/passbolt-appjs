@@ -100,6 +100,16 @@ var WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settings
 				}
 			})
 		];
+		// theme section.
+		this.sectionMenuItems['theme'] = [
+			new Action({
+				id: uuid(),
+				label: __('Theme'),
+				action: function () {
+					return;
+				}
+			})
+		];
 	},
 
 	/**

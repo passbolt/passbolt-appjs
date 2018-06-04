@@ -16,6 +16,7 @@ import UserEditAvatarForm from 'app/form/user/edit_avatar';
 import BreadcrumbComponent from 'app/component/settings/workspace_breadcrumb';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
+import Config from 'passbolt-mad/config/config';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import KeysComponent from 'app/component/gpgkey/keys';
 import MadBus from 'passbolt-mad/control/bus';
@@ -23,6 +24,7 @@ import MenuComponent from 'passbolt-mad/component/menu';
 import PrimaryMenuComponent from 'app/component/settings/workspace_primary_menu';
 import ProfileComponent from 'app/component/profile/profile';
 import TabComponent from 'passbolt-mad/component/tab';
+import ThemeComponent from 'app/component/settings/theme';
 import User from 'app/model/map/user';
 import UserCreateForm from 'app/form/user/create';
 import uuid from 'uuid/v4';
@@ -110,6 +112,21 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 		menu.insertItem(profileItem);
 		this.options.primarySidebarProfileItem = profileItem;
 
+		// Theme
+		var plugins = Config.read('server.passbolt.plugins');
+		if (plugins && plugins.accountSettings) {
+			var themeItem = new Action({
+				id: uuid(),
+				name: 'keys',
+				label: __('Theme'),
+				action: function () {
+					MadBus.trigger('request_settings_section', 'theme');
+				}
+			});
+			menu.insertItem(themeItem);
+			this.options.primarySidebarThemeItem = themeItem;
+		}
+
 		// Keys
 		var keysItem = new Action({
 			id: uuid(),
@@ -145,6 +162,15 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 			id: 'js_settings_wk_profile_keys_controller',
 			label: 'keys'
 		});
+
+		// Theme tab
+		var plugins = Config.read('server.passbolt.plugins');
+		if (plugins && plugins.accountSettings) {
+			tabs.addComponent(ThemeComponent, {
+				id: 'js_settings_wk_profile_theme_controller',
+				label: 'theme'
+			});
+		}
 	},
 
 	/**
@@ -261,6 +287,10 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 			case 'profile' :
 				tabId = 'js_settings_wk_profile_controller';
 				menuItem = this.options.primarySidebarProfileItem;
+				break;
+			case 'theme' :
+				tabId = 'js_settings_wk_profile_theme_controller';
+				menuItem = this.options.primarySidebarThemeItem;
 				break;
 		}
 

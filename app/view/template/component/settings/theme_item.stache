@@ -1,0 +1,10 @@
+<li id="{{ mappedItem.id }}" class="{{ cssClasses.join(' ') }}">
+    <div class="main-cell row theme">
+        <a>
+            <img src="{{ mappedItem.preview }}">
+            <div class="theme-desc">
+                {{ capitalize(mappedItem.name) }}
+            </div>
+        </a>
+    </div>
+</li>
