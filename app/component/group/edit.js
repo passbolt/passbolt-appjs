@@ -158,8 +158,8 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
                     return user.profile.fullName();
                 }
             },
-            userEmail: 'username',
-            userFingerprint: 'gpgkey.fingerprint',
+            userEmail: 'user.username',
+            userFingerprint: 'user.gpgkey.fingerprint',
             isAdmin: 'is_admin',
             isNew: 'is_new'
         });
@@ -232,6 +232,7 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
 
         // Load groupUsers.
         group.groups_users.each(function(groupUser) {
+            console.log(groupUser);
             self.addGroupUser(groupUser);
         });
 

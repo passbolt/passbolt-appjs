@@ -7,11 +7,11 @@
     <div class="user">
         <div class="details">
             <span class="name">{{ mappedItem.userLabel }}</span>
-            <div href="#" class="more_details tooltip-alt">
+            <div class="more_details tooltip-alt">
                 <i class="fa fa-info-circle"></i>
                 <div class="tooltip-text right">
                     <div class="email">{{ mappedItem.userEmail }}</div>
-                    <div class="fingerprint">{{ fingerprint }}</div>
+                    <div class="fingerprint">{{ mappedItem.userFingerprint }}</div>
                 </div>
             </div>
         </div>
