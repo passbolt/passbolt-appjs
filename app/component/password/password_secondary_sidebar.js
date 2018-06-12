@@ -120,22 +120,6 @@ var PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('passbo
 	 */
 	'{selectedItem} updated': function (item) {
 		this.setTitle(item.name)
-	},
-
-	/* ************************************************************** */
-	/* LISTEN TO THE STATE CHANGES */
-	/* ************************************************************** */
-
-	/**
-	 * A password has been clicked.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	' password_clicked': function (el, ev) {
-		// Get secret out of Resource object.
-		var secret = this.options.selectedItem.secrets[0].data;
-		// Request decryption. (delegated to plugin).
-		MadBus.trigger('passbolt.secret.decrypt', secret);
 	}
 });
 

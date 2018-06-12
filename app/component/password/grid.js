@@ -30,6 +30,7 @@ import View from 'passbolt-mad/view/view';
 import columnHeaderSelectTemplate from 'app/view/template/component/password/grid/column_header_select.stache!';
 import columnHeaderFavoriteTemplate from 'app/view/template/component/password/grid/column_header_favorite.stache!';
 import cellSecretTemplate from 'app/view/template/component/password/grid/cell_secret_template.stache!';
+import cellUsernameTemplate from 'app/view/template/component/password/grid/cell_username_template.stache!';
 import cellUriTemplate from 'app/view/template/component/password/grid/cell_uri_template.stache!';
 import gridEmptyTemplate from 'app/view/template/component/password/grid/grid_empty.stache!';
 
@@ -152,9 +153,10 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 		var usernameColumn = new GridColumn({
 			name: 'username',
 			index: 'username',
-			css: ['m-cell'],
+			css: ['m-cell', 'username'],
 			label: __('Username'),
-			sortable: true
+			sortable: true,
+			template: cellUsernameTemplate
 		});
 		columns.push(usernameColumn);
 
@@ -562,6 +564,21 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 		var secret = item.secrets[0].data;
 		// Request decryption. (delegated to plugin).
 		MadBus.trigger('passbolt.secret.decrypt', secret);
+	},
+
+	/**
+	 * A username has been clicked.
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
+	 * @param {passbolt.model.Resource} item The right selected item instance or its id
+	 * @param {HTMLEvent} srcEvent The source event which occurred
+	 */
+	' username_clicked': function (el, ev, item, srcEvent) {
+		var username = item.username;
+		MadBus.trigger('passbolt.clipboard', {
+			name: 'username',
+			data: username
+		});
 	},
 
 	/**

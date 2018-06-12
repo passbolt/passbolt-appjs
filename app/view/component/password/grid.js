@@ -42,6 +42,29 @@ var PasswordGridView = GridView.extend('passbolt.view.component.password.Grid', 
 	},
 
 	/**
+	 * Click on a username element.
+	 * @event username_clicked
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
+	 * @return {bool}
+	 */
+	'tbody tr td.username a click': function (el, ev) {
+		ev.stopPropagation();
+		ev.preventDefault();
+		var data = null,
+			$tr = $(el).parents('tr'),
+			itemClass = this.getController().getItemClass();
+
+		if (itemClass) {
+			data = DomData.get.call($tr[0], itemClass.shortName);
+		} else {
+			data = $tr[0].id;
+		}
+
+		$(this.element).trigger('username_clicked', [data, ev]);
+	},
+
+	/**
 	 * Right click has been detected. (contextual menu).
 	 * we just stop the event here, as we do not want to base our contextual menu on this event, but on the mouse down event instead.
 	 * @event item_right_selected

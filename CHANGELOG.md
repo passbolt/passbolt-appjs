@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [2.1.0] - 2018-06-13
 ### Added
 - PASSBOLT-2878: Integrate dark theme
+- PASSBOLT-2861: Make username clickable for copy to clipboard
 
 ### Fixed
 - PASSBOLT-1917: Upgrade to canjs 3.x

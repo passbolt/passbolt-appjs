@@ -5,7 +5,7 @@
 <ul class="accordion-content">
     <li class="username">
         <span class="label">{{ __('Username') }}</span>
-        <span class="value">{{ resource.username }}</span>
+        <span class="value"><a>{{ resource.username }}</a></span>
     </li>
     <li class="password">
         <div class="label">{{ __('Password') }}</div>
