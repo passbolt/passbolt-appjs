@@ -20,7 +20,6 @@ import FilterComponent from 'app/component/navigation/filter';
 import LoadingBarComponent from 'app/component/footer/loading_bar';
 import MadBus from 'passbolt-mad/control/bus';
 import NavigationLeftComponent from 'app/component/navigation/left';
-import NavigationRightComponent from 'app/component/navigation/right';
 import NotificationComponent from 'app/component/footer/notification';
 import PasswordWorkspaceComponent from 'app/component/password/workspace';
 import ProfileHeaderDropdownComponent from 'app/component/profile/header_dropdown';
@@ -59,9 +58,6 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	_initHeader: function() {
 		var navigationLeftComponent = new NavigationLeftComponent('#js_app_navigation_left');
 		navigationLeftComponent.start();
-
-		var navigationRightComponent = new NavigationRightComponent('#js_app_navigation_right');
-		navigationRightComponent.start();
 
 		var filterComponent = new FilterComponent('#js_app_filter', {});
 		filterComponent.start();

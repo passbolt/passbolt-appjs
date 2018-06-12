@@ -16,7 +16,10 @@
         <div class="primary navigation top">
             <ul id="js_app_navigation_left" class="left">
             </ul>
-            <ul id="js_app_navigation_right" class="right">
+            <ul class="right">
+                <li class="logout ready">
+                    <a href="/auth/logout"><span>{{ __('logout') }}</span></a>
+                </li>
             </ul>
         </div>
     </nav>
