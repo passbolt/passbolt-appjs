@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-1917: Upgrade to canjs 3.x
 - PASSBOLT-2883: Fix appjs logout link and remember me cleanup
 - PASSBOLT-2886: Fix fingerprint tooltips in user group management dialog
+- PASSBOLT-2894: Fix missing div breaking elipsis on long url in password workspace
 
 # Terminology
 - AN: Anonymous user

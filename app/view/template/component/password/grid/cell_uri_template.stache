@@ -1,1 +1,3 @@
-<a href="{{ mappedItem.safeUri }}" target="_blank" rel="noopener">{{ cellValue }}</a>
+<div title="{{cellValue}}">
+    <a href="{{ mappedItem.safeUri }}" target="_blank" rel="noopener">{{ cellValue }}</a>
+</div>

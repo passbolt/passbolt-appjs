@@ -1,1 +1,3 @@
-<a>{{ cellValue }}</a>
+<div title="{{cellValue}}">
+    <a>{{ cellValue }}</a>
+</div>
