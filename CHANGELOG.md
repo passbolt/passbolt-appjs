@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2891: Fix group edit users tooltips
 - PASSBOLT-2884: Update header left menu. Remove home and add help
 - PASSBOLT-2885: Update user settings menus
+- PASSBOLT-2895: Fix/homogenize notifications
 
 # Terminology
 - AN: Anonymous user

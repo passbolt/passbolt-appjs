@@ -11,25 +11,25 @@
 				"severity": "notice"
 			},
 			"app_resources_add_success": {
-				"msg": "The password %body.Resource.name% has been created"
+				"msg": "The password has been added successfully"
 			},
 			"app_resources_delete_success": {
 				"msg": "The password has been deleted"
 			},
 			"app_resources_update_success": {
-			  "msg": "The password %body.Resource.name% has been updated successfully"
+			  "msg": "The password has been updated successfully"
 			},
 			"app_users_addPost_success": {
-				"msg": "The user %body.User.username% has been added successfully"
+				"msg": "The user has been added successfully"
 			},
 			"app_users_delete_success": {
 				"msg": "The user has been deleted"
 			},
 			"app_users_editPost_success": {
-				"msg": "The user %body.User.username% has been updated successfully"
+				"msg": "The user has been updated successfully"
 			},
 			"app_users_editavatar_success": {
-				"msg": "The picture for user %body.User.username% has been updated successfully"
+				"msg": "The picture of the user has been updated successfully"
 			},
             "app_users_editavatar_error": {
                 "msg": "%header.message%"
@@ -47,7 +47,7 @@
 				"msg": "The password has been removed from favorites"
 			},
             "app_comments_addPost_success": {
-                "msg": "The comment has been added"
+                "msg": "The comment has been added successfully"
             },
             "app_comments_delete_success": {
               "msg": "The comment has been deleted"
