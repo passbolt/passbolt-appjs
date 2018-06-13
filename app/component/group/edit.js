@@ -159,7 +159,12 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
                 }
             },
             userEmail: 'user.username',
-            userFingerprint: 'user.gpgkey.fingerprint',
+            userFingerprint: {
+                key: 'user.gpgkey.fingerprint',
+                func: function(fingerprint) {
+                    return fingerprint.match(/(.{1,4})/g).join(' ');
+                }
+            },
             isAdmin: 'is_admin',
             isNew: 'is_new'
         });

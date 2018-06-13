@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2883: Fix appjs logout link and remember me cleanup
 - PASSBOLT-2886: Fix fingerprint tooltips in user group management dialog
 - PASSBOLT-2894: Fix missing div breaking elipsis on long url in password workspace
+- PASSBOLT-2891: Fix group edit users tooltips
 
 # Terminology
 - AN: Anonymous user
