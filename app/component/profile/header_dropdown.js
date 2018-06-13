@@ -13,6 +13,7 @@
  */
 import Action from 'passbolt-mad/model/map/action';
 import ButtonDropdown from 'passbolt-mad/component/button_dropdown';
+import Config from 'passbolt-mad/config/config';
 import MadBus from 'passbolt-mad/control/bus';
 import User from 'app/model/map/user';
 import uuid from 'uuid/v4';
@@ -45,26 +46,29 @@ var HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component.P
 		this._super();
 		var menu = this.options.menu;
 
-		// User profile
+		// profile
 		var profileItem = new Action({
 			id: uuid(),
-			label: __('my profile'),
+			label: __('Profile'),
 			action: () => this._goToUserProfile()
 		});
 		menu.insertItem(profileItem);
 
-		// Manage your keys
-		var keysItem = new Action({
-			id: uuid(),
-			label: __('manage your keys'),
-			action: () => this._goToManageYourKeys()
-		});
-		menu.insertItem(keysItem);
+		// theme
+		var plugins = Config.read('server.passbolt.plugins');
+		if (plugins && plugins.accountSettings) {
+			var keysItem = new Action({
+				id: uuid(),
+				label: __('Theme'),
+				action: () => this._goToTheme()
+			});
+			menu.insertItem(keysItem);
+		}
 
 		// Logout
 		var logoutItem = new Action({
 			id: uuid(),
-			label: __('logout'),
+			label: __('Logout'),
 			action: () => this._logout()
 		});
 		menu.insertItem(logoutItem);
@@ -82,9 +86,9 @@ var HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component.P
 	/**
 	 * Go to the manage your keys screen
 	 */
-	_goToManageYourKeys: function() {
+	_goToTheme: function() {
 		MadBus.trigger('request_workspace', 'settings');
-		MadBus.trigger('request_settings_section', 'keys');
+		MadBus.trigger('request_settings_section', 'theme');
 		this.view.close();
 	},
 

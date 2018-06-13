@@ -104,7 +104,7 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 		var profileItem = new Action({
 			id: uuid(),
 			name: 'profile',
-			label: __('My profile'),
+			label: __('Profile'),
 			action: function () {
 				MadBus.trigger('request_settings_section', 'profile');
 			}
@@ -131,7 +131,7 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 		var keysItem = new Action({
 			id: uuid(),
 			name: 'keys',
-			label: __('Manage your keys'),
+			label: __('Keys inspector'),
 			action: function () {
 				MadBus.trigger('request_settings_section', 'keys');
 			}

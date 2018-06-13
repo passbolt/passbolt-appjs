@@ -94,7 +94,7 @@ var WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settings
 		this.sectionMenuItems['keys'] = [
 			new Action({
 				id: uuid(),
-				label: __('Keys management'),
+				label: __('Keys inspector'),
 				action: function () {
 					return;
 				}
