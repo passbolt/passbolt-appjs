@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2886: Fix fingerprint tooltips in user group management dialog
 - PASSBOLT-2894: Fix missing div breaking elipsis on long url in password workspace
 - PASSBOLT-2891: Fix group edit users tooltips
+- PASSBOLT-2884: Update header left menu. Remove home and add help.
 
 # Terminology
 - AN: Anonymous user

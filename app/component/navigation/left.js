@@ -28,15 +28,6 @@ var NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft'
 	 * @inheritdoc
 	 */
 	afterStart: function () {
-		// home
-		var homeItem = new Action({
-			id: 'js_app_nav_left_home_link',
-			label: __('home'),
-			cssClasses: ['home'],
-			action: () => this._goHome()
-		});
-		this.insertItem(homeItem);
-
 		// passwords
 		var passwordsItem = new Action({
 			id: 'js_app_nav_left_password_wsp_link',
@@ -54,12 +45,15 @@ var NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft'
 			action: () => this._goToUserWorkspace()
 		});
 		this.insertItem(usersItem);
-	},
 
-	// Go Home
-	_goHome: function() {
-		this.options.selected = 'home';
-		MadBus.trigger('request_workspace', 'password');
+		// help
+		var helpItem = new Action({
+			id: 'js_app_nav_left_help_link',
+			label: __('help'),
+			cssClasses: ['help'],
+			action: () => this._goHelp()
+		});
+		this.insertItem(helpItem);
 	},
 
 	// Go to the password workspace
@@ -72,6 +66,13 @@ var NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft'
 	_goToUserWorkspace: function() {
 		this.options.selected = 'user';
 		MadBus.trigger('request_workspace', 'user');
+	},
+
+	// Go to the passbolt help
+	_goHelp: function() {
+		var helpWindow = window.open();
+		helpWindow.opener = null;
+		helpWindow.location = 'https://help.passbolt.com';
 	},
 
 	/* ************************************************************** */
