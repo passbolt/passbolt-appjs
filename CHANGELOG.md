@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [2.1.0] - 2018-06-13
+## [2.1.0] - 2018-06-14
 ### Added
 - PASSBOLT-2878: Integrate dark theme
 - PASSBOLT-2861: Make username clickable for copy to clipboard
