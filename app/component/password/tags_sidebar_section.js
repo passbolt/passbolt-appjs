@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import DomData from 'can-util/dom/data/data';
 import Filter from 'app/model/map/filter';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
@@ -277,7 +278,7 @@ var TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbo
 	 */
 	' a.tag click': function(el, ev) {
 		var li = el.closest('li');
-		var tag = li.data('passbolt.model.Tag');
+		var tag = DomData.get.call(li, Tag.shortName);
 		var filter = new Filter({
 			id: 'workspace_filter_tag_' + tag.id,
 			label: tag.slug + __(' (tag)'),
