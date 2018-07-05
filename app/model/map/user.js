@@ -13,6 +13,7 @@
  */
 import Ajax from 'app/net/ajax';
 import canEvent from 'can-event';
+import Config from 'passbolt-mad/config/config';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
@@ -47,14 +48,10 @@ var User = DefineMap.extend('passbolt.model.User', {
 	 * @returns {Promise}
 	 */
 	deleteDryRun : function() {
-		var params = {
-			id: this.id,
-			'api-version': 'v2'
-		};
+		// @todo To migrate to API v2
 		return Ajax.request({
-			url: 'users/{id}/dry-run.json',
+			url: 'users/' + this.id + '/dry-run.json',
 			type: 'DELETE',
-			params: params,
 			silentNotify: true
 		});
 	}
@@ -102,12 +99,13 @@ User.setCurrent = function(user) {
  */
 User.prototype.saveAvatar = function(file) {
 	var request = {};
+	request._xhr = null;
 	request.params = new FormData();
 	request.params.id = this.id;
 	request.params.append('id', this.id);
 	request.params.append('profile[avatar][file]', file);
 
-	// @todo Cannot use Ajax.request, the can ajax layer doesn't handle well the image data.
+	// @todo Cannot use Ajax.request, the can ajax layer cannot use the multipart/form-data content type.
 	Ajax._triggerAjaxStartEvent(request);
 	return $.ajax({
 		url: 'users/' + this.id + '.json?api-version=v2',
@@ -115,14 +113,24 @@ User.prototype.saveAvatar = function(file) {
 		cache: false,
 		contentType: false,
 		processData: false,
-		data: request.params
+		data: request.params,
+		headers: {'X-CSRF-Token': Config.read('app.csrfToken')},
+		beforeSend: (xhr) => { request._xhr = xhr; }
 	}).then(data => {
-		var response = Ajax.handleSuccess(request, data);
-		this.profile.assign({avatar: response.profile.avatar});
-		canEvent.dispatch.call(this, 'updated', [this]);
-		return Promise.resolve(this);
+		return Ajax.handleSuccess(request, data)
+			.then(data => {
+				this.profile.assign({avatar: data.profile.avatar});
+				canEvent.dispatch.call(this, 'updated', [this]);
+				return Promise.resolve(this);
+			});
 	}, jqXHR => {
-		return Ajax.handleError(request, jqXHR);
+		var jsonData = {};
+		if (jqXHR.responseText) {
+			try {
+				jsonData = $.parseJSON(jqXHR.responseText);
+			} catch(e) { }
+		}
+		return Ajax.handleError(request, jsonData);
 	});
 };
 

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import Ajax from 'passbolt-mad/net/ajax';
+import Config from 'passbolt-mad/config/config';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import MadBus from 'passbolt-mad/control/bus';
 import Response from 'passbolt-mad/net/response';
@@ -29,50 +30,38 @@ var AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
     /**
      * @inheritsdoc
      */
-    handleSuccess: function(request, data) {
-        var response = null;
-        if (Response.isResponse(data)) {
-            response = new Response(data);
-        } else {
-            response = data;
-        }
+    request: function (request) {
+        // Set the CSRF request header.
+        request.beforeSend = function(xhr) {
+            request._xhr = xhr;
+            var csrfToken = Config.read('app.csrfToken');
+            xhr.setRequestHeader('X-CSRF-Token', csrfToken);
+        };
 
-        this._triggerNotification(request, response);
-        this._triggerAjaxCompleteEvent(request);
-
-        if (response instanceof Response) {
-            return response.body;
-        }
-        return response;
+        return this._super(request);
     },
 
     /**
      * @inheritsdoc
      */
-    handleError: function(request, jqXHR) {
-        var response = null;
+    handleSuccess: function(request, data) {
+        return this._super(request, data)
+            .then(data => {
+                this._triggerNotification(request, request._response);
+                return Promise.resolve(data);
+            });
+    },
 
-        // ResponseText is provided if the server is reachable.
-        if (jqXHR.responseText) {
-            try {
-                // Passbolt returns always a json result.
-                var jsonData = $.parseJSON(jqXHR.responseText);
-                if (Response.isResponse(jsonData)) {
-                    jsonData.code = jqXHR.status;
-                    response = new Response(jsonData);
-                }
-            } catch(e) {
-                response = Response.getResponse(jqXHR.status);
-            }
-        } else {
-            response = Response.getResponse(0);
-        }
-
-        this._triggerAjaxCompleteEvent(request, response);
-        this._triggerNotification(request, response);
-        this._sessionExpired(request, response);
-
-        return Promise.reject(response);
+    /**
+     * @inheritsdoc
+     */
+    handleError: function(request, data) {
+        return this._super(request, data)
+            .then(null, data => {
+                this._triggerNotification(request, request._response);
+                this._sessionExpired(request, data);
+                return Promise.reject(data);
+            });
     },
 
     /**

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import cookies from 'browser-cookies/src/browser-cookies';
 import moment from 'moment/moment';
 import 'moment-timezone/builds/moment-timezone-with-data';
 import AccountSetting from 'app/model/map/accountSetting';
@@ -30,12 +31,19 @@ var AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 	 * @inheritdoc
 	 */
 	init: function (options) {
-		// Load mad bootstrap.
 		this._super(options);
-
+		this._csrfToken();
 		Promise.all([this._loadUser(), this._loadRoles(), this._loadAccountSettings()])
 			.then(this._loadApp)
 			.then(null, (e) => {throw e;} );
+	},
+
+	/**
+	 * Retrieve the csrf token from the cookie
+	 */
+	_csrfToken: function() {
+		var csrfToken = cookies.get('csrfToken');
+		Config.write('app.csrfToken', csrfToken);
 	},
 
 	/**
