@@ -46,6 +46,14 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	/**
 	 * @inheritdoc
 	 */
+	beforeRender: function () {
+		this._super();
+		this.setViewData('APP_URL', APP_URL);
+	},
+
+	/**
+	 * @inheritdoc
+	 */
 	afterStart: function() {
 		this._initHeader();
 		this._initFooter();

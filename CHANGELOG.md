@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - PASSBOLT-2896: Fix filter by tag from the password details sidebar
 - PASSBOLT-2906: Enable CSRF protection
+- PASSBOLT-2903: Fix logout link. It should target a full based url link
 
 ## [2.1.0] - 2018-06-14
 ### Added
