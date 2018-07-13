@@ -11,7 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Clipboard from 'app/util/clipboard';
 import MadBus from 'passbolt-mad/control/bus';
+import Plugin from 'app/util/plugin';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 
 import template from 'app/view/template/component/password/information_sidebar_section.stache!';
@@ -47,11 +49,9 @@ var InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' li.password .secret-copy > a click': function (el, ev) {
-		// Get secret out of Resource object.
-		var secret = this.options.resource.secrets[0].data;
-		// Request decryption. (delegated to plugin).
-		MadBus.trigger('passbolt.secret.decrypt', secret);
+	'{element} li.password .secret-copy > a click': function (el, ev) {
+		var secret = this.options.resource.secrets[0];
+		Plugin.decryptAndCopyToClipboard(secret.data);
 	},
 
 	/**
@@ -59,12 +59,9 @@ var InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' li.username .value > a click': function (el, ev) {
-		var username = this.options.resource.username;
-		MadBus.trigger('passbolt.clipboard', {
-			name: 'username',
-			data: username
-		});
+	'{element} li.username .value > a click': function (el, ev) {
+		var item = this.options.resource;
+		Clipboard.copy(item.username, 'username');
 	}
 
 });

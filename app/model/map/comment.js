@@ -74,11 +74,14 @@ Comment.connection = connect([connectParse, connectDataUrl, connectConstructor, 
 			});
 		},
 		destroyData: function(params) {
-			params['api-version'] = 'v2';
+			const requestParams = {
+				id: params.id,
+				'api-version': 'v2'
+			};
 			return Ajax.request({
 				url: 'comments/{id}.json',
 				type: 'DELETE',
-				params: params
+				params: requestParams
 			});
 		}
 	}

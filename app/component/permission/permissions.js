@@ -13,6 +13,7 @@
  */
 import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
+import domEvents from 'can-dom-events';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
 import Group from 'app/model/map/group';
 import MadBus from 'passbolt-mad/control/bus';
@@ -20,6 +21,7 @@ import MadMap from 'passbolt-mad/util/map/map';
 import Permission from 'app/model/map/permission';
 import PermissionType from 'app/model/map/permission_type';
 import PermissionsView from 'app/view/component/permission/permissions';
+import Plugin from 'app/util/plugin';
 import Resource from 'app/model/map/resource'
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 import TreeComponent from 'passbolt-mad/component/tree';
@@ -144,10 +146,7 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 
 			// Notify the plugin that the share dialog is ready to interact with it.
 			// The plugin will inject the form to grant new users.
-			MadBus.trigger('passbolt.plugin.resource_share', {
-				resourceId: this.options.acoInstance.id,
-				armored: this.options.acoInstance.secrets[0].data
-			});
+			Plugin.insertShareIframe(this.options.acoInstance.id, this.options.acoInstance.secrets[0].data);
 		}
 
 		// Load the component for the aco instance given in options.
@@ -306,7 +305,7 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 			ownerPermissions = [];
 
 		// Get all the owner.
-		this.permList.options.items.each(function (item) {
+		this.permList.options.items.forEach(function (item) {
 			var isOwner = false;
 			// Is owner ?
 			if (item.type == 15) {
@@ -397,7 +396,7 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 		}
 
 		// Propagate an event notifying other component regarding the changes.
-		$(this.element).trigger('changed', this.options.changes);
+		domEvents.dispatch(this.element, {type: 'changed', data: this.options.changes});
 		// Display the change feedback.
 		this.showApplyFeedback();
 
@@ -413,37 +412,13 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 		// Remove the permission from the list.
 		this.permList.removeItem(permission);
 
-		// Store the change in the list of permissions changes.
-		// If a permission change already exists for the given permission id.
-		if (typeof this.options.changes[permission.id] != 'undefined') {
+		// If a permission already exists and is new, remove it.
+		if (this.options.changes[permission.id] && this.options.changes[permission.id].Permission.isNew) {
+			// Remove the change.
+			delete this.options.changes[permission.id];
 
-			// If the changes is relative to a new permission. Remove this new temporary change.
-			if (typeof this.options.changes[permission.id].Permission.isNew != 'undefined' &&
-				typeof this.options.changes[permission.id].Permission.isNew) {
-
-				// Remove the change.
-				delete this.options.changes[permission.id];
-
-				// Notify the plugin, the user can be listed by the autocomplete again.
-				MadBus.trigger('passbolt.share.remove_permission', {
-					userId: permission.aro_foreign_key,
-					isTemporaryPermission: true
-				});
-			}
-			// Otherwise replace it with a delete change.
-			else {
-				this.options.changes[permission.id] = {
-					Permission: {
-						id : permission.id,
-						delete : 1
-					}
-				};
-				// Notify the plugin, the user shouldn't be listed by the autocomplete anymore.
-				MadBus.trigger('passbolt.share.remove_permission', {
-					userId: permission.aro_foreign_key,
-					isTemporaryPermission: false
-				});
-			}
+			// Notify the plugin, the user can be listed by the autocomplete again.
+			Plugin.shareIframeRemovePermission(permission.aro_foreign_key, true);
 		}
 		// Otherwise add a new delete change.
 		else {
@@ -454,10 +429,7 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 				}
 			};
 			// Notify the plugin, the user shouldn't be listed by the autocomplete anymore.
-			MadBus.trigger('passbolt.share.remove_permission', {
-				userId: permission.aro_foreign_key,
-				isTemporaryPermission: false
-			});
+			Plugin.shareIframeRemovePermission(permission.aro_foreign_key, false);
 		}
 
 		// Regarding the length of the permissions changes show or hide the apply feedback.
@@ -541,8 +513,8 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 	 * trigger resource_share_encrypted event.
 	 * Save the permission changes and the new encrypted secrets.
 	 */
-	'{mad.bus.element} resource_share_encrypted': function(el, ev, armoreds) {
-		// Save the permissions changes including the secret encrypted for the new users.
+	'{mad.bus.element} resource_share_encrypted': function(el, ev) {
+		const armoreds = ev.data;
 		this.save(armoreds);
 	},
 
@@ -557,7 +529,8 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 	 * Listen when a permission has been added through the plugin.
 	 * @todo v1 support to be removed
 	 */
-	'{mad.bus.element} resource_share_add_permission': function(el, ev, data) {
+	'{mad.bus.element} resource_share_add_permission': function(el, ev) {
+		const data = ev.data;
 		// V1 format to v2 manually.
 		var dataV2 = {
 			aco: data.aco,
@@ -603,9 +576,9 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 	 * The user want to remove a permission
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {passbolt.model.Permission} permission The permission to remove
 	 */
-	 ' request_permission_delete': function (el, ev, permission) {
+	 '{element} request_permission_delete': function (el, ev) {
+		const permission = ev.data.permission;
 		this.deletePermission(permission);
 	},
 
@@ -613,10 +586,10 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 	 * A permission has been updated.
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {string} permission The permission to edit
-	 * @param {string} type The new permission type
 	 */
-	 ' request_permission_edit': function (el, ev, permission, type) {
+	 '{element} request_permission_edit': function (el, ev) {
+		const permission = ev.data.permission;
+		const type = ev.data.type;
 		this.updateTypePermission(permission.id, type);
 	},
 
@@ -645,7 +618,7 @@ var PermissionsComponent = Component.extend('passbolt.component.permission.Permi
 
 		// Request the plugin to encrypt the secret for the new users.
 		// Once the plugin has encrypted the secret, it sends back an event resource_share_encrypted.
-		MadBus.trigger('passbolt.share.encrypt');
+		Plugin.shareIframeEncrypt();
 	},
 
 	/* ************************************************************** */

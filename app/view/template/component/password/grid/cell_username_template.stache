@@ -1,3 +1,3 @@
-<div title="{{cellValue}}">
-    <a>{{ cellValue }}</a>
+<div title="{{../mappedItem[name]}}">
+    <a>{{../mappedItem[name]}}</a>
 </div>

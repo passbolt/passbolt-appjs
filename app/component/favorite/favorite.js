@@ -40,7 +40,7 @@ var FavoriteComponent = Component.extend('passbolt.component.Favorite', /** @sta
 	favorite: function() {
 		this.setState('loading');
 		this.view.favorite();
-		MadBus.trigger('request_favorite', this.options.instance);
+		MadBus.trigger('request_favorite', {resource: this.options.instance});
 	},
 
 	/**
@@ -49,7 +49,7 @@ var FavoriteComponent = Component.extend('passbolt.component.Favorite', /** @sta
 	unfavorite: function() {
 		this.setState('loading');
 		this.view.unfavorite();
-		MadBus.trigger('request_unfavorite', this.options.instance);
+		MadBus.trigger('request_unfavorite', {resource: this.options.instance});
 	},
 
 	/* ************************************************************** */

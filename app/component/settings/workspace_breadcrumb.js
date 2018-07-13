@@ -51,30 +51,25 @@ var WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settings
 		// Contains the specific section menu items.
 		this.sectionMenuItems = [];
 
-		// First 2 items of the menu are constant.
+		// All users item
 		var menuItem = new Action({
 			id: uuid(),
 			label: __('All users'),
 			action: function () {
-				// Add a link to filter on all items as first item.
-				var filter = new Filter({
-					label: __('All users'),
-					type: Filter.SHORTCUT
-				});
 				// Switch to user workspace.
-				MadBus.trigger('request_workspace', 'user');
-				// Set filter.
-				MadBus.trigger('filter_users_browser', filter);
+				const workspace = 'user';
+				MadBus.trigger('request_workspace', {workspace});
 			}
 		});
 		this.menuItems.push(menuItem);
 
+		// Profile item
 		var menuItem = new Action({
 			id: uuid(),
 			label: User.getCurrent().profile.fullName(),
 			action: function () {
-				// Switch to profile workspace.
-				MadBus.trigger('request_settings_section', 'profile');
+				const section = 'profile';
+				MadBus.trigger('request_settings_section', {section});
 			}
 		});
 		this.menuItems.push(menuItem);
@@ -150,12 +145,11 @@ var WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settings
 
 	/**
 	 * Listen to request_settings_section event.
-	 * @param el
-	 * @param ev
-	 * @param section
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} request_settings_section': function (el, ev, section) {
-		// When the section changes, we refresh the menu items in the breadcrumb.
+	'{mad.bus.element} request_settings_section': function (el, ev) {
+		const section = ev.data.section;
 		this.refreshMenuItems(section);
 	}
 

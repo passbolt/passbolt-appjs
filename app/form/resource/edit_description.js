@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import domEvents from 'can-dom-events';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
@@ -32,7 +33,7 @@ var EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription', 
 	/**
 	 * @inheritdoc
 	 */
-	afterStart : function() {
+	afterStart: function() {
 		// id hidden field
 		//@todo ID_ERROR
 		this.addElement(new TextboxComponent('#' + this.element.id + ' .js_resource_id', {
@@ -52,8 +53,8 @@ var EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription', 
 
 		// Force event submit event (not thrown by default)
 		// TODO : understand why we need to do that... weird
-		$('.button.resource-submit').click(function(){
-			$(this).trigger('submit');
+		$('.button.resource-submit').click(() => {
+			domEvents.dispatch(this.element, {type: 'submit'});
 		});
 	},
 
@@ -61,7 +62,7 @@ var EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription', 
      * Reset description in description field.
      * @param description
      */
-    reset : function(description) {
+    reset: function(description) {
         this._super();
         if (description == undefined) {
             description = this.options.resource.description;

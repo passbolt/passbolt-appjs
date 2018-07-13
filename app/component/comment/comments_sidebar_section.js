@@ -117,25 +117,26 @@ var CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend('p
     /**
      * Catches event request_delete_comment, and proceed with deleting a comment
      * @param model
-     * @param ev
-     * @param comment
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
      */
-    '{mad.bus.element} request_delete_comment': function (model, ev, comment) {
+    '{mad.bus.element} request_delete_comment': function (el, ev) {
+        const item = ev.data.item;
         this.setState('loading');
-        comment.destroy().then(function () {
-            MadBus.trigger('comment_deleted', comment)
+        item.destroy().then(function () {
+            MadBus.trigger('comment_deleted', {item})
         });
     },
 
     /**
      * Listen when a comment entity is deleted.
      * If the comment belongs to the selected resource, remove it from the list.
-     * @param model
-     * @param ev
-     * @param comment
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
      */
-    '{mad.bus.element} comment_deleted': function (model, ev, comment) {
-        this.commentsList.removeItem(comment);
+    '{mad.bus.element} comment_deleted': function (el, ev) {
+        const item = ev.data.item;
+        this.commentsList.removeItem(item);
         if (this.commentsList.options.items.length == 0) {
             this.addForm.emptyContent();
             this.addForm.setState('visible');

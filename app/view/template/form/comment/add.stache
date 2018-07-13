@@ -17,7 +17,7 @@
                             <span class="modified">{{ __('right now') }}</span>
                         </div>
                         <div class="actions">
-                            <a class="button comment-submit"><span>{{ __('send') }}</span></a>
+                            <button type="submit" class="button comment-submit"><span>{{ __('send') }}</span></button>
                         </div>
                     </div>
                 </div>

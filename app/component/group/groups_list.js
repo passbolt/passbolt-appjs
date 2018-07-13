@@ -123,7 +123,7 @@ var GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /**
         var self = this,
             inserted = false;
 
-        this.options.items.each(function(elt) {
+        this.options.items.forEach(function(elt) {
             if (group.name.localeCompare(elt.name) == -1) {
                 self.insertItem(group, elt, 'before');
                 inserted = true;
@@ -172,7 +172,7 @@ var GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /**
                 'has-groups': group.id
             }
         });
-        MadBus.trigger('filter_workspace', this.selectedFilter);
+        MadBus.trigger('filter_workspace', {filter: this.selectedFilter});
     },
 
     /* ************************************************************** */
@@ -195,7 +195,8 @@ var GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /**
      * @param {HTMLEvent} ev The event which occurred
      * @param {Group} group The updated group
      */
-    '{mad.bus.element} group_replaced': function (model, ev, group) {
+    '{mad.bus.element} group_replaced': function (model, ev) {
+        const group = ev.data.group;
         this.refreshItem(group);
 
         // If the group was selected, mark it as selected
@@ -225,11 +226,11 @@ var GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /**
 
     /**
      * Listen to the browser filter
-     * @param {jQuery} element The source element
-     * @param {Event} event The jQuery event
-     * @param {passbolt.model.Filter} filter The filter to apply
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
      */
-    '{mad.bus.element} filter_workspace': function (element, evt, filter) {
+    '{mad.bus.element} filter_workspace': function (el, ev) {
+        const filter = ev.data.filter;
         if (!filter.id.match(/^workspace_filter_group_/)) {
             this.unselectAll();
         }

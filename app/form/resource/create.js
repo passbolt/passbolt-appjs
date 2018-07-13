@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import Config from 'passbolt-mad/config/config';
+import domEvents from 'can-dom-events';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import MadBus from 'passbolt-mad/control/bus';
@@ -149,7 +150,6 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 	 */
 	encrypt: function() {
 		var usersIds = [];
-
 		if (this.options.action == 'edit') {
 			// Get the users to encrypt the resource for.
 			// @todo #PASSBOLT-1248 #security
@@ -166,20 +166,20 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 					});
 					// Request the plugin to encrypt the secrets.
 					// When the secrets are encrypted the plugin will trigger the event secret_edition_secret_encrypted.
-					MadBus.trigger('passbolt.secret_edition.encrypt', usersIds);
+					MadBus.triggerPlugin('passbolt.secret_edition.encrypt', usersIds);
 				});
 		} else {
 			usersIds.push(User.getCurrent().id);
 			// Request the plugin to encrypt the secrets.
 			// When the secrets are encrypted the plugin will trigger the event secret_edition_secret_encrypted.
-			MadBus.trigger('passbolt.secret_edition.encrypt', usersIds);
+			MadBus.triggerPlugin('passbolt.secret_edition.encrypt', usersIds);
 		}
 	},
 
 	/**
 	 * @See parent::submit();
 	 */
-	' submit': function (el, ev) {
+	'{element} submit': function (el, ev) {
 		ev.preventDefault();
 		this.validate();
 	},
@@ -190,7 +190,9 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 	 * The validation of the secret is done aynchronously, once the validation is done
 	 * continue the submit process.
 	 */
-	'{mad.bus.element} secret_edition_secret_validated': function(el, ev, secretValidated) {
+	'{mad.bus.element} secret_edition_secret_validated': function(el, ev) {
+		const secretValidated = ev.data[0];
+
 		// If the validation of the secret failed.
 		if (!secretValidated) {
 			// Mark the field wrapper as in error.
@@ -217,7 +219,8 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 	 * Listen when the plugin has encrypted the secrets.
 	 * This function is called as callback of the event passbolt.secret_edition.encrypt.
 	 */
-	'{mad.bus.element} secret_edition_secret_encrypted': function(el, ev, armoreds) {
+	'{mad.bus.element} secret_edition_secret_encrypted': function(el, ev) {
+		const armoreds = ev.data;
 		var data = this.getData();
 		data['Resource'].secrets = [];
 
@@ -237,7 +240,7 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 	/**
 	 * Listen when the plugin observed a change on the password.
 	 */
-	'{mad.bus.element} secret_edition_secret_changed': function(el, ev, armoreds) {
+	'{mad.bus.element} secret_edition_secret_changed': function(el, ev) {
 		$(this.element).trigger('changed', 'secret');
 	},
 
@@ -250,7 +253,7 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 	 * @param el
 	 * @param ev
 	 */
-	'#js_field_username keydown': function(el, ev) {
+	'{element} #js_field_username keydown': function(el, ev) {
 		var code = ev.keyCode || ev.which;
 		if (code == '9') {
 			// Put focus on secret field (in plugin).
@@ -263,7 +266,7 @@ var CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 	 * @param el
 	 * @param ev
 	 */
-	'#js_field_description keydown': function(el, ev) {
+	'{element} #js_field_description keydown': function(el, ev) {
 		var code = ev.keyCode || ev.which;
 		if (code == '9' && ev.shiftKey) {
 			// Put focus on secret field (in plugin).

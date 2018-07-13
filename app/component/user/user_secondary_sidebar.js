@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Clipboard from 'app/util/clipboard';
 import GpgkeySectionComponent from 'app/component/gpgkey/gpgkey_sidebar_section';
 import InformationSectionComponent from 'app/component/user/information_sidebar_section';
 import MadBus from 'passbolt-mad/control/bus';
@@ -103,17 +104,12 @@ var UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt.c
 
 	/**
 	 * Listen when a user clicks on copy public key.
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' request_copy_publickey': function(el, ev) {
-		// Get secret out of Resource object.
-		var gpgKey = this.options.selectedItem.gpgkey.armored_key;
-		// Build data.
-		var data = {
-			name : 'Public key',
-			data : gpgKey
-		};
-		// Request decryption. (delegated to plugin).
-		MadBus.trigger('passbolt.clipboard', data);
+	'{element} request_copy_publickey': function(el, ev) {
+		const gpgkey = this.options.selectedItem.gpgkey;
+		Clipboard.copy(gpgkey.armored_key, 'public key');
 	}
 
 });

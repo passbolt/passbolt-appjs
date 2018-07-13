@@ -130,7 +130,7 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 		this.workspace.start();
 
 		$('#container').addClass('page ' + name);
-		MadBus.trigger('workspace_enabled', this.workspace);
+		MadBus.trigger('workspace_enabled', {workspace: this.workspace});
 	},
 
 	/**
@@ -181,9 +181,10 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	 * @param {string} workspaceName The target workspace name
 	 * @param {array} options Workspace's options
 	 */
-	'{mad.bus.element} request_workspace': function (el, event, workspaceName, options) {
-		options = options || {};
-		this._initWorkspace(workspaceName, options);
+	'{mad.bus.element} request_workspace': function (el, ev) {
+		const workspace = ev.data.workspace;
+		const options = ev.data.options || {};
+		this._initWorkspace(workspace, options);
 	},
 
 	/**
@@ -192,11 +193,12 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	 * @param {HTMLEvent} ev The event which occurred
 	 * @param {string} label The label of the dialog
 	 * @param {array} options (optional) Options to give to the dialog controller
+	 * @deprecated maybe
 	 */
-	'{mad.bus.element} request_dialog': function (el, ev, options) {
-		var options = options || {};
-		new DialogComponent(null, options).start();
-	},
+	//'{mad.bus.element} request_dialog': function (el, ev, options) {
+	//	var options = options || {};
+	//	new DialogComponent(null, options).start();
+	//},
 
 	/**
 	 * Remove all existing focus in the document.
@@ -206,11 +208,12 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	 * @param el
 	 * @param ev
 	 * @param options
+	 * @deprecated maybe
 	 */
-	'{mad.bus.element} remove_all_focuses': function (el, ev, options) {
-		var $focused = $(':focus');
-		$focused.blur();
-	},
+	//'{mad.bus.element} remove_all_focuses': function (el, ev, options) {
+	//	var $focused = $(':focus');
+	//	$focused.blur();
+	//},
 
 	/**
 	 * Observe when the application processus have been all completed.
@@ -242,6 +245,7 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	 * Observe when the user wants to close the latest dialog.
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
+	 * @deprecated maybe
 	 */
 	'{mad.bus.element} request_dialog_close_latest': function (el, ev, options) {
 		DialogComponent.closeLatest();
@@ -278,10 +282,9 @@ var App = Component.extend('passbolt.component.App', /** @static */ {
 	 * @param {boolean} go Enter or leave the state
 	 */
 	stateReady: function (go) {
-		// Select the password workspace
-		MadBus.trigger('request_workspace', 'password');
-		// When the application is ready, remove the launching screen.
 		$('html').removeClass('launching');
+		const workspace = 'user';
+		MadBus.trigger('request_workspace', {workspace});
 	}
 
 });

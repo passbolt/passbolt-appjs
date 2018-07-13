@@ -79,13 +79,15 @@ var FilterComponent = Component.extend('passbolt.component.navigation.Filter', /
 		if (this.options.workspace instanceof SettingsWorkspaceComponent) {
 			var filter = UserWorkspaceComponent.getDefaultFilterSettings();
 			filter.setRule('keywords', keywords);
-			MadBus.trigger('request_workspace', ['user', {filterSettings: filter}]);
+			const workspace = 'user';
+			const options = {filterSettings: filter};
+			MadBus.trigger('request_workspace', {workspace, options});
 		}
 		// Otherwise filter the current workspace.
 		else {
 			var filter = this.options.workspace.constructor.getDefaultFilterSettings();
 			filter.setRule('keywords', keywords);
-			MadBus.trigger('filter_workspace', filter);
+			MadBus.trigger('filter_workspace', {filter});
 		}
 	},
 
@@ -136,20 +138,20 @@ var FilterComponent = Component.extend('passbolt.component.navigation.Filter', /
 	 * Observe when the user switched to another workspace
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {mad.Component} workspace The enabled workspace
 	 */
-	'{mad.bus.element} workspace_enabled': function (el, event, workspace) {
+	'{mad.bus.element} workspace_enabled': function (el, ev) {
+		const workspace = ev.data.workspace;
 		this.options.workspace = workspace;
 		this._updateSearchPlaceholder(workspace.options.name);
 	},
 
 	/**
 	 * Listen to the browser filter
-	 * @param {jQuery} element The source element
-	 * @param {Event} event The jQuery event
-	 * @param {Filter} filter The filter to apply
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} filter_workspace': function (element, evt, filter) {
+	'{mad.bus.element} filter_workspace': function (el, ev) {
+		const filter = ev.data.filter;
 		var keywords = filter.getRule('keywords'),
 			formData =  this.options.filterForm.getData(),
 			previousKeywords = getObject(formData, 'passbolt.model.Filter.keywords');

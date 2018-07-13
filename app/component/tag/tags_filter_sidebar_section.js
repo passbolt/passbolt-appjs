@@ -98,11 +98,12 @@ var TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('p
       }
       // If the previously selected tag is not visible, reset the workspace.
       else {
-        MadBus.trigger('filter_workspace', new Filter({
+        const filter = new Filter({
           id: 'default',
           label: __('All items'),
           order: ['Resource.modified DESC']
-        }));
+        });
+        MadBus.trigger('filter_workspace', {filter});
       }
     }
   },
@@ -212,16 +213,16 @@ var TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('p
       tag: tag
     });
     this.options.filter = filter;
-    MadBus.trigger('filter_workspace', filter);
+    MadBus.trigger('filter_workspace', {filter});
   },
 
   /**
    * Observe when the workspace is filtered, if it's not a tags filter, unselect any previously selected tag.
    * @param {jQuery} element The source element
    * @param {Event} event The jQuery event
-   * @param {passbolt.model.Filter} filter The filter to apply
    */
-  '{mad.bus.element} filter_workspace': function (element, evt, filter) {
+  '{mad.bus.element} filter_workspace': function (el, ev) {
+    const filter = ev.data.filter;
     // If the workspace is not filtered by tag.
     if (!filter.id.match(/^workspace_filter_tag_/)) {
       this.options.filter = null;
@@ -275,12 +276,13 @@ var TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('p
           // Otherwise change reset all the filter to the default workspace "All Items" filter.
           // Keep the password selected
           else {
-            MadBus.trigger('filter_workspace', new Filter({
+            const filter = new Filter({
               id: 'default',
               label: __('All items'),
               order: ['Resource.modified DESC'],
               resource: resource
-            }));
+            });
+            MadBus.trigger('filter_workspace', {filter});
           }
         }
       });
@@ -316,7 +318,7 @@ var TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('p
           tag: tag
         });
         this.options.filter = filter;
-        MadBus.trigger('filter_workspace', filter);
+        MadBus.trigger('filter_workspace', {filter});
       } else {
         // Filter the list how it was.
         if (this.options.treeFilter) {

@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
+import domEvents from 'can-dom-events';
 import TreeView from 'passbolt-mad/view/component/tree';
 
 var CommentsListView = TreeView.extend('passbolt.view.component.comment.CommentsList', /** @static */ {
@@ -32,12 +33,12 @@ var CommentsListView = TreeView.extend('passbolt.view.component.comment.Comments
 		var itemClass = this.getController().getItemClass();
 
 		if (itemClass) {
-			data = DomData.get.call($li[0], itemClass.shortName);
+			data = DomData.get($li[0], itemClass.shortName);
 		} else {
 			data = $li[0].id;
 		}
 
-		$(el).trigger('request_delete_comment', data);
+		domEvents.dispatch(el, {type: 'request_delete_comment', data: {item: data}});
 	}
 });
 

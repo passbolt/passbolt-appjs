@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import domEvents from 'can-dom-events';
 import SecondarySidebarSectionView from 'app/view/component/workspace/secondary_sidebar_section';
 
 var PermissionsView = SecondarySidebarSectionView.extend('passbolt.view.component.permission.Permissions', /** @static */ {
@@ -26,9 +27,9 @@ var PermissionsView = SecondarySidebarSectionView.extend('passbolt.view.componen
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'a#js_edit_permissions_button click': function (el, ev) {
+	'{element} a#js_edit_permissions_button click': function (el, ev) {
 		if (this.getController().getViewData('administrable') !== false) {
-			$(this.element).trigger('request_resource_permissions_edit');
+			domEvents.dispatch(this.element, {type: 'request_resource_permissions_edit'});
 		}
 	}
 });

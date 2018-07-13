@@ -102,12 +102,12 @@ var ThemeComponent = Component.extend('passbolt.component.settings.Theme', /** @
 	 * Observe when an item is selected in the grid.
 	 * This event comes from the grid view
 	 *
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {mixed} item The selected item instance or its id
-	 * @param {HTMLEvent} ev The source event which occurred
+	 * @param {HTMLElement} el The element the event occured on
+	 * @param {HTMLEvent} ev The event which occured
 	 */
-	' item_selected': function (el, ev, item) {
+	'{element} item_selected': function (el, ev) {
+		alert('see if working');
+		const item = ev.data.item;
 		this._selectTheme(item);
 	}
 });

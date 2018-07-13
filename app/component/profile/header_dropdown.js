@@ -37,6 +37,7 @@ var HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component.P
 	 */
 	beforeStart: function() {
 		this.options.user = User.getCurrent();
+		this._super();
 	},
 
 	/**
@@ -78,8 +79,10 @@ var HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component.P
 	 * Go to the user profile
 	 */
 	_goToUserProfile: function() {
-		MadBus.trigger('request_workspace', 'settings');
-		MadBus.trigger('request_settings_section', 'profile');
+		const workspace = 'settings';
+		const section = 'profile';
+		MadBus.trigger('request_workspace', {workspace});
+		MadBus.trigger('request_settings_section', {section});
 		this.view.close();
 	},
 
@@ -87,8 +90,10 @@ var HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component.P
 	 * Go to the manage your keys screen
 	 */
 	_goToTheme: function() {
-		MadBus.trigger('request_workspace', 'settings');
-		MadBus.trigger('request_settings_section', 'theme');
+		const workspace = 'settings';
+		const section = 'theme';
+		MadBus.trigger('request_workspace', {workspace});
+		MadBus.trigger('request_settings_section', {section});
 		this.view.close();
 	},
 

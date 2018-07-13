@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import domEvents from 'can-dom-events';
 import SecondarySidebarView from 'app/view/component/workspace/secondary_sidebar';
 
 var UserSecondarySidebarView = SecondarySidebarView.extend('passbolt.view.component.user.UserSecondarySidebar', /** @static */ {
@@ -26,10 +27,10 @@ var UserSecondarySidebarView = SecondarySidebarView.extend('passbolt.view.compon
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'a.copy-public-key click': function (el, ev) {
+	'{element} a.copy-public-key click': function (el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-		$(this.element).trigger('request_copy_publickey', [ev]);
+		domEvents.dispatch(this.element, {type: 'request_copy_publickey'});
 	}
 });
 

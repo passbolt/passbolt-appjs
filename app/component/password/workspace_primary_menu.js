@@ -13,11 +13,13 @@
  */
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
+import Clipboard from 'app/util/clipboard';
 import Config from 'passbolt-mad/config/config';
 import ButtonComponent from 'passbolt-mad/component/button';
 import ButtonDropdownComponent from 'passbolt-mad/component/button_dropdown';
 import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
+import Plugin from 'app/util/plugin';
 import Resource from 'app/model/map/resource';
 import uuid from 'uuid/v4';
 
@@ -136,19 +138,16 @@ var PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Passwo
      * Copy login to clipboard.
      */
     _copyLogin: function() {
-        var username = this.options.selectedRs[0].username;
-        MadBus.trigger('passbolt.clipboard', {
-            name: 'username',
-            data: username
-        });
+        var item = this.options.selectedRs[0];
+        Clipboard.copy(item.username, 'username');
     },
 
     /**
      * Decrypt and copy secret to clipboard
      */
     _copySecret: function() {
-        var secret = this.options.selectedRs[0].secrets[0].data;
-        MadBus.trigger('passbolt.secret.decrypt', secret);
+        const secret = this.options.selectedRs[0].secrets[0];
+        Plugin.decryptAndCopyToClipboard(secret.data);
     },
 
     /**
@@ -156,7 +155,7 @@ var PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Passwo
      */
     _delete: function() {
         var resource = this.options.selectedRs[0];
-        MadBus.trigger('request_resource_deletion', resource);
+        MadBus.trigger('request_resource_deletion', {resource});
     },
 
     /**
@@ -164,7 +163,7 @@ var PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Passwo
      */
     _edit: function() {
         var resource = this.options.selectedRs[0];
-        MadBus.trigger('request_resource_edition', resource);
+        MadBus.trigger('request_resource_edition', {resource});
     },
 
     /**
@@ -172,14 +171,15 @@ var PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Passwo
      */
     _share: function() {
         var resource = this.options.selectedRs[0];
-        MadBus.trigger('request_resource_sharing', resource);
+        MadBus.trigger('request_resource_sharing', {resource});
     },
 
     /**
      * Export
      */
     _export: function() {
-        MadBus.trigger('request_export', 'csv');
+        const type = 'csv';
+        MadBus.trigger('request_export', {type});
     },
 
     /* ************************************************************** */

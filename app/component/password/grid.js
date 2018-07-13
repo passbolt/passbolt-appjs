@@ -13,6 +13,7 @@
  */
 import moment from 'moment';
 import CheckboxComponent from 'passbolt-mad/form/element/checkbox';
+import Clipboard from 'app/util/clipboard';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import FavoriteComponent from 'app/component/favorite/favorite';
@@ -24,6 +25,7 @@ import List from 'passbolt-mad/model/list';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PasswordGridView from 'app/view/component/password/grid';
+import Plugin from 'app/util/plugin';
 import Resource from 'app/model/map/resource';
 import View from 'passbolt-mad/view/view';
 
@@ -523,13 +525,10 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 	* This event comes from the grid view
 	* @param {HTMLElement} el The element the event occurred on
 	* @param {HTMLEvent} ev The event which occurred
-	* @param {mixed} item The selected item instance or its id
-	* @param {HTMLEvent} ev The source event which occurred
 	*/
-	' item_selected': function (el, ev, item, srcEvent) {
-		// switch to select state
+	'{element} item_selected': function (el, ev) {
+		const item = ev.data.item;
 		this.setState('selection');
-
 		if (this.beforeSelect(item)) {
 			this.select(item);
 		}
@@ -539,46 +538,38 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 	* An item has been right selected
 	* @param {HTMLElement} el The element the event occurred on
 	* @param {HTMLEvent} ev The event which occurred
-	* @param {passbolt.model.Resource} item The right selected item instance or its id
-	* @param {HTMLEvent} srcEvent The source event which occurred
 	*/
-    ' item_right_selected': function (el, ev, item, srcEvent) {
+    '{element} item_right_selected': function (el, ev) {
+		const item = ev.data.item;
+		const srcEv = ev.data.srcEv;
         // Select item.
 		this.select(item);
 		// Get the offset position of the clicked item.
 		var $item = $('#' + this.options.prefixItemId + item.id);
 		var itemOffset = $item.offset();
 		// Show contextual menu.
-		this.showContextualMenu(item, srcEvent.pageX - 3, itemOffset.top, srcEvent.target);
+		this.showContextualMenu(item, srcEv.pageX - 3, itemOffset.top, srcEv.target);
 	},
 
 	/**
 	* A password has been clicked.
 	* @param {HTMLElement} el The element the event occurred on
 	* @param {HTMLEvent} ev The event which occurred
-	* @param {passbolt.model.Resource} item The right selected item instance or its id
-	* @param {HTMLEvent} srcEvent The source event which occurred
 	*/
-	' password_clicked': function (el, ev, item, srcEvent) {
-		// Get secret out of Resource object.
-		var secret = item.secrets[0].data;
-		// Request decryption. (delegated to plugin).
-		MadBus.trigger('passbolt.secret.decrypt', secret);
+	'{element} password_clicked': function (el, ev) {
+		const item = ev.data.item;
+		var secret = item.secrets[0];
+		Plugin.decryptAndCopyToClipboard(secret.data);
 	},
 
 	/**
 	 * A username has been clicked.
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {passbolt.model.Resource} item The right selected item instance or its id
-	 * @param {HTMLEvent} srcEvent The source event which occurred
 	 */
-	' username_clicked': function (el, ev, item, srcEvent) {
-		var username = item.username;
-		MadBus.trigger('passbolt.clipboard', {
-			name: 'username',
-			data: username
-		});
+	'{element} username_clicked': function (el, ev) {
+		const item = ev.data.item;
+		Clipboard.copy(item.username, 'username');
 	},
 
 	/**
@@ -588,7 +579,7 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 	* @param {HTMLEvent} ev The event which occurred
 	* @param {mixed} rsId The id of the resource which has been checked
 	*/
-	'.js_checkbox_multiple_select checked': function (el, ev, rsId) {
+	'{element} .js_checkbox_multiple_select checked': function (el, ev, rsId) {
 		// if the grid is in initial state, switch it to selected
 		if (this.state.is('ready')) {
 			this.setState('selection');
@@ -610,7 +601,7 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 	* @param {HTMLEvent} ev The event which occurred
 	* @param {mixed} rsId The id of the resource which has been unchecked
 	*/
-	'.js_checkbox_multiple_select unchecked': function (el, ev, rsId) {
+	'{element} .js_checkbox_multiple_select unchecked': function (el, ev, rsId) {
 		// find the resource to select functions of its id
 		var i = List.indexOf(this.options.items, rsId);
 		var resource = this.options.items[i];
@@ -637,7 +628,8 @@ var PasswordGridComponent = GridComponent.extend('passbolt.component.password.Gr
 	 * @param {Event} event The jQuery event
 	 * @param {passbolt.model.Filter} filter The filter settings
 	 */
-	'{mad.bus.element} filter_workspace': function(el, ev, filter) {
+	'{mad.bus.element} filter_workspace': function(el, ev) {
+		const filter = ev.data.filter;
 		this.filterBySettings(filter);
 	},
 

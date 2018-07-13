@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
 import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
 
@@ -58,14 +58,16 @@ var NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft'
 
 	// Go to the password workspace
 	_goToPasswordWorkspace: function() {
-		this.options.selected = 'password';
-		MadBus.trigger('request_workspace', 'password');
+		const workspace = 'password';
+		this.options.selected = workspace;
+		MadBus.trigger('request_workspace', {workspace});
 	},
 
 	// Go to the user workspace
 	_goToUserWorkspace: function() {
-		this.options.selected = 'user';
-		MadBus.trigger('request_workspace', 'user');
+		const workspace = 'user';
+		this.options.selected = workspace;
+		MadBus.trigger('request_workspace', {workspace});
 	},
 
 	// Go to the passbolt help
@@ -83,16 +85,16 @@ var NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft'
 	 * Observe when the user wants to switch to another workspace
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {string} workspace The target workspace
-	 * @param {array} options Workspace's options
 	 */
-	'{mad.bus.element} request_workspace': function (el, event, workspace, options) {
+	'{mad.bus.element} request_workspace': function (el, ev) {
+		const workspace = ev.data.workspace;
+		const options = ev.data.options || {};
 		if (this.options.selected != workspace) {
 			var li = $('li.' + workspace),
 				itemClass = this.getItemClass();
 
 			if (itemClass) {
-				var data = DomData.get.call(li[0], itemClass.shortName);
+				var data = DomData.get(li[0], itemClass.shortName);
 				if (typeof data != 'undefined') {
 					this.selectItem(data);
 				}

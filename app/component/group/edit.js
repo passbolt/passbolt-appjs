@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import ButtonComponent from 'passbolt-mad/component/button';
-import canEvent from 'can-event';
+import canEventMap from 'can-event-queue/map/map';
 import Component from 'passbolt-mad/component/component';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
@@ -22,6 +22,7 @@ import GroupCreateForm from 'app/form/group/create';
 import GroupUser from 'app/model/map/group_user';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
+import Plugin from 'app/util/plugin';
 import TreeComponent from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
 import User from 'app/model/map/user';
@@ -185,11 +186,10 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
      * Notify the plugin about the group edit
      */
     _notifyPlugin: function() {
-        var group = this.options.data.Group;
-        MadBus.trigger('passbolt.plugin.group_edit', {
-            groupId: group.id != undefined ? group.id : '',
-            canAddGroupUsers: this.formState == 'create' || this.isGroupManager // Will define if the plugin loads the autocomplete field or not.
-        });
+        const group = this.options.data.Group;
+        const canAddGroupUsers = this.formState == 'create' || this.isGroupManager;
+        const groupId = group.id || '';
+        Plugin.insertGroupEditframe(groupId, canAddGroupUsers);
     },
 
     /**
@@ -236,8 +236,7 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
         this.formGroup.load({Group: group});
 
         // Load groupUsers.
-        group.groups_users.each(function(groupUser) {
-            console.log(groupUser);
+        group.groups_users.forEach(function(groupUser) {
             self.addGroupUser(groupUser);
         });
 
@@ -318,17 +317,7 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
         }
 
         // Notify the plugin, the user shouldn't be listed by the autocomplete anymore.
-        var message = {
-            groupUser: {
-                id: groupUser.id,
-                user_id: groupUser.user_id,
-                group_id: groupUser.group_id,
-                is_admin: groupUser.is_admin,
-                is_new: groupUser.is_new || false
-            }
-        };
-        MadBus.trigger('passbolt.group.edit.remove_group_user', message);
-
+        Plugin.groupEditIframeRemoveGroupUser(groupUser);
         this.checkManager();
     },
 
@@ -337,20 +326,8 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
      * @param groupUser The groupUser to edit
      */
     editGroupUser: function(groupUser, value) {
-        // Force value on groupUser.
         groupUser.is_admin = value;
-
-        // Notify the plugin.
-        MadBus.trigger('passbolt.group.edit.edit_group_user', {
-            groupUser: {
-                id: groupUser.id,
-                user_id: groupUser.user_id,
-                group_id: groupUser.group_id,
-                is_admin: groupUser.is_admin,
-                is_new: groupUser.is_new
-            }
-        });
-
+        Plugin.groupEditIframeEditGroupUser(groupUser);
         this.checkManager();
     },
 
@@ -440,10 +417,7 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
                 var groupJson = {name: formData['Group']['name']};
 
                 MadBus.trigger('passbolt_loading');
-                // Inform plugin that group should be saved.
-                MadBus.trigger('passbolt.group.edit.save', {
-                    group: groupJson
-                });
+                Plugin.groupEditIframeSave(groupJson);
 
                 // Switch the component in loading state.
                 // The ready state will be restored once the component will be refreshed.
@@ -471,7 +445,9 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
     /**
      * Listen when a permission has been added through the plugin.
      */
-    '{mad.bus.element} passbolt.group.edit.add_user': function(el, ev, data) {
+    '{mad.bus.element} passbolt.group.edit.add_user': function(el, ev) {
+        const data = ev.data;
+
         // @todo remove it when the plugin deprecate the v1 format.
         // V1 format to v2 manually.
         data.user = data.User;
@@ -496,12 +472,13 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
     /**
      * Listen when a change to group users has been reported by the plugin.
      */
-    '{mad.bus.element} passbolt.plugin.group.edit.group_users_updated': function(el, ev, data) {
+    '{mad.bus.element} passbolt.plugin.group.edit.group_users_updated': function(el, ev) {
+        const data = ev.data;
         var self = this;
         self.changeList = data.changeList;
 
         setTimeout(function() {
-            self.groupUserList.options.items.each(function(item) {
+            self.groupUserList.options.items.forEach(function(item) {
                 var userId = item.user_id,
                     groupUserId = item.id,
                     correspondingChange = data.changeList.find(function(item) {
@@ -526,8 +503,9 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
     /**
      * Listen when a group has been added / updated through the plugin.
      */
-    '{mad.bus.element} group_edit_save_success': function(el, ev, data) {
+    '{mad.bus.element} group_edit_save_success': function(el, ev) {
         // Retrieve the created/updated group.
+        const data = ev.data;
         var findOptions = {
             id: data.Group.id,
             contain: {group_user: 1}
@@ -536,9 +514,9 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
         Group.findOne(findOptions)
         .then(group => {
             if (this.formState == 'create') {
-                canEvent.dispatch.call(Group, 'created', [group]);
+                Group.dispatch('created', [group]);
             } else {
-                MadBus.trigger('group_replaced', group);
+                MadBus.trigger('group_replaced', {group});
             }
 
             this.setState('ready');
@@ -603,9 +581,9 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
      * The user want to remove a groupUser
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
-     * @param {passbolt.model.groupUser} groupUser The groupUser to remove
      */
-    ' request_group_user_delete': function (el, ev, groupUser) {
+    '{element} request_group_user_delete': function (el, ev) {
+        const groupUser = ev.data.groupUser;
         this.deleteGroupUser(groupUser);
     },
 
@@ -613,10 +591,11 @@ var EditComponent = Component.extend('passbolt.component.group.Edit', /** @stati
      * The user wants to edit a groupUser
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
-     * @param {passbolt.model.groupUser} groupUser The groupUser to edit
      */
-    ' request_group_user_edit': function (el, ev, groupUser, value) {
-        this.editGroupUser(groupUser, value);
+    '{element} request_group_user_edit': function (el, ev) {
+        const groupUser = ev.data.groupUser;
+        const isAdmin = ev.data.isAdmin;
+        this.editGroupUser(groupUser, isAdmin);
     }
 
 });

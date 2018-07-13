@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
+import Clipboard from 'app/util/clipboard';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import MadBus from 'passbolt-mad/control/bus';
 import User from 'app/model/map/user';
@@ -82,11 +83,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Copy public key to clipboard
      */
     _copyPublicKey: function() {
-        var data = {
-            name: 'public key',
-            data: this.options.user.gpgkey.armored_key
-        };
-        MadBus.trigger('passbolt.clipboard', data);
+        const gpgkey = this.options.user.gpgkey;
+        Clipboard.copy(gpgkey.armored_key, 'public key');
         this.remove();
     },
 
@@ -94,11 +92,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Copy email to clipboard
      */
     _copyEmail: function () {
-        var data = {
-            name: 'email',
-            data: this.options.user.username
-        };
-        MadBus.trigger('passbolt.clipboard', data);
+        const user = this.options.user;
+        Clipboard.copy(user.username, 'email');
         this.remove();
     },
 
@@ -106,7 +101,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Edit the user
      */
     _edit: function() {
-        MadBus.trigger('request_user_edition', this.options.user);
+        const user = this.options.user;
+        MadBus.trigger('request_user_edition', {user});
         this.remove();
     },
 
@@ -115,7 +111,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Delete the user
      */
     _delete: function() {
-        MadBus.trigger('request_user_deletion', this.options.user);
+        const user = this.options.user;
+        MadBus.trigger('request_user_deletion', {user});
         this.remove();
     }
 

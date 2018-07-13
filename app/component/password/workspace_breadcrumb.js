@@ -89,12 +89,11 @@ var WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadcru
 	 * @parent mad.component.Menu.view_events
 	 * @param {HTMLElement} el The element the event occured on
 	 * @param {HTMLEvent} ev The event which occured
-	 * @param {string} item The selected item
-	 * @return {void}
 	 */
-	' item_selected': function (el, ev, item) {
+	'{element} item_selected': function (el, ev) {
+		const item = ev.data.item;
 		if (item.filter) {
-			MadBus.trigger('filter_workspace', item.filter);
+			MadBus.trigger('filter_workspace', {filter: item.filter});
 		}
 	},
 
@@ -108,7 +107,8 @@ var WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadcru
 	 * @param {Event} event The jQuery event
 	 * @param {passbolt.model.Filter} filter The filter to apply
 	 */
-	'{mad.bus.element} filter_workspace': function (element, evt, filter) {
+	'{mad.bus.element} filter_workspace': function (el, ev) {
+		const filter = ev.data.filter;
 		this.options.menu.reset();
 		var menuItems = this.parseFilter(filter);
 		this.options.menu.load(menuItems);

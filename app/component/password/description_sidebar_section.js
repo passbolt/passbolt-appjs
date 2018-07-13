@@ -81,7 +81,7 @@ var DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.extend
 	 * @param {HTMLElement} el The element
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' request_resource_description_edit' : function(el, ev) {
+	'{element} request_resource_description_edit' : function(el, ev) {
 		if(!this.state.is('edit')) {
 			this.setState('edit');
 		}

@@ -173,8 +173,9 @@ var PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.extend
 	 * @param {HTMLElement} el The element
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' request_resource_permissions_edit' : function(el, ev) {
-		MadBus.trigger('request_resource_sharing', this.options.acoInstance);
+	'{element} request_resource_permissions_edit' : function(el, ev) {
+		const resource = this.options.acoInstance;
+		MadBus.trigger('request_resource_sharing', {resource});
 	}
 
 });

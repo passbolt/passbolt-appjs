@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import domEvents from 'can-dom-events';
 import SidebarSectionView from 'app/view/component/workspace/secondary_sidebar_section';
 
 var Description = SidebarSectionView.extend('passbolt.view.component.sidebarSection.Description', /** @static */ {
@@ -28,7 +29,7 @@ var Description = SidebarSectionView.extend('passbolt.view.component.sidebarSect
 	 */
 	'a#js_edit_description_button, p.description_content click': function (el, ev) {
         if (this.getController().getViewData('editable') !== false) {
-			$(this.element).trigger('request_resource_description_edit');
+			domEvents.dispatch(this.element, {type: 'request_resource_description_edit'});
         }
 	},
 
@@ -42,7 +43,7 @@ var Description = SidebarSectionView.extend('passbolt.view.component.sidebarSect
         // Are we in edit state.
         var isEditState = this.getController().state.is('edit');
         // Source of the click.
-        var evtSrc = ev.originalEvent.target;
+        var evtSrc = ev.target;
         // Description p element.
         var descriptionElt = $('p.description_content', this.getController().element).get(0);
         // Edit button element.

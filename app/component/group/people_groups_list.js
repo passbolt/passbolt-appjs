@@ -29,18 +29,18 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
 
   /**
    * Show the contextual menu
-   * @param {passbolt.model.Resource} item The item to show the contextual menu for
+   * @param {Group} group The item to show the contextual menu for
    * @param {string} x The x position where the menu will be rendered
    * @param {string} y The y position where the menu will be rendered
    * @param {HTMLElement} eventTarget The element the event occurred on
    */
-  showContextualMenu: function (item, x, y, eventTarget) {
+  showContextualMenu: function (group, x, y, eventTarget) {
 
     var currentUser = User.getCurrent(),
       isAdmin = currentUser.isAdmin();
 
     // Get the offset position of the clicked item.
-    var $item = $('#' + this.options.prefixItemId + item.id);
+    var $item = $('#' + this.options.prefixItemId + group.id);
     var item_offset = $('.more-ctrl a', $item).offset();
 
     // Instantiate the contextual menu menu.
@@ -60,7 +60,7 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
       label: 'Edit group',
       initial_state: 'ready',
       action: function (menu) {
-        MadBus.trigger('request_group_edition', item);
+        MadBus.trigger('request_group_edition', {group});
         menu.remove();
       }
     });
@@ -73,8 +73,7 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
         label: 'Delete group',
         initial_state: 'ready',
         action: function (menu) {
-          // var secret = item.Secret[0].data;
-          MadBus.trigger('request_group_deletion', item);
+          MadBus.trigger('request_group_deletion', {group});
           menu.remove();
         }
       });
@@ -93,11 +92,11 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
    * An item has been clicked on the menu icon
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Group} item The right selected item instance or its id
-   * @param {HTMLEvent} srcEvent The source event which occurred
    */
-  ' item_menu_clicked': function (el, ev, item, srcEvent) {
-    this.showContextualMenu(item, srcEvent.pageX, srcEvent.pageY, srcEvent.target);
+  '{element} item_menu_clicked': function (el, ev) {
+    const group = ev.data.group;
+    const srcEv = ev.data.srcEv;
+    this.showContextualMenu(group, srcEv.pageX, srcEv.pageY, srcEv.target);
   }
 
 });

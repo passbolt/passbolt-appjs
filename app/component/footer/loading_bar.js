@@ -152,9 +152,9 @@ var LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar
 	 * Listen when a component is entering loading state.
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {mad.controller.CoponentController} component The target component
 	 */
-	'{mad.bus.element} passbolt_component_loading_start': function (el, ev, component) {
+	'{mad.bus.element} passbolt_component_loading_start': function (el, ev) {
+		const component = ev.data.component;
 		if (!component.options.silentLoading) {
 			this.options.currentProcs++;
 			this.update();
@@ -165,9 +165,9 @@ var LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar
 	 * Listen when a component is leaving loading state.
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {mad.controller.CoponentController} component The target component
 	 */
-	'{mad.bus.element} passbolt_component_loading_complete': function (el, ev, component) {
+	'{mad.bus.element} passbolt_component_loading_complete': function (el, ev) {
+		const component = ev.data.component;
 		if (!component.options.silentLoading) {
 			if(this.options.currentProcs) this.options.currentProcs--;
 			this.update();
@@ -179,8 +179,9 @@ var LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} mad_ajax_request_start': function (el, ev, request) {
-		MadBus.trigger('passbolt_ajax_request_start', request);
+	'{mad.bus.element} mad_ajax_request_start': function (el, ev) {
+		const request = ev.data.request;
+		MadBus.trigger('passbolt_ajax_request_start', {request: request});
 	},
 
 	/**
@@ -188,8 +189,9 @@ var LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} mad_ajax_request_complete': function (el, ev, request) {
-		MadBus.trigger('passbolt_ajax_request_complete', request);
+	'{mad.bus.element} mad_ajax_request_complete': function (el, ev) {
+		const request = ev.data.request;
+		MadBus.trigger('passbolt_ajax_request_complete',  {request: request});
 	},
 
 	/**
@@ -197,7 +199,8 @@ var LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} passbolt_ajax_request_start': function (el, ev, request) {
+	'{mad.bus.element} passbolt_ajax_request_start': function (el, ev) {
+		const request = ev.data.request;
 		if (!request.silentLoading) {
 			this.options.currentProcs++;
 			this.update();
@@ -209,7 +212,8 @@ var LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} passbolt_ajax_request_complete': function (el, ev, request) {
+	'{mad.bus.element} passbolt_ajax_request_complete': function (el, ev) {
+		const request = ev.data.request;
 		if (!request.silentLoading) {
 			this.options.currentProcs--;
 			this.update();

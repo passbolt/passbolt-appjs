@@ -95,7 +95,7 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
 		}
 
 		// Filter the workspace
-		MadBus.trigger('filter_workspace', filter);
+		MadBus.trigger('filter_workspace', {filter});
 
         this.on();
     },
@@ -511,9 +511,9 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      *
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
-     * @param {Filter} filter, the filter being applied.
      */
-    '{mad.bus.element} filter_workspace': function (el, ev, filter) {
+    '{mad.bus.element} filter_workspace': function (el, ev) {
+        const filter = ev.data.filter;
         // If the filter applied is "all users", then empty the list of selected groups.
         if (typeof filter.name != 'undefined') {
             if(filter.name == 'all') {
@@ -533,7 +533,7 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
      */
-    '{mad.bus.element} request_group_creation': function (el, ev, data) {
+    '{mad.bus.element} request_group_creation': function (el, ev) {
         var group = new Group({});
         this.openEditGroupDialog(group);
     },
@@ -544,7 +544,8 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
      */
-    '{mad.bus.element} request_group_edition': function (el, ev, group) {
+    '{mad.bus.element} request_group_edition': function (el, ev) {
+        const group = ev.data.group;
         this.openEditGroupDialog(group);
     },
 
@@ -554,7 +555,8 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
      */
-    '{mad.bus.element} request_group_deletion': function (el, ev, group) {
+    '{mad.bus.element} request_group_deletion': function (el, ev) {
+        const group = ev.data.group;
         this.deleteGroup(group);
     },
 
@@ -576,7 +578,7 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      * @param {HTMLEvent} ev The event which occurred
      */
     '{mad.bus.element} request_user_edition': function (el, ev) {
-        var user = this.options.selectedUsers[0];
+        var user = ev.data.user;
         this.openEditUserDialog(user);
     },
 
@@ -585,9 +587,9 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      *
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
-     * @param {User} user A target user to delete
      */
-    '{mad.bus.element} request_user_deletion': function (el, ev, user) {
+    '{mad.bus.element} request_user_deletion': function (el, ev) {
+        const user = ev.data.user;
         this.deleteUser(user);
     },
 
@@ -600,7 +602,7 @@ var UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace
      */
     '{mad.bus.element} reset_filters': function(el, ev) {
         var filter = UserWorkspaceComponent.getDefaultFilterSettings();
-        MadBus.trigger('filter_workspace', filter);
+        MadBus.trigger('filter_workspace', {filter});
     }
 
 });

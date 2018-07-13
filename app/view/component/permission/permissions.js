@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
+import domEvents from 'can-dom-events';
 import View from 'passbolt-mad/view/view';
 
 var PermissionsView = View.extend('passbolt.view.component.permission.Permissions', /** @static */ { }, /** @prototype */ {
@@ -25,13 +26,12 @@ var PermissionsView = View.extend('passbolt.view.component.permission.Permission
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' .js_perm_delete click': function(el, ev) {
+	'{element} .js_perm_delete click': function(el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-
 		var $li = $(el).parents('li');
-		var permission = DomData.get.call($li[0], 'passbolt.model.Permission');
-		$(this.element).trigger('request_permission_delete', [permission]);
+		var permission = DomData.get($li[0], 'passbolt.model.Permission');
+		domEvents.dispatch(this.element, {type: 'request_permission_delete', data: {permission}});
 	},
 
 	/**
@@ -39,14 +39,14 @@ var PermissionsView = View.extend('passbolt.view.component.permission.Permission
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' .js_share_rs_perm_type changed': function(el, ev, data) {
+	'{element} .js_share_rs_perm_type changed': function(el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-
-		var $li = $(el).parents('li'),
-			permission = DomData.get.call($li[0], 'passbolt.model.Permission');
-
-		$(this.element).trigger('request_permission_edit', [permission, data.value]);
+		const data = ev.data;
+		const $li = $(el).parents('li');
+		const permission = DomData.get($li[0], 'passbolt.model.Permission');
+		const type = data.value;
+		domEvents.dispatch(this.element, {type: 'request_permission_edit', data: {permission, type}});
 	},
 
 	/**
@@ -54,10 +54,9 @@ var PermissionsView = View.extend('passbolt.view.component.permission.Permission
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' #js_perm_create_form_add_btn click': function(el, ev) {
+	'{element} #js_perm_create_form_add_btn click': function(el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-
 		$(el).trigger('submit');
 	}
 

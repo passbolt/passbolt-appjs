@@ -11,7 +11,7 @@ import Config from 'passbolt-mad/config/config';
 import 'lib/p3_narrow/p3.narrow';
 import notificationConfig from 'app/config/notification.json';
 import appConfig from 'app/config/config.json';
-import $ from 'can-jquery';
+import $ from 'jquery';
 
 $(document).ready(function () {
 	// Adds classes to an element (body by default) based on document width.

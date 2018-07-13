@@ -26,18 +26,9 @@ var CommentsSidebarSectionView = SecondarySidebarSectionView.extend('passbolt.vi
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' a.js_add_comment click': function (el, ev) {
+	'{element} a.js_add_comment click': function (el, ev) {
 		// Displays the add comment form
 		this.getController().addForm.setState('ready');
-	},
-
-	/**
-	 * Observe when the user clicks on submit to save the comment
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'a.button.comment-submit click': function (el, ev) {
-		$(el).trigger('submit');
 	}
 });
 

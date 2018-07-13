@@ -104,9 +104,10 @@ var GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'a#js_edit_members_button click': function (el, ev) {
+	'{element} a#js_edit_members_button click': function (el, ev) {
 		ev.preventDefault();
-		MadBus.trigger('request_group_edition', this.options.group);
+		const group = this.options.group;
+		MadBus.trigger('request_group_edition', group);
 	},
 
 	/**
@@ -114,7 +115,7 @@ var GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' .accordion-header click': function(el, ev) {
+	'{element} .accordion-header click': function(el, ev) {
 		if (this.options.tree == null) {
 			Group.findView(this.options.group.id)
 				.then(group => this._initTree(group));

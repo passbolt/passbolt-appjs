@@ -119,15 +119,14 @@ var ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
 	/**
 	 * An item has been selected
 	 * @parent mad.component.Menu.view_events
-	 * @param {HTMLElement} el The element the event occured on
-	 * @param {HTMLEvent} ev The event which occured
-	 * @param {string} item The selected item
-	 * @return {void}
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' item_selected': function (el, ev, item) {
+	'{element} item_selected': function (el, ev) {
+		const item = ev.data.item;
 		// If this item is not disabled, try to execute the item action.
 		if (!item.state.is('disabled')) {
-			MadBus.trigger('filter_workspace', item.filter);
+			MadBus.trigger('filter_workspace', {filter: item.filter});
 		}
 	},
 
@@ -139,14 +138,14 @@ var ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
 	 * Listen to the workspace is filtered
 	 * @param {jQuery} element The source element
 	 * @param {Event} event The jQuery event
-	 * @param {Filter} filter The filter to apply
 	 */
-	'{mad.bus.element} filter_workspace': function (element, evt, filter) {
-		var menu = this.options.menu;
+	'{mad.bus.element} filter_workspace': function (el, ev) {
+		const filter = ev.data.filter;
+		const menu = this.options.menu;
 		menu.unselectAll();
 
 		// If the filter is relative to a filter registered in this component, select it.
-		menu.options.items.each(function(item) {
+		menu.options.items.forEach(function(item) {
 			if (item.filter.id == filter.id) {
 				menu.selectItem(item);
 			}

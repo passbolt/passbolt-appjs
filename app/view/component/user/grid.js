@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
+import domEvents from 'can-dom-events';
 import GridView from 'passbolt-mad/view/component/grid';
 
 var UserGridView = GridView.extend('passbolt.view.component.user.Grid', /** @static */ {
@@ -26,7 +27,7 @@ var UserGridView = GridView.extend('passbolt.view.component.user.Grid', /** @sta
      * @param {HTMLEvent} ev The event which occurred
      * @return {bool}
      */
-    'tbody tr contextmenu': function (el, ev) {
+    '{element} tbody tr contextmenu': function (el, ev) {
         ev.stopPropagation();
         ev.preventDefault();
         return false;
@@ -39,20 +40,14 @@ var UserGridView = GridView.extend('passbolt.view.component.user.Grid', /** @sta
 	 * @param {HTMLEvent} ev The event which occurred
 	 * @return {bool}
 	 */
-	'tbody tr mousedown': function (el, ev) {
+	'{element} tbody tr mousedown': function (el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
 
 		if (ev.which == 3) {
-			var data = null;
-			var itemClass = this.getController().getItemClass();
-
-			if (itemClass) {
-				data = DomData.get.call(el, itemClass.shortName);
-			} else {
-				data = el.id;
-			}
-			$(this.element).trigger('item_right_selected', [data, ev]);
+			const itemClass = this.getController().getItemClass();
+			const item = DomData.get(el, itemClass.shortName);
+			domEvents.dispatch(this.element, {type: 'item_right_selected', data: {item, srcEv: ev}});
 
 		}
 		return false;

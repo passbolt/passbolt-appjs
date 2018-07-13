@@ -31,7 +31,6 @@ import UserGridView from 'app/view/component/user/grid';
 
 import cellAvatarTemplate from 'app/view/template/component/user/grid/cell_avatar.stache!';
 import columnHeaderSelectTemplate from 'app/view/template/component/user/grid/column_header_select.stache!';
-import itemTemplate from 'app/view/template/component/user/grid/gridItem.stache!';
 
 var UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /** @static */ {
 
@@ -42,7 +41,6 @@ var UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /**
         selectedUsers: new User.List(),
         prefixItemId: 'user_',
         silentLoading: false,
-		itemTemplate: itemTemplate,
         // For now we are using the can-connect/can/model/model to migrate our v2 models.
         // Canjs should be able to observe Map in a Control as a function, however it doesn't.
         // Test it again after we completed the migration of the model to the canjs style.
@@ -464,13 +462,10 @@ var UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /**
      * This event comes from the grid view
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
-     * @param {mixed} item The selected item instance or its id
-     * @param {HTMLEvent} ev The source event which occurred
      */
-    ' item_selected': function (el, ev, item, srcEvent) {
-        // switch to select state
+    '{element} item_selected': function (el, ev) {
+        const item = ev.data.item;
         this.setState('selection');
-
         if (this.beforeSelect(item)) {
             this.select(item);
         }
@@ -480,67 +475,14 @@ var UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /**
      * An item has been right selected
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
-     * @param {passbolt.model.User} item The right selected item instance or its id
-     * @param {HTMLEvent} srcEvent The source event which occurred
      */
-    ' item_right_selected': function (el, ev, item, srcEvent) {
-        // Select item.
+    '{element} item_right_selected': function (el, ev) {
+        const item = ev.data.item;
+        const srcEv = ev.data.srcEv;
         this.select(item);
-        // Get the offset position of the clicked item.
         var $item = $('#' + this.options.prefixItemId + item.id);
         var itemOffset = $item.offset();
-        // Show contextual menu.
-        this.showContextualMenu(item, srcEvent.pageX - 3, itemOffset.top);
-    },
-
-    /**
-     * Listen to the check event on any checkbox form element components.
-     *
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     * @param {mixed} rsId The id of the resource which has been checked
-     */
-    '.js_checkbox_multiple_select checked': function (el, ev, userId) {
-        // if the grid is in initial state, switch it to selected
-        if (this.state.is('ready')) {
-            this.setState('selection');
-        }
-
-        // find the resource to select functions of its id
-        var i = List.indexOf(this.options.items, userId);
-        var user = this.options.items[i];
-
-        if (this.beforeSelect(user)) {
-            this.select(user);
-        }
-    },
-
-    /**
-     * Listen to the uncheck event on any checkbox form element components.
-     *
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     * @param {mixed} userId The id of the user which has been unchecked
-     */
-    '.js_checkbox_multiple_select unchecked': function (el, ev, userId) {
-        var self = this;
-
-        // find the resource to select functions of its id
-        var i = List.indexOf(this.options.items, userId);
-        var user = this.options.items[i];
-
-        if (this.beforeUnselect()) {
-            self.unselect(user);
-        }
-
-        // if there is no more selected resources, switch the grid to its initial state
-        if (!this.options.selectedUsers.length) {
-            this.setState('ready');
-
-            // else if only one resource is selected
-        } else if (this.options.selectedUsers.length == 1) {
-            this.setState('selection');
-        }
+        this.showContextualMenu(item, srcEv.pageX - 3, itemOffset.top);
     },
 
     /* ************************************************************** */
@@ -551,9 +493,9 @@ var UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /**
      * Listen to the browser filter
      * @param {jQuery} element The source element
      * @param {Event} event The jQuery event
-     * @param {passbolt.model.Filter} filter The filter to apply
      */
-    '{mad.bus.element} filter_workspace': function (element, evt, filter) {
+    '{mad.bus.element} filter_workspace': function (el, ev) {
+        const filter = ev.data.filter;
         if (this.state.is('destroyed')) {
             return;
         }

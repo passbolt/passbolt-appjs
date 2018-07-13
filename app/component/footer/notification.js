@@ -209,9 +209,9 @@ var NotificationComponent = Component.extend('passbolt.component.footer.Notifica
 	 * Listen the event passbolt_notify and display load the corresponding notification.
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {array} notification
 	 */
-	'{mad.bus.element} passbolt_notify': function (el, ev, notif) {
+	'{mad.bus.element} passbolt_notify': function (el, ev) {
+		const notif = ev.data;
 		// When we receive a notification, we load it in the main system.
 		this.load(new Notification(notif));
 	}

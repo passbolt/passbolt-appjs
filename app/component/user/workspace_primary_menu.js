@@ -74,7 +74,8 @@ var WorkspacePrimaryMenu = Component.extend('passbolt.component.user.WorkspacePr
      * @param {HTMLEvent} ev The event which occurred
      */
     '{editButton.element} click': function (el, ev) {
-        MadBus.trigger('request_user_edition');
+        const user = this.options.selectedUsers[0];
+        MadBus.trigger('request_user_edition', {user});
     },
 
     /**
@@ -83,8 +84,8 @@ var WorkspacePrimaryMenu = Component.extend('passbolt.component.user.WorkspacePr
      * @param {HTMLEvent} ev The event which occurred
      */
     '{deleteButton.element} click': function (el, ev) {
-        var users = this.options.selectedUsers;
-        MadBus.trigger('request_user_deletion', users);
+        const user = this.options.selectedUsers[0];
+        MadBus.trigger('request_user_deletion', {user});
     },
 
     /**

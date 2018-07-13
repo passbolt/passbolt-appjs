@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import Ajax from 'app/net/ajax';
-import canEvent from 'can-event';
+//import canEvent from 'can-event';
 import Config from 'passbolt-mad/config/config';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';

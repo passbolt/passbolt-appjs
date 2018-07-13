@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
+import domEvents from 'can-dom-events';
 import TreeView from 'passbolt-mad/view/component/tree';
 
 var GroupsListView = TreeView.extend('passbolt.view.component.GroupsList', /** @static */ {
@@ -22,25 +23,17 @@ var GroupsListView = TreeView.extend('passbolt.view.component.GroupsList', /** @
      * Mousedown event.
      *
      * We use this event to display the contextual menu
-     * @param el
-     * @param ev
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
      * @returns {boolean}
      */
-    '.more-ctrl a mousedown': function (el, ev) {
+    '{element} .more-ctrl a mousedown': function (el, ev) {
         ev.stopPropagation();
         ev.preventDefault();
-
-        var data = null;
-        var $li = $(el).closest('li');
-        var itemClass = this.getController().getItemClass();
-
-        if (itemClass) {
-            data = DomData.get.call($li[0], itemClass.shortName);
-        } else {
-            data = $li[0].id;
-        }
-
-        $(this.element).trigger('item_menu_clicked', [data, ev]);
+        const $li = $(el).closest('li');
+        const itemClass = this.getController().getItemClass();
+        const group = DomData.get($li[0], itemClass.shortName);
+        domEvents.dispatch(this.element, {type: 'item_menu_clicked', data: {group, srcEv: ev}});
 
         return false;
     }

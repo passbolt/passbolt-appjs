@@ -62,8 +62,8 @@ var SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Worksp
 
 	/**
 	 * Observe when the user wants to download his public key.
-	 * @param el
-	 * @param ev
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
 	'{publicKeyButton.element} click': function (el, ev) {
 		MadBus.trigger('passbolt.settings.download_public_key');
@@ -71,8 +71,8 @@ var SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Worksp
 
 	/**
 	 * Observe when the user wants to download his private key.
-	 * @param el
-	 * @param ev
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
 	'{privateKeyButton.element} click': function (el, ev) {
 		MadBus.trigger('passbolt.settings.download_private_key');
@@ -84,11 +84,11 @@ var SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Worksp
 
 	/**
 	 * Observe when the user changes section inside the workspace, and adjust the menu items accordingly
-	 * @param el
-	 * @param ev
-	 * @param section
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} request_settings_section': function(el, ev, section) {
+	'{mad.bus.element} request_settings_section': function(el, ev) {
+		const section = ev.data.section;
  		if (section == 'profile') {
 			this.options.editButton.setState('ready');
 			this.options.publicKeyButton.setState('hidden');

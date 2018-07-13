@@ -83,7 +83,7 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 
 		// Filter the workspace
 		var filter = this.constructor.getDefaultFilterSettings();
-		MadBus.trigger('filter_workspace', filter);
+		MadBus.trigger('filter_workspace', {filter});
 
 		this.on();
 	},
@@ -395,23 +395,12 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 * When a new filter is applied to the workspace.
 	 * @param {jQuery} element The source element
 	 * @param {Event} event The jQuery event
-	 * @param {Filter} filter The filter to apply
 	 */
-	'{mad.bus.element} filter_workspace': function (element, evt, filter) {
+	'{mad.bus.element} filter_workspace': function (el, ev) {
 		// When filtering the resources browser, unselect all the resources.
 		this.options.selectedRs.splice(0, this.options.selectedRs.length);
 		// Enable the create button
 		this.options.mainButton.setState('ready');
-	},
-
-	/**
-	 * Observe when a third party request a resource to be selected.
-	 * @param {jQuery} element The source element
-	 * @param {Event} event The jQuery event
-	 * @param {Filter} filter The filter to apply
-	 */
-	'{mad.bus.element} request_select_resource': function (element, evt, resource) {
-		this.options.selectedRs.push(resource);
 	},
 
 	/**
@@ -428,9 +417,9 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 * Observe when the user requests a resource edition
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {Resource} resource The target resource to edit
 	 */
-	'{mad.bus.element} request_resource_edition': function (el, ev, resource) {
+	'{mad.bus.element} request_resource_edition': function (el, ev) {
+		const resource = ev.data.resource;
 		this.openEditResourceDialog(resource);
 	},
 
@@ -439,9 +428,9 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 *
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {Resource} resource The target resource to delete
 	 */
-	'{mad.bus.element} request_resource_deletion': function (el, ev, resource) {
+	'{mad.bus.element} request_resource_deletion': function (el, ev) {
+		const resource = ev.data.resource;
 		this.deleteResource(resource);
 	},
 
@@ -449,9 +438,9 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 * Observe when the user requests a resource deletion
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {Resource} resource The target resource to delete
 	 */
-	'{mad.bus.element} request_resource_sharing': function (el, ev, resource) {
+	'{mad.bus.element} request_resource_sharing': function (el, ev) {
+		const resource = ev.data.resource;
 		this.openShareResourceDialog(resource);
 	},
 
@@ -459,9 +448,9 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 * Observe when the user requests to set an instance as favorite
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {Resource} resource The target resource to set as favorite
 	 */
-	'{mad.bus.element} request_favorite': function (el, ev, resource) {
+	'{mad.bus.element} request_favorite': function (el, ev) {
+		const resource = ev.data.resource;
 		this.favoriteResource(resource);
 	},
 
@@ -469,19 +458,19 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 * Observe when the user requests to unset an instance as favorite
 	 * @param {HTMLElement} el The element the event occurred on
 	 * @param {HTMLEvent} ev The event which occurred
-	 * @param {Resource} resource The target instance to unset as favorite
 	 */
-	'{mad.bus.element} request_unfavorite': function (el, ev, resource) {
+	'{mad.bus.element} request_unfavorite': function (el, ev) {
+		const resource = ev.data.resource;
 		this.unfavoriteResource(resource);
 	},
 
 	/**
 	 * Listen to the workspace request_export
-	 * @param {jQuery} element The source element
-	 * @param {Event} event The jQuery event
-	 * @param {type} type of export
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} request_export': function(el, ev, format) {
+	'{mad.bus.element} request_export': function(el, ev) {
+		const type = ev.data.type;
 		var resources = this.options.grid.options.items;
 		var resourcesFormated = resources.reduce((carry, resource) =>  {
 			carry.push({
@@ -496,7 +485,7 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 		}, []);
 
 		var data = {
-			format: format,
+			format: type,
 			resources: resourcesFormated
 		};
 		MadBus.trigger('passbolt.export-passwords', data);
@@ -506,19 +495,20 @@ var PasswordWorkspaceComponent = Component.extend('passbolt.component.password.W
 	 * Observe when the plugin informs that an import is complete.
 	 * If a tag has been created for the import, then the same tag will be selected in the workspace.
 	 * If no tag has been created (no tag integration) then just refresh the workspace.
-	 * @param element
-	 * @param evt
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 * @param options
 	 *   * tag : the tag created during the import.
 	 */
-	'{mad.bus.element} passbolt.plugin.import-passwords-complete': function (element, evt, options) {
+	'{mad.bus.element} passbolt.plugin.import-passwords-complete': function (el, ev, options) {
 		// If a tag is provided, then we update the tags list and select the corresponding tag.
 		if (options !== undefined && options.tag !== undefined) {
 			MadBus.trigger('tags_updated', {selectTag: options.tag});
 		}
 		// else, we simply refresh the entire workspace.
 		else {
-			MadBus.trigger('request_workspace', 'password');
+			const workspace = 'password';
+			MadBus.trigger('request_workspace', {workspace});
 		}
 	}
 });

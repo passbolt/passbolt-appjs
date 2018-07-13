@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
+import domEvents from 'can-dom-events';
 import GridView from 'passbolt-mad/view/component/grid';
 
 var PasswordGridView = GridView.extend('passbolt.view.component.password.Grid', /** @static */ {
@@ -25,20 +26,13 @@ var PasswordGridView = GridView.extend('passbolt.view.component.password.Grid', 
 	 * @param {HTMLEvent} ev The event which occurred
 	 * @return {bool}
 	 */
-	'tbody tr td.password a click': function (el, ev) {
+	'{element} tbody tr td.password a click': function (el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-		var data = null,
-			$tr = $(el).parents('tr'),
-			itemClass = this.getController().getItemClass();
-
-		if (itemClass) {
-			data = DomData.get.call($tr[0], itemClass.shortName);
-		} else {
-			data = $tr[0].id;
-		}
-
-		$(this.element).trigger('password_clicked', [data, ev]);
+		const $tr = $(el).parents('tr');
+		const itemClass = this.getController().getItemClass();
+		const item = DomData.get($tr[0], itemClass.shortName);
+		domEvents.dispatch(this.element, {type: 'password_clicked', data: {item, srcEv: ev}});
 	},
 
 	/**
@@ -48,20 +42,14 @@ var PasswordGridView = GridView.extend('passbolt.view.component.password.Grid', 
 	 * @param {HTMLEvent} ev The event which occurred
 	 * @return {bool}
 	 */
-	'tbody tr td.username a click': function (el, ev) {
+	'{element} tbody tr td.username a click': function (el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-		var data = null,
-			$tr = $(el).parents('tr'),
-			itemClass = this.getController().getItemClass();
-
-		if (itemClass) {
-			data = DomData.get.call($tr[0], itemClass.shortName);
-		} else {
-			data = $tr[0].id;
-		}
-
-		$(this.element).trigger('username_clicked', [data, ev]);
+		const $tr = $(el).parents('tr');
+		const itemClass = this.getController().getItemClass();
+		const item = DomData.get($tr[0], itemClass.shortName);
+		domEvents.dispatch(this.element, {type: 'username_clicked', data: {item, srcEv: ev}});
+		return false;
 	},
 
 	/**
@@ -72,7 +60,7 @@ var PasswordGridView = GridView.extend('passbolt.view.component.password.Grid', 
 	 * @param {HTMLEvent} ev The event which occurred
 	 * @return {bool}
 	 */
-	'tbody tr contextmenu': function (el, ev) {
+	'{element} tbody tr contextmenu': function (el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
 		return false;
@@ -87,23 +75,14 @@ var PasswordGridView = GridView.extend('passbolt.view.component.password.Grid', 
 	 * @param ev
 	 * @returns {boolean}
 	 */
-	'tbody tr mousedown': function (el, ev) {
+	'{element} tbody tr mousedown': function (el, ev) {
 		ev.stopPropagation();
 		ev.preventDefault();
-
 		if (ev.which == 3) {
-			var data = null;
-			var itemClass = this.getController().getItemClass();
-
-			if (itemClass) {
-				data = DomData.get.call(el, itemClass.shortName);
-			} else {
-				data = el.id;
-			}
-
-			$(this.element).trigger('item_right_selected', [data, ev]);
+			const itemClass = this.getController().getItemClass();
+			const item = DomData.get(el, itemClass.shortName);
+			domEvents.dispatch(this.element, {type: 'item_right_selected', data: {item, srcEv: ev}});
 		}
-
 		return false;
 	}
 

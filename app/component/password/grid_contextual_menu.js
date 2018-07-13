@@ -12,9 +12,11 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
+import Clipboard from 'app/util/clipboard';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
+import Plugin from 'app/util/plugin';
 
 var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.component.password.GridContextualMenu', /** @static */ {
 
@@ -106,11 +108,7 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Copy login to clipboard
      */
     _copyLogin: function() {
-        var data = {
-            name : 'username',
-            data : this.options.resource.username
-        };
-        MadBus.trigger('passbolt.clipboard', data);
+        Clipboard.copy(this.options.resource.username, 'username');
         this.remove();
     },
 
@@ -118,8 +116,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Copy secret to clipboard
      */
     _copySecret: function () {
-        var secret = this.options.resource.secrets[0].data;
-        MadBus.trigger('passbolt.secret.decrypt', secret);
+        const secret = this.options.resource.secrets[0];
+        Plugin.decryptAndCopyToClipboard(secret.data);
         this.remove();
     },
 
@@ -127,11 +125,7 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Copy uri to clipboard
      */
     _copyUri: function() {
-        var data = {
-            name : 'URL',
-            data : this.options.resource.uri
-        };
-        MadBus.trigger('passbolt.clipboard', data);
+        Clipboard.copy(this.options.resource.uri, 'URL');
         this.remove();
     },
 
@@ -148,7 +142,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Edit the resource
      */
     _edit: function() {
-        MadBus.trigger('request_resource_edition', this.options.resource);
+        const resource = this.options.resource;
+        MadBus.trigger('request_resource_edition', {resource});
         this.remove();
     },
 
@@ -156,7 +151,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Share the resource
      */
     _share: function() {
-        MadBus.trigger('request_resource_sharing', this.options.resource);
+        const resource = this.options.resource;
+        MadBus.trigger('request_resource_sharing', {resource});
         this.remove();
     },
 
@@ -164,7 +160,8 @@ var GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.compo
      * Delete the resource
      */
     _delete: function() {
-        MadBus.trigger('request_resource_deletion', this.options.resource);
+        const resource = this.options.resource;
+        MadBus.trigger('request_resource_deletion', {resource});
         this.remove();
     }
 

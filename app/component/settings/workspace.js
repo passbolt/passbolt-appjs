@@ -106,7 +106,8 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 			name: 'profile',
 			label: __('Profile'),
 			action: function () {
-				MadBus.trigger('request_settings_section', 'profile');
+				const section = 'profile';
+				MadBus.trigger('request_settings_section', {section});
 			}
 		});
 		menu.insertItem(profileItem);
@@ -120,7 +121,8 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 				name: 'keys',
 				label: __('Theme'),
 				action: function () {
-					MadBus.trigger('request_settings_section', 'theme');
+					const section = 'theme';
+					MadBus.trigger('request_settings_section', {section});
 				}
 			});
 			menu.insertItem(themeItem);
@@ -133,7 +135,8 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 			name: 'keys',
 			label: __('Keys inspector'),
 			action: function () {
-				MadBus.trigger('request_settings_section', 'keys');
+				const section = 'keys';
+				MadBus.trigger('request_settings_section', {section});
 			}
 		});
 		menu.insertItem(keysItem);
@@ -270,14 +273,14 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 
 	/**
 	 * Observe when the user requests a section.
-	 * @param el
-	 * @param ev
-	 * @param section
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	'{mad.bus.element} request_settings_section': function (el, ev, section) {
-		var tabId = null,
-			menuItem = null,
-			menu = this.options.primarySidebarMenu;
+	'{mad.bus.element} request_settings_section': function (el, ev) {
+		const section = ev.data.section;
+		let tabId = null;
+		let menuItem = null;
+		const menu = this.options.primarySidebarMenu;
 
 		switch (section) {
 			case 'keys' :
@@ -315,8 +318,8 @@ var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.W
 	 * @param {boolean} go Enter or leave the state
 	 */
 	stateReady: function (go) {
-		// Load profile section by default.
-		MadBus.trigger('request_settings_section', 'profile');
+		const section = 'profile';
+		MadBus.trigger('request_settings_section', {section});
 	},
 
 	/**

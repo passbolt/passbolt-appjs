@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DomData from 'can-util/dom/data/data';
+import DomData from 'can-dom-data';
+import domEvents from 'can-dom-events';
 import View from 'passbolt-mad/view/view';
 
 var EditView = View.extend('passbolt.view.component.group.Edit', /** @static */ { }, /** @prototype */ {
@@ -25,13 +26,12 @@ var EditView = View.extend('passbolt.view.component.group.Edit', /** @static */ 
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
      */
-    ' .js_group_user_delete click': function(el, ev) {
+    '{element} .js_group_user_delete click': function(el, ev) {
         ev.stopPropagation();
         ev.preventDefault();
-
         var $li = $(el).parents('li');
-        var groupUser = DomData.get.call($li[0], 'passbolt.model.GroupUser');
-        $(this.element).trigger('request_group_user_delete', [groupUser]);
+        var groupUser = DomData.get($li[0], 'passbolt.model.GroupUser');
+        domEvents.dispatch(this.element, {type: 'request_group_user_delete', data: {groupUser}});
     },
 
     /**
@@ -39,15 +39,14 @@ var EditView = View.extend('passbolt.view.component.group.Edit', /** @static */ 
      * @param {HTMLElement} el The element the event occurred on
      * @param {HTMLEvent} ev The event which occurred
      */
-    ' .js_group_user_is_admin changed': function(el, ev, data) {
+    '{element} .js_group_user_is_admin changed': function(el, ev) {
         ev.stopPropagation();
         ev.preventDefault();
-
+        const data = ev.data;
         var $li = $(el).parents('li');
-        var groupUser = DomData.get.call($li[0], 'passbolt.model.GroupUser');
+        var groupUser = DomData.get($li[0], 'passbolt.model.GroupUser');
         var isAdmin = data.value;
-
-        $(this.element).trigger('request_group_user_edit', [groupUser, isAdmin]);
+        domEvents.dispatch(this.element, {type: 'request_group_user_edit', data: {groupUser, isAdmin}});
     }
 
 });

@@ -84,11 +84,11 @@ var CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsList
 
 	/**
 	 * Catches a request_delete_comment coming from an item in the list then redistribute on mad bus
-	 * @param elt
-	 * @param evt
-	 * @param data
+	 * @param {HTMLElement} el The element the event occurred on
+	 * @param {HTMLEvent} ev The event which occurred
 	 */
-	' request_delete_comment': function(elt, evt, data) {
+	'{element} request_delete_comment': function(el, ev) {
+		const item = ev.data.item;
         var confirm = ConfirmComponent.instantiate({
 			label: __('Do you really want to delete?'),
 			content: commentDeleteConfirmTemplate,
@@ -97,7 +97,7 @@ var CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsList
 				cssClasses: ['warning']
 			},
 			action: function() {
-				MadBus.trigger('request_delete_comment', data);
+				MadBus.trigger('request_delete_comment', {item});
 			}
 		});
 		confirm.start();

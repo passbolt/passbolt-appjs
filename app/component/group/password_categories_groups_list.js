@@ -50,7 +50,7 @@ var PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.componen
       },
       order: ['Resource.modified DESC']
     });
-    MadBus.trigger('filter_workspace', this.selectedFilter);
+    MadBus.trigger('filter_workspace', {filter: this.selectedFilter});
   }
 
 });
