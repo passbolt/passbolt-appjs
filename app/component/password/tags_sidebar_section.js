@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import DomData from 'can-dom-data';
-import Filter from 'app/model/map/filter';
+import Filter from 'app/model/filter';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PermissionType from 'app/model/map/permission_type';

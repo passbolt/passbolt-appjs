@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
-import Filter from 'app/model/map/filter';
+import Filter from 'app/model/filter';
 import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
 import PrimarySidebarSectionComponent from 'app/component/workspace/primary_sidebar_section';

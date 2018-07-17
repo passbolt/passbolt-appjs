@@ -13,7 +13,7 @@
  */
 import Action from 'passbolt-mad/model/map/action';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
-import Filter from 'app/model/map/filter';
+import Filter from 'app/model/filter';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PrimarySidebarSectionComponent from 'app/component/workspace/primary_sidebar_section';

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Filter from 'app/model/map/filter';
+import Filter from 'app/model/filter';
 import getObject from 'can-util/js/get/get';
 import Group from 'app/model/map/group';
 import GroupListView from 'app/view/component/group/groups_list';

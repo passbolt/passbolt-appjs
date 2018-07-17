@@ -18,7 +18,7 @@ import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
-import Filter from 'app/model/map/filter';
+import Filter from 'app/model/filter';
 import GridComponent from 'app/component/user/grid';
 import Group from 'app/model/map/group';
 import GroupEditComponent from 'app/component/group/edit';

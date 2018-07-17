@@ -26,10 +26,9 @@ import PrimarySidebarComponent from 'app/component/password/primary_sidebar';
 import ResourceCreateForm from 'app/form/resource/create';
 import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
 import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
-import uuid from 'uuid/v4';
 
 import Favorite from 'app/model/map/favorite';
-import Filter from 'app/model/map/filter';
+import Filter from 'app/model/filter';
 import Group from 'app/model/map/group';
 import Resource from 'app/model/map/resource';
 
