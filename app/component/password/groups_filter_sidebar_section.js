@@ -18,7 +18,7 @@ import User from 'app/model/map/user';
 
 import template from 'app/view/template/component/password/groups_filter_sidebar_section.stache!';
 
-var GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.password.GroupsFilterSidebarSection', /** @static */ {
+const GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.password.GroupsFilterSidebarSection', /** @static */ {
 
   defaults: {
     template: template,
@@ -33,7 +33,7 @@ var GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    * @inheritdoc
    */
   afterStart: function() {
-    var groupList = new PasswordCategoriesGroupsList('#js_wsp_password_categories_groups_list', {
+    const groupList = new PasswordCategoriesGroupsList('#js_wsp_password_categories_groups_list', {
       selectedGroups: this.options.selectedGroups,
       defaultGroupFilter: {
         "has-users": User.getCurrent().id

@@ -22,14 +22,14 @@ import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/const
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var Tag = DefineMap.extend('passbolt.model.Tag', {
-	id: 'string',
-	slug: 'string',
-	user_id: 'string',
-	is_shared: 'boolean'
+const Tag = DefineMap.extend('passbolt.model.Tag', {
+  id: 'string',
+  slug: 'string',
+  user_id: 'string',
+  is_shared: 'boolean'
 });
 DefineMap.setReference('Tag', Tag);
-Tag.List = DefineList.extend({'#': { Type: Tag }});
+Tag.List = DefineList.extend({'#': {Type: Tag}});
 
 /**
  * Update the resource tags
@@ -37,28 +37,26 @@ Tag.List = DefineList.extend({'#': { Type: Tag }});
  * @param {array} slugs The list tags
  */
 Tag.updateResourceTags = function(resourceId, slugs) {
-	return Ajax.request({
-		url: 'tags/{resourceId}.json?api-version=v2',
-		type: 'POST',
-		params: {Tags: slugs, resourceId: resourceId}
-	}).then(function (data) {
-		return Promise.resolve(new Tag.List(data));
-	});
+  return Ajax.request({
+    url: 'tags/{resourceId}.json?api-version=v2',
+    type: 'POST',
+    params: {Tags: slugs, resourceId: resourceId}
+  }).then(data => Promise.resolve(new Tag.List(data)));
 };
 
 Tag.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
-	Map: Tag,
-	List: Tag.List,
-	url: {
-		resource: '/',
-		getListData: function(params) {
-			return Ajax.request({
-				url: 'tags.json?api-version=v2',
-				type: 'GET',
-				params: params
-			});
-		}
-	}
+  Map: Tag,
+  List: Tag.List,
+  url: {
+    resource: '/',
+    getListData: function(params) {
+      return Ajax.request({
+        url: 'tags.json?api-version=v2',
+        type: 'GET',
+        params: params
+      });
+    }
+  }
 });
 
 export default Tag;

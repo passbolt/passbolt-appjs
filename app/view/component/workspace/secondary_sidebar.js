@@ -15,35 +15,33 @@ import Config from 'passbolt-mad/config/config';
 import MadBus from 'passbolt-mad/control/bus';
 import View from 'passbolt-mad/view/view';
 
-var SecondarySidebarView = View.extend('passbolt.view.component.SecondarySidebar', /** @static */ {
+const SecondarySidebarView = View.extend('passbolt.view.component.SecondarySidebar', /** @static */ {
 
 }, /** @prototype */ {
 
-    /**
-     * Set the title
-     * @param {string} title The new title
-     */
-    setTitle: function (title) {
-        $('.sidebar .sidebar-header .sidebar-header-title', this.element).text(title);
-    },
+  /**
+   * Set the title
+   * @param {string} title The new title
+   */
+  setTitle: function(title) {
+    $('.sidebar .sidebar-header .sidebar-header-title', this.element).text(title);
+  },
 
-    /**
-     * Set the subtitle
-     * @param {string} subtitle The new subtitle
-     */
-    setSubtitle: function (subtitle) {
-        $('.sidebar .sidebar-header .sidebar-header-subtitle', this.element).text(subtitle);
-    },
+  /**
+   * Set the subtitle
+   * @param {string} subtitle The new subtitle
+   */
+  setSubtitle: function(subtitle) {
+    $('.sidebar .sidebar-header .sidebar-header-subtitle', this.element).text(subtitle);
+  },
 
-    /**
-     * Observe when the user clicks on the close button
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    ' .js_sidebar_close click': function(el, ev) {
-        Config.write('ui.workspace.showSidebar', false);
-        MadBus.trigger('workspace_sidebar_hide');
-    }
+  /**
+   * Observe when the user clicks on the close button
+   */
+  ' .js_sidebar_close click': function() {
+    Config.write('ui.workspace.showSidebar', false);
+    MadBus.trigger('workspace_sidebar_hide');
+  }
 
 });
 

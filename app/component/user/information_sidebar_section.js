@@ -15,30 +15,30 @@ import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_
 
 import template from 'app/view/template/component/user/information_sidebar_section.stache!';
 
-var InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.user.InformationSidebarSection', /** @static */ {
+const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.user.InformationSidebarSection', /** @static */ {
 
-	defaults: {
-		label: 'Sidebar Section Information Controller',
-		template: template,
-		user: null
-	}
+  defaults: {
+    label: 'Sidebar Section Information Controller',
+    template: template,
+    user: null
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	beforeRender: function () {
-		this._super();
-		this.setViewData('user', this.options.user);
-	},
+  /**
+   * @inheritdoc
+   */
+  beforeRender: function() {
+    this._super();
+    this.setViewData('user', this.options.user);
+  },
 
-	/**
-	 * Observer when the user is updated
-	 */
-	'{user} updated': function() {
-		this.refresh();
-	}
+  /**
+   * Observer when the user is updated
+   */
+  '{user} updated': function() {
+    this.refresh();
+  }
 
 });
 

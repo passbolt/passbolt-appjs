@@ -15,31 +15,31 @@ import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_
 
 import template from 'app/view/template/component/group/information_sidebar_section.stache!';
 
-var InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.group.InformationSidebarSection', /** @static */ {
+const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.group.InformationSidebarSection', /** @static */ {
 
-	defaults: {
-		label: 'Sidebar Section Information Controller',
-		template: template,
-		group: null
-	}
+  defaults: {
+    label: 'Sidebar Section Information Controller',
+    template: template,
+    group: null
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	beforeRender: function () {
-		this._super();
-		this.setViewData('group', this.options.group);
-	},
+  /**
+   * @inheritdoc
+   */
+  beforeRender: function() {
+    this._super();
+    this.setViewData('group', this.options.group);
+  },
 
-	/**
-	 * Observe when the item is updated
-	 * @param {passbolt.model} item The updated item
-	 */
-	'{group} updated': function () {
-		this.refresh();
-	}
+  /**
+   * Observe when the item is updated
+   * @param {passbolt.model} item The updated item
+   */
+  '{group} updated': function() {
+    this.refresh();
+  }
 
 });
 

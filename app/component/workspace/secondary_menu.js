@@ -18,71 +18,65 @@ import Resource from 'app/model/map/resource';
 import ToggleButton from 'passbolt-mad/component/toggle_button';
 import template from 'app/view/template/component/workspace/secondary_menu.stache!';
 
-var WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSecondaryMenu', /** @static */ {
+const WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSecondaryMenu', /** @static */ {
 
-	defaults: {
-		label: 'Workspace Secondary Menu',
-		template: template,
-		tag: 'ul',
-        // Selected items list
-        selectedItems: new Resource.List()
-	}
+  defaults: {
+    label: 'Workspace Secondary Menu',
+    template: template,
+    tag: 'ul',
+    // Selected items list
+    selectedItems: new Resource.List()
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function () {
-		var showSidebar = Config.read('ui.workspace.showSidebar');
-		var viewSidebarButton = new ToggleButton('#js_wk_secondary_menu_view_sidebar_button', {
-			state: showSidebar ? 'selected' : 'ready'
-		});
-		viewSidebarButton.start();
-		this.options.viewSidebarButton = viewSidebarButton;
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    const showSidebar = Config.read('ui.workspace.showSidebar');
+    const viewSidebarButton = new ToggleButton('#js_wk_secondary_menu_view_sidebar_button', {
+      state: showSidebar ? 'selected' : 'ready'
+    });
+    viewSidebarButton.start();
+    this.options.viewSidebarButton = viewSidebarButton;
 
-		// Rebind controller events
-		this.on();
-	},
+    // Rebind controller events
+    this.on();
+  },
 
-	/* ************************************************************** */
-	/* LISTEN TO THE APP EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE APP EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Observe when sidebar is close by another component.
-	 *
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{mad.bus.element} workspace_sidebar_hide': function (el, ev) {
-		if (this.options.viewSidebarButton.state.is('selected')) {
-			this.options.viewSidebarButton.setState('ready');
-		}
-	},
+  /**
+   * Observe when sidebar is close by another component.
+   */
+  '{mad.bus.element} workspace_sidebar_hide': function() {
+    if (this.options.viewSidebarButton.state.is('selected')) {
+      this.options.viewSidebarButton.setState('ready');
+    }
+  },
 
-	/**
-	 * Observe when the user wants to view the side bar
-	 *
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{viewSidebarButton.element} click': function (el, ev) {
-		var showSidebar = !Config.read('ui.workspace.showSidebar'),
-			isSelection = this.options.selectedItems.length > 0;
+  /**
+   * Observe when the user wants to view the side bar
+   */
+  '{viewSidebarButton.element} click': function() {
+    const showSidebar = !Config.read('ui.workspace.showSidebar');
+    const isSelection = this.options.selectedItems.length > 0;
 
-		// Set new status in the settings.
-		Config.write('ui.workspace.showSidebar', showSidebar);
+    // Set new status in the settings.
+    Config.write('ui.workspace.showSidebar', showSidebar);
 
-		if (isSelection) {
-			// Trigger show sidebar event with the new status.
-			if (showSidebar) {
-				MadBus.trigger('workspace_sidebar_show');
-			} else {
-				MadBus.trigger('workspace_sidebar_hide');
-			}
-		}
-	}
+    if (isSelection) {
+      // Trigger show sidebar event with the new status.
+      if (showSidebar) {
+        MadBus.trigger('workspace_sidebar_show');
+      } else {
+        MadBus.trigger('workspace_sidebar_hide');
+      }
+    }
+  }
 });
 
 export default WorkspaceSecondaryMenu;

@@ -12,83 +12,79 @@
  * @since         2.0.0
  */
 import cookies from 'browser-cookies/src/browser-cookies';
-import moment from 'moment/moment';
-import 'moment-timezone/builds/moment-timezone-with-data';
 import AccountSetting from 'app/model/map/accountSetting';
-import baseUrl from 'can-util/js/base-url/base-url';
 import Bootstrap from 'passbolt-mad/bootstrap';
 import Config from 'passbolt-mad/config/config';
 import AppComponent from 'app/component/app';
-import Common from 'app/util/common';
 import Role from 'app/model/map/role';
 import User from 'app/model/map/user';
 
-var AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
+const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 
 }, /**  @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	init: function (options) {
-		this._super(options);
-		this._csrfToken();
-		Promise.all([this._loadUser(), this._loadRoles(), this._loadAccountSettings()])
-			.then(this._loadApp)
-			.then(null, (e) => {throw e;} );
-	},
+  /**
+   * @inheritdoc
+   */
+  init: function(options) {
+    this._super(options);
+    this._csrfToken();
+    Promise.all([this._loadUser(), this._loadRoles(), this._loadAccountSettings()])
+      .then(this._loadApp)
+      .then(null, e => { throw e; });
+  },
 
-	/**
-	 * Retrieve the csrf token from the cookie
-	 */
-	_csrfToken: function() {
-		var csrfToken = cookies.get('csrfToken');
-		Config.write('app.csrfToken', csrfToken);
-	},
+  /**
+   * Retrieve the csrf token from the cookie
+   */
+  _csrfToken: function() {
+    const csrfToken = cookies.get('csrfToken');
+    Config.write('app.csrfToken', csrfToken);
+  },
 
-	/**
-	 * Load the user information
-	 */
-	_loadUser: function() {
-		return User.findOne({
-			id: 'me'
-		}).then(function(user) {
-			User.setCurrent(user);
-		});
-	},
+  /**
+   * Load the user information
+   */
+  _loadUser: function() {
+    return User.findOne({
+      id: 'me'
+    }).then(user => {
+      User.setCurrent(user);
+    });
+  },
 
-	/**
-	 * Load the list of roles
-	 */
-	_loadRoles: function() {
-		return Role.findAll()
-		.then(function(roles) {
-			Role.setCache(roles);
-		});
-	},
+  /**
+   * Load the list of roles
+   */
+  _loadRoles: function() {
+    return Role.findAll()
+      .then(roles => {
+        Role.setCache(roles);
+      });
+  },
 
-	/**
-	 * Load the account settings
-	 */
-	_loadAccountSettings: function() {
-		var plugins = Config.read('server.passbolt.plugins');
-		if (plugins && plugins.accountSettings) {
-			return AccountSetting.findAll()
-                .then(accountSettings => {
-                    AccountSetting.saveInConfig(accountSettings);
-                });
-		}
-
-		return null;
-	},
-
-    /**
-     * Load the application
-     */
-	_loadApp: function() {
-		var app = new AppComponent('#js_app_controller');
-		app.start();
+  /**
+   * Load the account settings
+   */
+  _loadAccountSettings: function() {
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins && plugins.accountSettings) {
+      return AccountSetting.findAll()
+        .then(accountSettings => {
+          AccountSetting.saveInConfig(accountSettings);
+        });
     }
+
+    return null;
+  },
+
+  /**
+   * Load the application
+   */
+  _loadApp: function() {
+    const app = new AppComponent('#js_app_controller');
+    app.start();
+  }
 
 });
 

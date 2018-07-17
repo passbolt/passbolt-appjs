@@ -11,28 +11,27 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Common from 'app/util/common';
 import Component from 'passbolt-mad/component/component';
 import User from 'app/model/map/user';
 
 import template from 'app/view/template/component/gpgkey/keys.stache!';
 
-var Keys = Component.extend('passbolt.component.gpgkey.Keys', /** @static */ {
+const Keys = Component.extend('passbolt.component.gpgkey.Keys', /** @static */ {
 
-	defaults: {
-		template: template
-	}
+  defaults: {
+    template: template
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	beforeRender: function() {
-		this._super();
-		var gpgKey = User.getCurrent().gpgkey;
-		this.setViewData('gpgkey', gpgKey);
-	}
+  /**
+   * @inheritdoc
+   */
+  beforeRender: function() {
+    this._super();
+    const gpgKey = User.getCurrent().gpgkey;
+    this.setViewData('gpgkey', gpgKey);
+  }
 });
 
 export default Keys;

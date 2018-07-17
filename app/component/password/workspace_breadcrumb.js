@@ -20,99 +20,96 @@ import uuid from 'uuid/v4';
 import template from 'app/view/template/component/breadcrumb/breadcrumb.stache!';
 import itemTemplate from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
 
-var WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadcrumb', /** @static */ {
+const WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadcrumb', /** @static */ {
 
-	defaults: {
-		template: template,
-		status: 'hidden',
-		// Root crumb filter
-		rootFilter: null
-	}
+  defaults: {
+    template: template,
+    status: 'hidden',
+    // Root crumb filter
+    rootFilter: null
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function () {
-		var menuSelector = '#' + this.getId() + ' ul';
-		var menu = new Menu(menuSelector, {
-			itemTemplate: itemTemplate
-		});
-		menu.start();
-		this.options.menu = menu;
-	},
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    const menuSelector = `#${this.getId()} ul`;
+    const menu = new Menu(menuSelector, {
+      itemTemplate: itemTemplate
+    });
+    menu.start();
+    this.options.menu = menu;
+  },
 
-	/**
-	 * Parse the current filter
-	 * @param {passbolt.model.Filter} filter The filter to load
-	 * @return {array}
-	 */
-	parseFilter: function (filter) {
-		var menuItems = [],
-			keywords = filter.getRule('keywords');
+  /**
+   * Parse the current filter
+   * @param {Filter} filter The filter to load
+   * @return {array}
+   */
+  parseFilter: function(filter) {
+    const menuItems = [];
+    const keywords = filter.getRule('keywords');
 
-		// Add a link to filter on all items as first item.
-		var menuItem = new Action({
-			id: uuid(),
-			label: __('All items'),
-			filter: this.options.rootFilter
-		});
-		menuItems.push(menuItem);
+    // Add a link to filter on all items as first item.
+    const allItemsItem = new Action({
+      id: uuid(),
+      label: __('All items'),
+      filter: this.options.rootFilter
+    });
+    menuItems.push(allItemsItem);
 
-		// If filtered by keywords, add a breadcrumb relative to the searched keywords
-		if (keywords && keywords != '') {
-			var menuItem = new Action({
-				id: uuid(),
-				label: __('Search : %s', keywords)
-			});
-			menuItems.push(menuItem);
-		}
-		// For any other filters than the default one, add a breadcrumb entry.
-		else if (filter.id != 'default') {
-			var menuItem = new Action({
-				id: uuid(),
-				label: filter.label
-			});
-			menuItems.push(menuItem);
-		}
+    // If filtered by keywords, add a breadcrumb relative to the searched keywords
+    if (keywords && keywords != '') {
+      const searchItem = new Action({
+        id: uuid(),
+        label: __('Search : %s', keywords)
+      });
+      menuItems.push(searchItem);
+    } else if (filter.id != 'default') {
+      // For any other filters than the default one, add a breadcrumb entry.
+      const thirdItem = new Action({
+        id: uuid(),
+        label: filter.label
+      });
+      menuItems.push(thirdItem);
+    }
 
-		return menuItems;
-	},
+    return menuItems;
+  },
 
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * An item has been selected
-	 * @parent mad.component.Menu.view_events
-	 * @param {HTMLElement} el The element the event occured on
-	 * @param {HTMLEvent} ev The event which occured
-	 */
-	'{element} item_selected': function (el, ev) {
-		const item = ev.data.item;
-		if (item.filter) {
-			MadBus.trigger('filter_workspace', {filter: item.filter});
-		}
-	},
+  /**
+   * An item has been selected
+   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{element} item_selected': function(el, ev) {
+    const item = ev.data.item;
+    if (item.filter) {
+      MadBus.trigger('filter_workspace', {filter: item.filter});
+    }
+  },
 
-	/* ************************************************************** */
-	/* LISTEN TO THE APP EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE APP EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Listen to the browser filter
-	 * @param {jQuery} element The source element
-	 * @param {Event} event The jQuery event
-	 * @param {passbolt.model.Filter} filter The filter to apply
-	 */
-	'{mad.bus.element} filter_workspace': function (el, ev) {
-		const filter = ev.data.filter;
-		this.options.menu.reset();
-		var menuItems = this.parseFilter(filter);
-		this.options.menu.load(menuItems);
-	}
+  /**
+   * Listen to the browser filter
+   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{mad.bus.element} filter_workspace': function(el, ev) {
+    const filter = ev.data.filter;
+    this.options.menu.reset();
+    const menuItems = this.parseFilter(filter);
+    this.options.menu.load(menuItems);
+  }
 
 });
 

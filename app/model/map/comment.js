@@ -23,19 +23,19 @@ import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import User from 'app/model/map/user';
 
-var Comment = DefineMap.extend('passbolt.model.Comment', {
-	id: 'string',
-	parent_id: 'string',
-	foreign_model: 'string',
-	foreign_key: 'string',
-	content: 'string',
-	created: 'string',
-	modified: 'string',
-	creator: User,
-	modifier: User
+const Comment = DefineMap.extend('passbolt.model.Comment', {
+  id: 'string',
+  parent_id: 'string',
+  foreign_model: 'string',
+  foreign_key: 'string',
+  content: 'string',
+  created: 'string',
+  modified: 'string',
+  creator: User,
+  modifier: User
 });
 DefineMap.setReference('Comment', Comment);
-Comment.List = DefineList.extend({'#': { Type: Comment }});
+Comment.List = DefineList.extend({'#': {Type: Comment}});
 
 /*
  * Default validation rules.
@@ -43,48 +43,48 @@ Comment.List = DefineList.extend({'#': { Type: Comment }});
  * @see https://github.com/passbolt/passbolt_api/src/Model/Table/CommentsTable.php
  */
 Comment.validationRules = {
-	id: [
-		{rule: 'uuid'}
-	],
-	content: [
-		{rule: 'required', message: __('A comment is required.')},
-		{rule: ['lengthBetween', 1, 255], message: __('The comment should be between %s and %s characters.', 1, 255)},
-		{rule: 'utf8Extended', message: __('The comment should be a valid utf8 string.')}
-	]
+  id: [
+    {rule: 'uuid'}
+  ],
+  content: [
+    {rule: 'required', message: __('A comment is required.')},
+    {rule: ['lengthBetween', 1, 255], message: __('The comment should be between %s and %s characters.', 1, 255)},
+    {rule: 'utf8Extended', message: __('The comment should be a valid utf8 string.')}
+  ]
 };
 
 Comment.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
-	Map: Comment,
-	List: Comment.List,
-	url: {
-		resource: '/',
-		createData: function(params) {
-			return Ajax.request({
-				url: 'comments/resource/{foreign_key}.json?api-version=v2',
-				type: 'POST',
-				params: params
-			});
-		},
-		getListData: function(params) {
-			params['api-version'] = 'v2';
-			return Ajax.request({
-				url: 'comments/resource/{foreignKey}.json',
-				type: 'GET',
-				params: params
-			});
-		},
-		destroyData: function(params) {
-			const requestParams = {
-				id: params.id,
-				'api-version': 'v2'
-			};
-			return Ajax.request({
-				url: 'comments/{id}.json',
-				type: 'DELETE',
-				params: requestParams
-			});
-		}
-	}
+  Map: Comment,
+  List: Comment.List,
+  url: {
+    resource: '/',
+    createData: function(params) {
+      return Ajax.request({
+        url: 'comments/resource/{foreign_key}.json?api-version=v2',
+        type: 'POST',
+        params: params
+      });
+    },
+    getListData: function(params) {
+      params['api-version'] = 'v2';
+      return Ajax.request({
+        url: 'comments/resource/{foreignKey}.json',
+        type: 'GET',
+        params: params
+      });
+    },
+    destroyData: function(params) {
+      const requestParams = {
+        id: params.id,
+        'api-version': 'v2'
+      };
+      return Ajax.request({
+        url: 'comments/{id}.json',
+        type: 'DELETE',
+        params: requestParams
+      });
+    }
+  }
 });
 
 export default Comment;

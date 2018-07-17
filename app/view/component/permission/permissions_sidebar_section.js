@@ -14,24 +14,22 @@
 import domEvents from 'can-dom-events';
 import SecondarySidebarSectionView from 'app/view/component/workspace/secondary_sidebar_section';
 
-var PermissionsView = SecondarySidebarSectionView.extend('passbolt.view.component.permission.Permissions', /** @static */ {
+const PermissionsView = SecondarySidebarSectionView.extend('passbolt.view.component.permission.Permissions', /** @static */ {
 
 }, /** @prototype */ {
 
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Observe when the user clicks on the edit button
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} a#js_edit_permissions_button click': function (el, ev) {
-		if (this.getController().getViewData('administrable') !== false) {
-			domEvents.dispatch(this.element, {type: 'request_resource_permissions_edit'});
-		}
-	}
+  /**
+   * Observe when the user clicks on the edit button
+   */
+  '{element} a#js_edit_permissions_button click': function() {
+    if (this.getController().getViewData('administrable') !== false) {
+      domEvents.dispatch(this.element, {type: 'request_resource_permissions_edit'});
+    }
+  }
 });
 
 export default PermissionsView;

@@ -14,12 +14,12 @@
 import Component from 'passbolt-mad/component/component';
 import SecondarySidebarView from 'app/view/component/workspace/secondary_sidebar_section';
 
-var SecondarySidebarSection = Component.extend('passbolt.component.workspace.SecondarySidebarSection', /** @static */ {
+const SecondarySidebarSection = Component.extend('passbolt.component.workspace.SecondarySidebarSection', /** @static */ {
 
-    defaults: {
-        label: 'SecondarySidebar Component',
-        viewClass: SecondarySidebarView
-    }
+  defaults: {
+    label: 'SecondarySidebar Component',
+    viewClass: SecondarySidebarView
+  }
 
 }, /** @prototype */ {
 

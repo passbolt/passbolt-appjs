@@ -13,23 +13,21 @@
  */
 import SecondarySidebarSectionView from 'app/view/component/workspace/secondary_sidebar_section';
 
-var CommentsSidebarSectionView = SecondarySidebarSectionView.extend('passbolt.view.component.comment.CommentsSidebarSection', /** @static */ {
+const CommentsSidebarSectionView = SecondarySidebarSectionView.extend('passbolt.view.component.comment.CommentsSidebarSection', /** @static */ {
 
 }, /** @prototype */ {
 
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Observe when the user clicks on the plus button, to add a comment
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} a.js_add_comment click': function (el, ev) {
-		// Displays the add comment form
-		this.getController().addForm.setState('ready');
-	}
+  /**
+   * Observe when the user clicks on the plus button, to add a comment
+   */
+  '{element} a.js_add_comment click': function() {
+    // Displays the add comment form
+    this.getController().addForm.setState('ready');
+  }
 });
 
 export default CommentsSidebarSectionView;

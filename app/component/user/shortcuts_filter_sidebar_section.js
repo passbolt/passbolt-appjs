@@ -19,93 +19,93 @@ import PrimarySidebarSectionComponent from 'app/component/workspace/primary_side
 
 import template from 'app/view/template/component/user/shortcuts_filter_sidebar_section.stache!';
 
-var ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.user.ShortcutsFilterSidebarSection', /** @static */ {
+const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.user.ShortcutsFilterSidebarSection', /** @static */ {
 
-	defaults: {
-		allFilter: null,
-		template: template
-	}
+  defaults: {
+    allFilter: null,
+    template: template
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function() {
-		this.options.menu = this._initShortcutsList();
-		this._super();
-	},
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    this.options.menu = this._initShortcutsList();
+    this._super();
+  },
 
-	/**
-	 * Init the shortcuts list.
-	 */
-	_initShortcutsList: function() {
-		var menu = new MenuComponent($('ul', this.element)[0]);
-		menu.start();
+  /**
+   * Init the shortcuts list.
+   */
+  _initShortcutsList: function() {
+    const menu = new MenuComponent($('ul', this.element)[0]);
+    menu.start();
 
-		// All
-		var allItem = new Action({
-			id: 'js_users_wsp_filter_all',
-			label: __('All users'),
-			filter: this.options.allFilter
-		});
-		menu.insertItem(allItem);
-		menu.selectItem(allItem);
+    // All
+    const allItem = new Action({
+      id: 'js_users_wsp_filter_all',
+      label: __('All users'),
+      filter: this.options.allFilter
+    });
+    menu.insertItem(allItem);
+    menu.selectItem(allItem);
 
-		// Modified
-		var modifiedItem = new Action({
-			id: 'js_users_wsp_filter_recently_modified',
-			label: __('Recently modified'),
-			filter: new Filter({
-				id: 'workspace_filter_modified',
-				label: __('Recently modified'),
-				order: ['User.modified DESC']
-			})
-		});
-		menu.insertItem(modifiedItem);
+    // Modified
+    const modifiedItem = new Action({
+      id: 'js_users_wsp_filter_recently_modified',
+      label: __('Recently modified'),
+      filter: new Filter({
+        id: 'workspace_filter_modified',
+        label: __('Recently modified'),
+        order: ['User.modified DESC']
+      })
+    });
+    menu.insertItem(modifiedItem);
 
-		return menu;
-	},
+    return menu;
+  },
 
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * An item has been selected
-	 * @parent mad.component.Menu.view_events
-	 * @param {HTMLElement} el The element the event occured on
-	 * @param {HTMLEvent} ev The event which occured
-	 */
-	'{element} item_selected': function (el, ev) {
-		const item = ev.data.item;
-		// If this item is not disabled, try to execute the item action.
-		if (!item.state.is('disabled')) {
-			MadBus.trigger('filter_workspace', {filter: item.filter});
-		}
-	},
+  /**
+   * An item has been selected
+   * @parent mad.component.Menu.view_events
+   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{element} item_selected': function(el, ev) {
+    const item = ev.data.item;
+    // If this item is not disabled, try to execute the item action.
+    if (!item.state.is('disabled')) {
+      MadBus.trigger('filter_workspace', {filter: item.filter});
+    }
+  },
 
-	/* ************************************************************** */
-	/* LISTEN TO THE APP EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE APP EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Listen to the workspace is filtered
-	 * @param {HTMLElement} el The element the event occured on
-	 * @param {HTMLEvent} ev The event which occured
-	 */
-	'{mad.bus.element} filter_workspace': function (el, ev) {
-		const filter = ev.data.filter;
-		var menu = this.options.menu;
-		menu.unselectAll();
+  /**
+   * Listen to the workspace is filtered
+   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{mad.bus.element} filter_workspace': function(el, ev) {
+    const filter = ev.data.filter;
+    const menu = this.options.menu;
+    menu.unselectAll();
 
-		// If the filter is relative to a filter registered in this component, select it.
-		menu.options.items.forEach(function(item) {
-			if (item.filter.id == filter.id) {
-				menu.selectItem(item);
-			}
-		});
-	}
+    // If the filter is relative to a filter registered in this component, select it.
+    menu.options.items.forEach(item => {
+      if (item.filter.id == filter.id) {
+        menu.selectItem(item);
+      }
+    });
+  }
 });
 
 export default ShortcutsFilterSidebarSectionComponent;

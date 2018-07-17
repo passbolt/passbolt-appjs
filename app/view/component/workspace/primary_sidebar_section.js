@@ -13,38 +13,36 @@
  */
 import View from 'passbolt-mad/view/view';
 
-var PrimarySidebarSectionView = View.extend('passbolt.view.component.PrimarySidebarSection', /** @static */ {
+const PrimarySidebarSectionView = View.extend('passbolt.view.component.PrimarySidebarSection', /** @static */ {
 
 }, /** @prototype */ {
 
-    /**
-     * Open the section.
-     */
-    open: function() {
-        $('.accordion-content', this.element).slideDown(50);
-        $(this.element).removeClass('closed');
-    },
+  /**
+   * Open the section.
+   */
+  open: function() {
+    $('.accordion-content', this.element).slideDown(50);
+    $(this.element).removeClass('closed');
+  },
 
-    /**
-     * Close the section
-     */
-    close: function() {
-        $('.accordion-content', this.element).slideUp(50);
-        $(this.element).addClass('closed');
-    },
+  /**
+   * Close the section
+   */
+  close: function() {
+    $('.accordion-content', this.element).slideUp(50);
+    $(this.element).addClass('closed');
+  },
 
-    /**
-     * Observe when accordion-header is clicked.
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    ' .accordion-header click': function(el, ev) {
-        if ($(this.element).hasClass('closed')) {
-            this.open();
-        } else {
-            this.close();
-        }
+  /**
+   * Observe when accordion-header is clicked.
+   */
+  ' .accordion-header click': function() {
+    if ($(this.element).hasClass('closed')) {
+      this.open();
+    } else {
+      this.close();
     }
+  }
 
 });
 

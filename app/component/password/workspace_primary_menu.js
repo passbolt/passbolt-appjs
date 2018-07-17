@@ -25,243 +25,236 @@ import uuid from 'uuid/v4';
 
 import template from 'app/view/template/component/password/workspace_primary_menu.stache!';
 
-var PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.PasswordWorkspaceMenu', /** @static */ {
+const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.PasswordWorkspaceMenu', /** @static */ {
 
-    defaults: {
-        label: 'Workspace Menu Controller',
-        tag: 'ul',
-        // the selected resources, you can pass an existing list as parameter of the constructor to share the same list
-        selectedRs: new Resource.List(),
-        template: template
-    }
+  defaults: {
+    label: 'Workspace Menu Controller',
+    tag: 'ul',
+    // the selected resources, you can pass an existing list as parameter of the constructor to share the same list
+    selectedRs: new Resource.List(),
+    template: template
+  }
 
 }, /** @prototype */ {
 
-    /**
-     * @inheritdoc
-     */
-    afterStart: function () {
-		// Copy secret button
-        var copySecretButton = new ButtonComponent('#js_wk_menu_secretcopy_button', {
-            state: 'disabled',
-            events: {
-                click: () => this._copySecret()
-            }
-        });
-        copySecretButton.start();
-		this.options.secretCopyButton = copySecretButton;
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    // Copy secret button
+    const copySecretButton = new ButtonComponent('#js_wk_menu_secretcopy_button', {
+      state: 'disabled',
+      events: {
+        click: () => this._copySecret()
+      }
+    });
+    copySecretButton.start();
+    this.options.secretCopyButton = copySecretButton;
 
-		// Edit button
-        var editButton = new ButtonComponent('#js_wk_menu_edition_button', {
-            state: 'disabled',
-            events: {
-                click: () => this._edit()
-            }
-        });
-        editButton.start();
-        this.options.editButton = editButton;
+    // Edit button
+    const editButton = new ButtonComponent('#js_wk_menu_edition_button', {
+      state: 'disabled',
+      events: {
+        click: () => this._edit()
+      }
+    });
+    editButton.start();
+    this.options.editButton = editButton;
 
-        // Share button
-        var shareButton = new ButtonComponent('#js_wk_menu_sharing_button', {
-            state: 'disabled',
-            events: {
-                click: () => this._share()
-            }
-        });
-        shareButton.start();
-        this.options.shareButton = shareButton;
+    // Share button
+    const shareButton = new ButtonComponent('#js_wk_menu_sharing_button', {
+      state: 'disabled',
+      events: {
+        click: () => this._share()
+      }
+    });
+    shareButton.start();
+    this.options.shareButton = shareButton;
 
-        // Export
-        this._initExportButton();
+    // Export
+    this._initExportButton();
 
-        // More button items
-        var moreButtonMenuItems = [];
+    // More button items
+    const moreButtonMenuItems = [];
 
-        // Copy login
-        var copyLoginItem = new Action({
-            id: uuid(),
-            label: __('copy login to clipboard'),
-            cssClasses: [],
-            action: () => this._copyLogin()
-        });
-        moreButtonMenuItems.push(copyLoginItem);
+    // Copy login
+    const copyLoginItem = new Action({
+      id: uuid(),
+      label: __('copy login to clipboard'),
+      cssClasses: [],
+      action: () => this._copyLogin()
+    });
+    moreButtonMenuItems.push(copyLoginItem);
 
-        // Copy secret
-        var copySecretItem = new Action({
-            id: uuid(),
-            label: __('copy password to clipboard'),
-            cssClasses: [],
-            action: () => this._copySecret()
-        });
-        moreButtonMenuItems.push(copySecretItem);
+    // Copy secret
+    const copySecretItem = new Action({
+      id: uuid(),
+      label: __('copy password to clipboard'),
+      cssClasses: [],
+      action: () => this._copySecret()
+    });
+    moreButtonMenuItems.push(copySecretItem);
 
-        // Delete
-        var deleteItem = new Action({
-            id: 'js_wk_menu_delete_action',
-            label: __('delete'),
-            cssClasses: [],
-            action: () => this._delete()
-        });
-        moreButtonMenuItems.push(deleteItem);
+    // Delete
+    const deleteItem = new Action({
+      id: 'js_wk_menu_delete_action',
+      label: __('delete'),
+      cssClasses: [],
+      action: () => this._delete()
+    });
+    moreButtonMenuItems.push(deleteItem);
 
-        var moreButton = new ButtonDropdownComponent('#js_wk_menu_more_button', {
-            state: 'disabled',
-            items: moreButtonMenuItems,
-            template: null
-        });
-        moreButton.start();
-        this.options.moreButton = moreButton;
+    const moreButton = new ButtonDropdownComponent('#js_wk_menu_more_button', {
+      state: 'disabled',
+      items: moreButtonMenuItems,
+      template: null
+    });
+    moreButton.start();
+    this.options.moreButton = moreButton;
 
-        // @todo URGENT, buggy, it rebinds 2 times external element event (such as madbus)
-        this.on();
-    },
+    // @todo URGENT, buggy, it rebinds 2 times external element event (such as madbus)
+    this.on();
+  },
 
-    /**
-     * Init export button.
-     * @private
-     */
-    _initExportButton: function() {
-        if (Config.read('server.passbolt.plugins.export')) {
-            var exportButtonSelector = '#js_wk_menu_export_button';
-            $(exportButtonSelector).removeClass('hidden');
-            var exportButton = new ButtonComponent(exportButtonSelector, {
-                events: {
-                    click: () => this._export()
-                }
-            });
-            exportButton.start();
-            this.options.exportButton = exportButton;
+  /**
+   * Init export button.
+   * @private
+   */
+  _initExportButton: function() {
+    if (Config.read('server.passbolt.plugins.export')) {
+      const exportButtonSelector = '#js_wk_menu_export_button';
+      $(exportButtonSelector).removeClass('hidden');
+      const exportButton = new ButtonComponent(exportButtonSelector, {
+        events: {
+          click: () => this._export()
         }
-    },
-
-    /**
-     * Copy login to clipboard.
-     */
-    _copyLogin: function() {
-        var item = this.options.selectedRs[0];
-        Clipboard.copy(item.username, 'username');
-    },
-
-    /**
-     * Decrypt and copy secret to clipboard
-     */
-    _copySecret: function() {
-        const secret = this.options.selectedRs[0].secrets[0];
-        Plugin.decryptAndCopyToClipboard(secret.data);
-    },
-
-    /**
-     * Delete
-     */
-    _delete: function() {
-        var resource = this.options.selectedRs[0];
-        MadBus.trigger('request_resource_deletion', {resource});
-    },
-
-    /**
-     * Edit
-     */
-    _edit: function() {
-        var resource = this.options.selectedRs[0];
-        MadBus.trigger('request_resource_edition', {resource});
-    },
-
-    /**
-     * Share
-     */
-    _share: function() {
-        var resource = this.options.selectedRs[0];
-        MadBus.trigger('request_resource_sharing', {resource});
-    },
-
-    /**
-     * Export
-     */
-    _export: function() {
-        const type = 'csv';
-        MadBus.trigger('request_export', {type});
-    },
-
-    /* ************************************************************** */
-    /* LISTEN TO THE MODEL EVENTS */
-    /* ************************************************************** */
-
-    /**
-     * Observe when a resource is selected
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     * @param {passbolt.model.Resource} resource The selected resource
-     */
-    '{selectedRs} add': function (el, ev, resource) {
-        // If a resource is selected
-        if (this.options.selectedRs.length == 1) {
-            this.setState('selection');
-        } else if (this.options.selectedRs.length == 0) {
-            this.setState('ready');
-        }
-    },
-
-    /**
-     * Observe when a resource is unselected
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     * @param {passbolt.model.Resource} resource The unselected resource
-     */
-    '{selectedRs} remove': function (el, ev, resource) {
-        // If a resource is selected
-        if (this.options.selectedRs.length == 1) {
-            this.setState('selection');
-        }
-        else if (this.options.selectedRs.length == 0) {
-            this.setState('ready');
-        }
-    },
-
-    /* ************************************************************** */
-    /* LISTEN TO THE STATE CHANGES */
-    /* ************************************************************** */
-
-    /**
-     * Listen to the change relative to the state selected
-     * @param {boolean} go Enter or leave the state
-     */
-    stateSelection: function (go) {
-        if (go) {
-            var permission = this.options.selectedRs[0].permission;
-            // Is the resource editable ?
-            var updatable = permission.isAllowedTo(PermissionType.UPDATE);
-            // Is the resource administrable ?
-            var administrable = permission.isAllowedTo(PermissionType.ADMIN);
-
-			this.options.secretCopyButton
-				.setValue(this.options.selectedRs[0])
-				.setState('ready');
-            this.options.editButton
-                .setValue(this.options.selectedRs[0])
-                .setState(updatable ? 'ready' : 'disabled');
-            this.options.shareButton
-                .setValue(this.options.selectedRs)
-                .setState(administrable ? 'ready' : 'disabled');
-            this.options.moreButton
-                .setValue(this.options.selectedRs[0])
-                .setState('ready');
-			this.options.moreButton.setItemState('js_wk_menu_delete_action', updatable ? 'ready' : 'disabled')
-        } else {
-			this.options.secretCopyButton
-				.setValue(null)
-				.setState('disabled');
-            this.options.editButton
-                .setValue(null)
-                .setState('disabled');
-            this.options.shareButton
-                .setValue(null)
-                .setState('disabled');
-            this.options.moreButton
-                .setValue(null)
-                .setState('disabled');
-			this.options.moreButton.setItemState('js_wk_menu_delete_action', 'disabled');
-        }
+      });
+      exportButton.start();
+      this.options.exportButton = exportButton;
     }
+  },
+
+  /**
+   * Copy login to clipboard.
+   */
+  _copyLogin: function() {
+    const item = this.options.selectedRs[0];
+    Clipboard.copy(item.username, 'username');
+  },
+
+  /**
+   * Decrypt and copy secret to clipboard
+   */
+  _copySecret: function() {
+    const secret = this.options.selectedRs[0].secrets[0];
+    Plugin.decryptAndCopyToClipboard(secret.data);
+  },
+
+  /**
+   * Delete
+   */
+  _delete: function() {
+    const resource = this.options.selectedRs[0];
+    MadBus.trigger('request_resource_deletion', {resource: resource});
+  },
+
+  /**
+   * Edit
+   */
+  _edit: function() {
+    const resource = this.options.selectedRs[0];
+    MadBus.trigger('request_resource_edition', {resource: resource});
+  },
+
+  /**
+   * Share
+   */
+  _share: function() {
+    const resource = this.options.selectedRs[0];
+    MadBus.trigger('request_resource_sharing', {resource: resource});
+  },
+
+  /**
+   * Export
+   */
+  _export: function() {
+    const type = 'csv';
+    MadBus.trigger('request_export', {type: type});
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO THE MODEL EVENTS */
+  /* ************************************************************** */
+
+  /**
+   * Observe when a resource is selected
+   */
+  '{selectedRs} add': function() {
+    // If a resource is selected
+    if (this.options.selectedRs.length == 1) {
+      this.setState('selection');
+    } else if (this.options.selectedRs.length == 0) {
+      this.setState('ready');
+    }
+  },
+
+  /**
+   * Observe when a resource is unselected
+   */
+  '{selectedRs} remove': function() {
+    // If a resource is selected
+    if (this.options.selectedRs.length == 1) {
+      this.setState('selection');
+    } else if (this.options.selectedRs.length == 0) {
+      this.setState('ready');
+    }
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO THE STATE CHANGES */
+  /* ************************************************************** */
+
+  /**
+   * Listen to the change relative to the state selected
+   * @param {boolean} go Enter or leave the state
+   */
+  stateSelection: function(go) {
+    if (go) {
+      const permission = this.options.selectedRs[0].permission;
+      // Is the resource editable ?
+      const updatable = permission.isAllowedTo(PermissionType.UPDATE);
+      // Is the resource administrable ?
+      const administrable = permission.isAllowedTo(PermissionType.ADMIN);
+
+      this.options.secretCopyButton
+        .setValue(this.options.selectedRs[0])
+        .setState('ready');
+      this.options.editButton
+        .setValue(this.options.selectedRs[0])
+        .setState(updatable ? 'ready' : 'disabled');
+      this.options.shareButton
+        .setValue(this.options.selectedRs)
+        .setState(administrable ? 'ready' : 'disabled');
+      this.options.moreButton
+        .setValue(this.options.selectedRs[0])
+        .setState('ready');
+      this.options.moreButton.setItemState('js_wk_menu_delete_action', updatable ? 'ready' : 'disabled');
+    } else {
+      this.options.secretCopyButton
+        .setValue(null)
+        .setState('disabled');
+      this.options.editButton
+        .setValue(null)
+        .setState('disabled');
+      this.options.shareButton
+        .setValue(null)
+        .setState('disabled');
+      this.options.moreButton
+        .setValue(null)
+        .setState('disabled');
+      this.options.moreButton.setItemState('js_wk_menu_delete_action', 'disabled');
+    }
+  }
 
 });
 

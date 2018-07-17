@@ -2,8 +2,8 @@ import CanDefineMap from 'can-define/map/map';
 import route from 'can-route/can-route';
 
 const AppViewModel = CanDefineMap.extend({
-    controller: 'string',
-    action: 'string'
+  controller: 'string',
+  action: 'string'
 });
 const appState = new AppViewModel();
 route.data = appState;

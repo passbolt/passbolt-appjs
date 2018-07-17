@@ -19,7 +19,7 @@ import MadBus from 'passbolt-mad/control/bus';
 
 import itemTemplate from 'app/view/template/component/group/group_item.stache!';
 
-var PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.component.PasswordCategoriesGroupsList', /** @static */ {
+const PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.component.PasswordCategoriesGroupsList', /** @static */ {
 
   defaults: {
     itemClass: Group,
@@ -43,7 +43,7 @@ var PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.componen
    */
   _filterWorkspaceByGroup: function(group) {
     this.selectedFilter = new Filter({
-      id: 'workspace_filter_group_' + group.id,
+      id: `workspace_filter_group_${group.id}`,
       label: __('%s (group)', group.name),
       rules: {
         'is-shared-with-group': group.id

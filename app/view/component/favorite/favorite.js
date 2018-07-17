@@ -13,23 +13,23 @@
  */
 import View from 'passbolt-mad/view/view';
 
-var FavoriteView = View.extend('passbolt.view.component.favorite.Favorite', /** @static */ {
+const FavoriteView = View.extend('passbolt.view.component.favorite.Favorite', /** @static */ {
 
 }, /** @prototype */ {
 
-	/**
-	 * Mark as a favorite.
-	 */
-	favorite: function (el, ev) {
-		$('i', this.element).removeClass('fav').addClass('unfav');
-	},
+  /**
+   * Mark as a favorite.
+   */
+  favorite: function() {
+    $('i', this.element).removeClass('fav').addClass('unfav');
+  },
 
-	/**
-	 * Unmark as a favorite.
-	 */
-	unfavorite: function (el, ev) {
-		$('i', this.element).removeClass('unfav').addClass('fav');
-	}
+  /**
+   * Unmark as a favorite.
+   */
+  unfavorite: function() {
+    $('i', this.element).removeClass('unfav').addClass('fav');
+  }
 
 });
 

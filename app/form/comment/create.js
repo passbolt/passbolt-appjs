@@ -19,94 +19,96 @@ import User from 'app/model/map/user';
 
 import template from 'app/view/template/form/comment/add.stache!';
 
-var CreateForm = Form.extend('passbolt.form.comment.Create', /** @static */ {
+const CreateForm = Form.extend('passbolt.form.comment.Create', /** @static */ {
 
-	defaults: {
-		foreignModel: null,
-		foreignKey: null,
-		callbacks: {
-			submit: function (data) {
-				var comment = new Comment(data['Comment']);
-				comment.save();
-			}
-		},
-		template: template,
-		commentContentField: null
-	}
+  defaults: {
+    foreignModel: null,
+    foreignKey: null,
+    callbacks: {
+      submit: function(data) {
+        const comment = new Comment(data['Comment']);
+        comment.save();
+      }
+    },
+    template: template,
+    commentContentField: null
+  }
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	init: function(el, options) {
-		this._super(el, options);
-		this.setViewData('user', User.getCurrent());
-	},
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    this._super(el, options);
+    this.setViewData('user', User.getCurrent());
+  },
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function () {
-		// parent_id hidden field
-		this.addElement(
-			new TextboxComponent('#' + this.element.id + ' .js_comment_parent_id', {
-				modelReference: 'Comment.parent_id'
-			}).start()
-		);
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    // parent_id hidden field
+    this.addElement(
+      new TextboxComponent(`#${this.element.id} .js_comment_parent_id`, {
+        modelReference: 'Comment.parent_id'
+      }).start()
+    );
 
-		// foreign_model hidden field
-		this.addElement(
-			new TextboxComponent('#' + this.element.id + ' .js_comment_foreign_model', {
-				modelReference: 'Comment.foreign_model'
-			}).start().setValue('Resource')
-		);
+    // foreign_model hidden field
+    this.addElement(
+      new TextboxComponent(`#${this.element.id} .js_comment_foreign_model`, {
+        modelReference: 'Comment.foreign_model'
+      }).start().setValue('Resource')
+    );
 
-		// foreign_key hidden field
-		this.addElement(
-			new TextboxComponent('#' + this.element.id + ' .js_comment_foreign_key', {
-				modelReference: 'Comment.foreign_key'
-			}).start().setValue(this.options.foreignKey)
-		);
+    // foreign_key hidden field
+    this.addElement(
+      new TextboxComponent(`#${this.element.id} .js_comment_foreign_key`, {
+        modelReference: 'Comment.foreign_key'
+      }).start().setValue(this.options.foreignKey)
+    );
 
-		// feedback.
-		this.options.commentContentField = new TextboxComponent('#' + this.element.id + ' .js_comment_content', {
-			modelReference: 'Comment.content'
-		}).start();
-		this.addElement(
-			this.options.commentContentField,
-			new FeedbackComponent('#' + this.element.id + ' .js_comment_content_feedback', {}).start()
-		);
-	},
+    // feedback.
+    this.options.commentContentField = new TextboxComponent(`#${this.element.id} .js_comment_content`, {
+      modelReference: 'Comment.content'
+    }).start();
+    this.addElement(
+      this.options.commentContentField,
+      new FeedbackComponent(`#${this.element.id} .js_comment_content_feedback`, {}).start()
+    );
+  },
 
-    /**
-     * Empty content of the comment content field.
+  /**
+   * Empty content of the comment content field.
+   */
+  emptyContent: function() {
+    this.options.commentContentField.setValue('');
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
+
+  /**
+   * State ready.
+   * Empty the comment content field.
+   */
+  stateReady: function() {
+    this.options.commentContentField.setValue('');
+  },
+
+  /**
+   * State hidden.
+   * @param go
+   */
+  stateHidden: function(go) {
+    this._super(go);
+    /*
+     * Reinitialize number of validations to avoid inline validation
+     * each time the form appears.
      */
-    emptyContent: function() {
-        this.options.commentContentField.setValue('');
-    },
-
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
-
-	/**
-	 * State ready.
-	 * Empty the comment content field.
-	 */
-	stateReady: function() {
-		this.options.commentContentField.setValue('');
-	},
-
-    /**
-     * State hidden.
-     * @param go
-     */
-    stateHidden: function (go) {
-        this._super(go);
-        // Reinitialize number of validations to avoid inline validation
-        // each time the form appears.
-        this.validations = 0;
-    }
+    this.validations = 0;
+  }
 });
 
 export default CreateForm;

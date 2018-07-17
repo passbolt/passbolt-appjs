@@ -15,50 +15,50 @@ import DomData from 'can-dom-data';
 import domEvents from 'can-dom-events';
 import View from 'passbolt-mad/view/view';
 
-var PermissionsView = View.extend('passbolt.view.component.permission.Permissions', /** @static */ { }, /** @prototype */ {
+const PermissionsView = View.extend('passbolt.view.component.permission.Permissions', /** @static */ { }, /** @prototype */ {
 
-	/* ************************************************************** */
-	/* LISTEN TO VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Observe when the user want to delete a permission.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} .js_perm_delete click': function(el, ev) {
-		ev.stopPropagation();
-		ev.preventDefault();
-		var $li = $(el).parents('li');
-		var permission = DomData.get($li[0], 'passbolt.model.Permission');
-		domEvents.dispatch(this.element, {type: 'request_permission_delete', data: {permission}});
-	},
+  /**
+   * Observe when the user want to delete a permission.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} .js_perm_delete click': function(el, ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    const $li = $(el).parents('li');
+    const permission = DomData.get($li[0], 'passbolt.model.Permission');
+    domEvents.dispatch(this.element, {type: 'request_permission_delete', data: {permission: permission}});
+  },
 
-	/**
-	 * Observe when the user want to edit a permission type.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} .js_share_rs_perm_type changed': function(el, ev) {
-		ev.stopPropagation();
-		ev.preventDefault();
-		const data = ev.data;
-		const $li = $(el).parents('li');
-		const permission = DomData.get($li[0], 'passbolt.model.Permission');
-		const type = data.value;
-		domEvents.dispatch(this.element, {type: 'request_permission_edit', data: {permission, type}});
-	},
+  /**
+   * Observe when the user want to edit a permission type.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} .js_share_rs_perm_type changed': function(el, ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    const data = ev.data;
+    const $li = $(el).parents('li');
+    const permission = DomData.get($li[0], 'passbolt.model.Permission');
+    const type = data.value;
+    domEvents.dispatch(this.element, {type: 'request_permission_edit', data: {permission: permission, type: type}});
+  },
 
-	/**
-	 * Observe when the user want to reset the filter
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} #js_perm_create_form_add_btn click': function(el, ev) {
-		ev.stopPropagation();
-		ev.preventDefault();
-		$(el).trigger('submit');
-	}
+  /**
+   * Observe when the user want to reset the filter
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} #js_perm_create_form_add_btn click': function(el, ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    $(el).trigger('submit');
+  }
 
 });
 

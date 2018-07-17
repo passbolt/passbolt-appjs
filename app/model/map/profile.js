@@ -14,32 +14,32 @@
 import DefineMap from 'passbolt-mad/model/map/map';
 import ImageStorage from 'app/model/map/image_storage';
 
-var Profile = DefineMap.extend('passbolt.model.Profile', {
-	id: 'string',
-	first_name: 'string',
-	last_name: 'string',
-	avatar: ImageStorage,
-	
-	/**
-	 * Return the user full name.
-	 * @return {string}
-	 */
-	fullName: function() {
-		return this.first_name + ' ' + this.last_name;
-	},
+const Profile = DefineMap.extend('passbolt.model.Profile', {
+  id: 'string',
+  first_name: 'string',
+  last_name: 'string',
+  avatar: ImageStorage,
 
-	/**
-	 * Get the avatar image path
-	 * @param {string} version (optional) The version to get
-	 * @return {string} The image path
-	 */
-	avatarPath: function(version) {
-		if (typeof this.avatar != 'undefined' && this.avatar.url != undefined) {
-			return this.avatar.imagePath(version);
-		} else {
-			return 'img/avatar/user.png';
-		}
-	}
+  /**
+   * Return the user full name.
+   * @return {string}
+   */
+  fullName: function() {
+    return `${this.first_name} ${this.last_name}`;
+  },
+
+  /**
+   * Get the avatar image path
+   * @param {string} version (optional) The version to get
+   * @return {string} The image path
+   */
+  avatarPath: function(version) {
+    if (typeof this.avatar != 'undefined' && this.avatar.url != undefined) {
+      return this.avatar.imagePath(version);
+    } else {
+      return 'img/avatar/user.png';
+    }
+  }
 });
 DefineMap.setReference('Profile', Profile);
 
@@ -49,18 +49,18 @@ DefineMap.setReference('Profile', Profile);
  * @see https://github.com/passbolt/passbolt_api/src/Model/Table/PRofilesTable.php
  */
 Profile.validationRules = {
-	first_name: [
-		{rule: 'required', message: __('A first name is required')},
-		{rule: 'notEmpty', message: __('A first name is required')},
-		{rule: 'utf8', message: __('First name should be a valid utf8 string.')},
-		{rule: ['lengthBetween', 0, 255], message: __('The first name length should be maximum 255 characters.')}
-	],
-	last_name: [
-		{rule: 'required', message: __('A last name is required')},
-		{rule: 'notEmpty', message: __('A last name is required')},
-		{rule: 'utf8', message: __('Last name should be a valid utf8 string.')},
-		{rule: ['lengthBetween', 0, 255], message: __('The last name length should be maximum 255 characters.')}
-	]
+  first_name: [
+    {rule: 'required', message: __('A first name is required')},
+    {rule: 'notEmpty', message: __('A first name is required')},
+    {rule: 'utf8', message: __('First name should be a valid utf8 string.')},
+    {rule: ['lengthBetween', 0, 255], message: __('The first name length should be maximum 255 characters.')}
+  ],
+  last_name: [
+    {rule: 'required', message: __('A last name is required')},
+    {rule: 'notEmpty', message: __('A last name is required')},
+    {rule: 'utf8', message: __('Last name should be a valid utf8 string.')},
+    {rule: ['lengthBetween', 0, 255], message: __('The last name length should be maximum 255 characters.')}
+  ]
 };
 
 export default Profile;

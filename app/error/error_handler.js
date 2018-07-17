@@ -13,7 +13,7 @@
  */
 import MadErrorHandler from "passbolt-mad/error/error_handler";
 
-var ErrorHandler = MadErrorHandler.extend('passbolt.error.ErrorHandler', /** @static */ {
+const ErrorHandler = MadErrorHandler.extend('passbolt.error.ErrorHandler', /** @static */ {
 
 });
 

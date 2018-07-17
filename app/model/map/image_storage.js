@@ -13,24 +13,23 @@
  */
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var ImageStorage = DefineMap.extend('passbolt.model.ImageStorage', {
-    /**
-     * Get the image path
-     * @param {passbolt.model.ImageStorage} img The target image
-     * @param {string} version (optional) The version to get
-     * @return {string} The image path
-     */
-    imagePath: function(version) {
-        if (typeof this.url == 'undefined') {
-            return '';
-        }
-        if (typeof this.url[version] == 'undefined') {
-            return '';
-        }
-        else {
-            return this.url[version];
-        }
+const ImageStorage = DefineMap.extend('passbolt.model.ImageStorage', {
+  /**
+   * Get the image path
+   * @param {passbolt.model.ImageStorage} img The target image
+   * @param {string} version (optional) The version to get
+   * @return {string} The image path
+   */
+  imagePath: function(version) {
+    if (typeof this.url == 'undefined') {
+      return '';
     }
+    if (typeof this.url[version] == 'undefined') {
+      return '';
+    } else {
+      return this.url[version];
+    }
+  }
 });
 DefineMap.setReference('ImageStorage', ImageStorage);
 

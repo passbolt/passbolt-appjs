@@ -15,22 +15,21 @@ import Form from 'passbolt-mad/form/form';
 
 import template from 'app/view/template/form/user/avatar.stache!';
 
-var EditAvatarForm = Form.extend('passbolt.form.user.Avatar', /** @static */ {
+const EditAvatarForm = Form.extend('passbolt.form.user.Avatar', /** @static */ {
 
-	defaults: {
-		template: template
-	}
+  defaults: {
+    template: template
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function () {
-
-		// Rebind controller events
-		this.on();
-	}
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    // Rebind controller events
+    this.on();
+  }
 
 });
 export default EditAvatarForm;

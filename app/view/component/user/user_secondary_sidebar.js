@@ -14,24 +14,24 @@
 import domEvents from 'can-dom-events';
 import SecondarySidebarView from 'app/view/component/workspace/secondary_sidebar';
 
-var UserSecondarySidebarView = SecondarySidebarView.extend('passbolt.view.component.user.UserSecondarySidebar', /** @static */ {
+const UserSecondarySidebarView = SecondarySidebarView.extend('passbolt.view.component.user.UserSecondarySidebar', /** @static */ {
 
 }, /** @prototype */ {
 
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Observe when the user clicks on the copy key button.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} a.copy-public-key click': function (el, ev) {
-		ev.stopPropagation();
-		ev.preventDefault();
-		domEvents.dispatch(this.element, {type: 'request_copy_publickey'});
-	}
+  /**
+   * Observe when the user clicks on the copy key button.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} a.copy-public-key click': function(el, ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    domEvents.dispatch(this.element, {type: 'request_copy_publickey'});
+  }
 });
 
 export default UserSecondarySidebarView;

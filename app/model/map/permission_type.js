@@ -13,10 +13,10 @@
  */
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var PermissionType = DefineMap.extend('passbolt.model.PermissionType', {
-	serial: 'string',
-	name: 'string',
-	description: 'string'
+const PermissionType = DefineMap.extend('passbolt.model.PermissionType', {
+  serial: 'string',
+  name: 'string',
+  description: 'string'
 });
 
 /**
@@ -39,24 +39,24 @@ PermissionType.ADMIN = 15;
  * Translation of the available permissions types.
  */
 PermissionType.PERMISSION_TYPES = {
-	1: __('read'),
-	7: __('update'),
-	15: __('owner')
+  1: __('read'),
+  7: __('update'),
+  15: __('owner')
 };
 
 /**
  * @inheritdoc
  */
 PermissionType.validationRules = {
-	serial: [{
-		rule: 'choice',
-		options: {
-			callback: function() {
-				// return the available serials (array_keys in js style)
-				return $.map(PermissionType.PERMISSION_TYPES, function(element,index) {return index});
-			}
-		}
-	}]
+  serial: [{
+    rule: 'choice',
+    options: {
+      callback: function() {
+        // return the available serials (array_keys in js style)
+        return $.map(PermissionType.PERMISSION_TYPES, (element, index) => index);
+      }
+    }
+  }]
 };
 
 
@@ -64,21 +64,21 @@ PermissionType.validationRules = {
  * Get permission type formated.
  * @return {string}
  */
-PermissionType.formatToString= function(permId) {
-	var returnValue = '';
-	if (permId == undefined) {
-		console.error('Warning, PermissionType.toString called without permId');
-		return 'can read';
-	}
-	switch (permId.toString()) {
-		case PermissionType.ADMIN.toString():
-			returnValue = __('is %s', PermissionType.PERMISSION_TYPES[permId]);
-			break;
-		default:
-			returnValue = __('can %s', PermissionType.PERMISSION_TYPES[permId]);
-			break;
-	}
-	return returnValue;
+PermissionType.formatToString = function(permId) {
+  let returnValue = '';
+  if (permId == undefined) {
+    console.error('Warning, PermissionType.toString called without permId');
+    return 'can read';
+  }
+  switch (permId.toString()) {
+    case PermissionType.ADMIN.toString():
+      returnValue = __('is %s', PermissionType.PERMISSION_TYPES[permId]);
+      break;
+    default:
+      returnValue = __('can %s', PermissionType.PERMISSION_TYPES[permId]);
+      break;
+  }
+  return returnValue;
 };
 
 export default PermissionType;

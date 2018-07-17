@@ -22,19 +22,19 @@ import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/const
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var Role = DefineMap.extend('passbolt.model.User', {
-	id: 'string',
-	name: 'string'
+const Role = DefineMap.extend('passbolt.model.User', {
+  id: 'string',
+  name: 'string'
 });
 DefineMap.setReference('Role', Role);
-Role.List = DefineList.extend({'#': { Type: Role }});
+Role.List = DefineList.extend({'#': {Type: Role}});
 
 /**
  * Get the stored roles.
  * @returns {DefineList<Role>}
  */
 Role.getCache = function() {
-	return this.cache;
+  return this.cache;
 };
 
 /**
@@ -42,7 +42,7 @@ Role.getCache = function() {
  * @param {DefineList<Role>} roles
  */
 Role.setCache = function(roles) {
-	this.cache = roles;
+  this.cache = roles;
 };
 
 /**
@@ -50,27 +50,27 @@ Role.setCache = function(roles) {
  * @param {string} roleName
  */
 Role.toId = function(roleName) {
-	return this.cache.reduce((carry, item) => {
-		if (roleName == item.name) {
-			carry = item.id;
-		}
-		return carry;
-	}, '');
+  return this.cache.reduce((carry, item) => {
+    if (roleName == item.name) {
+      carry = item.id;
+    }
+    return carry;
+  }, '');
 };
 
 Role.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
-	Map: Role,
-	List: Role.List,
-	url: {
-		resource: '/',
-		getListData: function(params) {
-			return Ajax.request({
-				url: 'roles.json?api-version=v2',
-				type: 'GET',
-				params: params
-			});
-		}
-	}
+  Map: Role,
+  List: Role.List,
+  url: {
+    resource: '/',
+    getListData: function(params) {
+      return Ajax.request({
+        url: 'roles.json?api-version=v2',
+        type: 'GET',
+        params: params
+      });
+    }
+  }
 });
 
 export default Role;

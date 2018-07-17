@@ -16,13 +16,13 @@ import Component from 'passbolt-mad/component/component';
 
 import template from 'app/view/template/component/workspace/primary_sidebar.stache!';
 
-var PrimarySidebarComponent = Component.extend('passbolt.component.workspace.PrimarySidebar', /** @static */ {
+const PrimarySidebarComponent = Component.extend('passbolt.component.workspace.PrimarySidebar', /** @static */ {
 
-    defaults: {
-        label: 'Sidebar Component',
-        //viewClass: PrimarySidebarView,
-        template: template
-    }
+  defaults: {
+    label: 'Sidebar Component',
+    //viewClass: PrimarySidebarView,
+    template: template
+  }
 
 }, /** @prototype */ {
 

@@ -21,34 +21,34 @@ import connectStore from 'can-connect/constructor/store/store';
 import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var Favorite = DefineMap.extend('passbolt.model.Favorite', {
-	id: 'string',
-	user_id: 'string',
-	foreign_model: 'string',
-	foreign_key: 'string'
+const Favorite = DefineMap.extend('passbolt.model.Favorite', {
+  id: 'string',
+  user_id: 'string',
+  foreign_model: 'string',
+  foreign_key: 'string'
 });
 DefineMap.setReference('Favorite', Favorite);
 
 Favorite.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
-	Map: Favorite,
-	List: Favorite.List,
-	url: {
-		resource: '/',
-		destroyData: function(params) {
-			return Ajax.request({
-				url: 'favorites/{id}.json?api-version=v2',
-				type: 'DELETE',
-				params: params
-			});
-		},
-		createData: function(params) {
-			return Ajax.request({
-				url: 'favorites/resource/{foreign_key}.json?api-version=v2',
-				type: 'POST',
-				params: params
-			});
-		}
-	}
+  Map: Favorite,
+  List: Favorite.List,
+  url: {
+    resource: '/',
+    destroyData: function(params) {
+      return Ajax.request({
+        url: 'favorites/{id}.json?api-version=v2',
+        type: 'DELETE',
+        params: params
+      });
+    },
+    createData: function(params) {
+      return Ajax.request({
+        url: 'favorites/resource/{foreign_key}.json?api-version=v2',
+        type: 'POST',
+        params: params
+      });
+    }
+  }
 });
 
 export default Favorite;

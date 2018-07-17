@@ -15,637 +15,638 @@ import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import domEvents from 'can-dom-events';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
-import Group from 'app/model/map/group';
-import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import Permission from 'app/model/map/permission';
 import PermissionType from 'app/model/map/permission_type';
 import PermissionsView from 'app/view/component/permission/permissions';
 import Plugin from 'app/util/plugin';
-import Resource from 'app/model/map/resource'
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 import TreeComponent from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
-import User from 'app/model/map/user';
 import uuid from 'uuid/v4';
 
 import template from 'app/view/template/component/permission/permissions.stache!';
 import permissionListItemTemplate from 'app/view/template/component/permission/permission_list_item.stache!';
 
-var PermissionsComponent = Component.extend('passbolt.component.permission.Permissions', /** @static */ {
+const PermissionsComponent = Component.extend('passbolt.component.permission.Permissions', /** @static */ {
 
-	defaults: {
-		label: 'Permissions Controller',
-        // Override the viewClass option.
-		viewClass: PermissionsView,
-		// The resource instance to bind the component on.
-		acoInstance: null,
-		// The list of changes.
-		changes: [],
-        // The template used to render the permissions component.
-		template: template,
-        // Override the silentLoading parameter.
-        silentLoading: false,
-		// The initial state the component will be initialized on (after start).
-		state: 'loading',
-		// Component callbacks
-		callbacks: {
-			shared: null
-		}
-	}
+  defaults: {
+    label: 'Permissions Controller',
+    // Override the viewClass option.
+    viewClass: PermissionsView,
+    // The resource instance to bind the component on.
+    acoInstance: null,
+    // The list of changes.
+    changes: [],
+    // The template used to render the permissions component.
+    template: template,
+    // Override the silentLoading parameter.
+    silentLoading: false,
+    // The initial state the component will be initialized on (after start).
+    state: 'loading',
+    // Component callbacks
+    callbacks: {
+      shared: null
+    }
+  }
 
 }, /** @prototype */ {
 
-	// A list of permission change type dropdown components.
-	_permissionChangeTypeDropDowns: {},
-	// A list of permission delete button components.
-	_permissionDeleteButtons: {},
+  // A list of permission change type dropdown components.
+  _permissionChangeTypeDropDowns: {},
+  // A list of permission delete button components.
+  _permissionDeleteButtons: {},
 
-	// Constructor like
-	init: function (el, opts) {
-		this._super(el, opts);
-		this.setViewData('canAdmin', this._isAdmin());
-	},
+  // Constructor like
+  init: function(el, opts) {
+    this._super(el, opts);
+    this.setViewData('canAdmin', this._isAdmin());
+  },
 
-	/**
-	 * Check that the current user has admin right on the resource.
-	 * @return {boolean}
-	 */
-	_isAdmin: function() {
-		var permission = this.options.acoInstance.permission;
-		return permission.isAllowedTo(PermissionType.ADMIN);
-	},
+  /**
+   * Check that the current user has admin right on the resource.
+   * @return {boolean}
+   */
+  _isAdmin: function() {
+    const permission = this.options.acoInstance.permission;
+    return permission.isAllowedTo(PermissionType.ADMIN);
+  },
 
-	/**
-	 * After start hook.
-	 * @see {mad.Component}
-	 */
-	afterStart: function() {
-		var self = this;
-
-		// List defined permissions
-		this.permList = new TreeComponent('#js_permissions_list', {
-			cssClasses: ['permissions'],
-			viewClass: TreeView,
-			itemClass: Permission,
-			itemTemplate: permissionListItemTemplate,
-			// The map to use to make jstree working with our permission model
-			map: new MadMap({
-				id: 'id',
-				aroLabel: {
-					key: 'aro',
-					func: function(aro, map, obj) {
-						return aro.toLowerCase();
-					}
-				},
-				aroAvatarPath: {
-					key: 'id',
-					func: function(user, map, obj) {
-						if (obj.aro == 'User') {
-							return obj.user.profile.avatarPath('small');
-						} else {
-							return 'img/avatar/group_default.png';
-						}
-					}
-				},
-				permType: 'PermissionType.serial',
-				permLabel: {
-					key: 'type',
-					func: function(type, map, obj) {
-						return PermissionType.formatToString(type);
-					}
-				},
-				acoLabel: {
-					key: 'aco_foreign_key',
-					func: function(aco_foreign_key, map, obj) {
-						if (obj.aro == 'User') {
-							return obj.user.profile.fullName();
-						} else if (obj.aro == 'Group') {
-							return obj.group.name;
-						}
-					}
-				},
-				acoDetails: {
-					key: 'aco_foreign_key',
-					func: function(aco_foreign_key, map, obj) {
-						if (obj.aro == 'User') {
-							return obj.user.username;
-						} else if (obj.aro == 'Group') {
-							return __('group');
-						}
-					}
-				}
-			})
-		});
-		this.permList.start();
-
-		if (this._isAdmin()) {
-			// Add an hidden element to the form to carry the aro id
-			this.permAroHiddenTxtbx = new TextboxComponent('#js_perm_create_form_aro', {}).start();
-			this.permAroHiddenTxtbx.setValue(this.options.acoInstance.id);
-
-			// Notify the plugin that the share dialog is ready to interact with it.
-			// The plugin will inject the form to grant new users.
-			Plugin.insertShareIframe(this.options.acoInstance.id, this.options.acoInstance.secrets[0].data);
-		}
-
-		// Load the component for the aco instance given in options.
-		this.load(this.options.acoInstance);
-
-		// Add a button to control the final save action
-		this.options.saveChangesButton = new ButtonComponent('#js_rs_share_save', {
-			// By default it is disabled, it will be enabled once the user has changed something.
-			state: 'disabled'
-		}).start();
-
-		this.on();
-	},
-
-	/**
-	 * Load a new permission in the list.
-	 * @param permission
-	 */
-	loadPermission: function(permission) {
-		var permTypeSelector = '#js_share_rs_perm_' + permission.id,
-			actionSelector = '#js_actions_rs_perm_' + permission.id,
-			permSelector = '#' + permission.id,
-            availablePermissionTypes = {},
-            permissionTypes = [1, 7, 15]; // Hardcoded for Resource and direct permission.
-
-		// Gather the available permission types
-        for (var permType in permissionTypes) {
-            availablePermissionTypes[permissionTypes[permType]] = PermissionType.formatToString(permissionTypes[permType]);
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    // List defined permissions
+    this.permList = new TreeComponent('#js_permissions_list', {
+      cssClasses: ['permissions'],
+      viewClass: TreeView,
+      itemClass: Permission,
+      itemTemplate: permissionListItemTemplate,
+      // The map to use to make jstree working with our permission model
+      map: new MadMap({
+        id: 'id',
+        aroLabel: {
+          key: 'aro',
+          func: function(aro) {
+            return aro.toLowerCase();
+          }
+        },
+        aroAvatarPath: {
+          key: 'id',
+          func: function(user, map, obj) {
+            if (obj.aro == 'User') {
+              return obj.user.profile.avatarPath('small');
+            } else {
+              return 'img/avatar/group_default.png';
+            }
+          }
+        },
+        permType: 'PermissionType.serial',
+        permLabel: {
+          key: 'type',
+          func: function(type) {
+            return PermissionType.formatToString(type);
+          }
+        },
+        acoLabel: {
+          key: 'aco_foreign_key',
+          func: function(aco_foreign_key, map, obj) {
+            if (obj.aro == 'User') {
+              return obj.user.profile.fullName();
+            } else if (obj.aro == 'Group') {
+              return obj.group.name;
+            }
+          }
+        },
+        acoDetails: {
+          key: 'aco_foreign_key',
+          func: function(aco_foreign_key, map, obj) {
+            if (obj.aro == 'User') {
+              return obj.user.username;
+            } else if (obj.aro == 'Group') {
+              return __('group');
+            }
+          }
         }
+      })
+    });
+    this.permList.start();
 
-		// Add the permission to the list of permissions
-		this.permList.insertItem(permission);
+    if (this._isAdmin()) {
+      // Add an hidden element to the form to carry the aro id
+      this.permAroHiddenTxtbx = new TextboxComponent('#js_perm_create_form_aro', {}).start();
+      this.permAroHiddenTxtbx.setValue(this.options.acoInstance.id);
 
-		// Add a selectbox to display the permission type (and allow to change)
-		this._permissionChangeTypeDropDowns[permission.id] = new DropdownComponent(permTypeSelector + ' .js_share_rs_perm_type', {
-			id: 'js_share_perm_type_' + permission.id,
-			emptyValue: false,
-			modelReference: 'passbolt.model.Permission.type',
-			availableValues: availablePermissionTypes,
-			// If the current user has no admin right, disable this action.
-			state: this._isAdmin() ? 'ready' : 'disabled'
-		})
-			.start()
-			.setValue(permission.type);
+      /*
+       * Notify the plugin that the share dialog is ready to interact with it.
+       * The plugin will inject the form to grant new users.
+       */
+      Plugin.insertShareIframe(this.options.acoInstance.id, this.options.acoInstance.secrets[0].data);
+    }
 
-		// Add a button to allow the user to delete the permission
-		this._permissionDeleteButtons[permission.id] = new ButtonComponent(actionSelector + ' .js_perm_delete', {
-			id: 'js_share_perm_delete_' + permission.id,
-			// If the current user has no admin right, disable this action.
-			state: this._isAdmin() ? 'ready' : 'disabled'
-		}).start();
+    // Load the component for the aco instance given in options.
+    this.load(this.options.acoInstance);
 
-		// If the permission is temporary and requires a final save action to be applied.
-		if(permission.is_new) {
-			// Mark the row as updated.
-			$(permSelector).addClass('permission-updated');
-			// Scroll the permissions list to the last permission.
-			$(this.permList.element).scrollTop($(permSelector).offset().top);
-		}
-	},
+    // Add a button to control the final save action
+    this.options.saveChangesButton = new ButtonComponent('#js_rs_share_save', {
+      // By default it is disabled, it will be enabled once the user has changed something.
+      state: 'disabled'
+    }).start();
 
-	/**
-	 * load permission for a given instance
-	 * @param {mad.model.Model} obj The target instance
-	 */
-	load: function(obj) {
-		var self = this;
-		this.options.acoInstance = obj;
-		this.options.changes = {};
+    this.on();
+  },
 
-		// change the state of the component to loading.
-		this.setState('loading');
+  /**
+   * Load a new permission in the list.
+   * @param {Permission} permission
+   */
+  loadPermission: function(permission) {
+    const permTypeSelector = `#js_share_rs_perm_${permission.id}`;
+    const actionSelector = `#js_actions_rs_perm_${permission.id}`;
+    const permSelector = `#${permission.id}`;
+    const availablePermissionTypes = {};
+    const permissionTypes = [1, 7, 15]; // Hardcoded for Resource and direct permission.
 
-		// get permissions for the given resource
-		return Permission.findAll({
-			aco: 'resource',
-			aco_foreign_key: this.options.acoInstance.id,
-			contain: {group:1, user:1, 'user.profile': 1}
-		}).then(function (permissions) {
-			for (var i=0; i<permissions.length; i++) {
-				self.loadPermission(permissions[i]);
-			}
-			// Check the permission must have a owner case
-			// This check is not necessary if the current user has no admin right, as all actions
-			// will be disabled.
-			if (self._isAdmin()) {
-				self.checkOwner();
-			}
+    // Gather the available permission types
+    for (const permType in permissionTypes) {
+      availablePermissionTypes[permissionTypes[permType]] = PermissionType.formatToString(permissionTypes[permType]);
+    }
 
-			// change the state of the component to loading
-			self.setState('ready');
-		}, function() {
-			console.log('an error occured');
-			console.log(arguments);
-		});
-	},
+    // Add the permission to the list of permissions
+    this.permList.insertItem(permission);
 
-	/**
-	 * Refresh
-	 */
-	refresh: function() {
-		var self = this;
+    // Add a selectbox to display the permission type (and allow to change)
+    this._permissionChangeTypeDropDowns[permission.id] = new DropdownComponent(`${permTypeSelector} .js_share_rs_perm_type`, {
+      id: `js_share_perm_type_${permission.id}`,
+      emptyValue: false,
+      modelReference: 'passbolt.model.Permission.type',
+      availableValues: availablePermissionTypes,
+      // If the current user has no admin right, disable this action.
+      state: this._isAdmin() ? 'ready' : 'disabled'
+    })
+      .start()
+      .setValue(permission.type);
 
-		// hide the user feedback.
-		$('#js_permissions_changes').addClass('hidden');
+    // Add a button to allow the user to delete the permission
+    this._permissionDeleteButtons[permission.id] = new ButtonComponent(`${actionSelector} .js_perm_delete`, {
+      id: `js_share_perm_delete_${permission.id}`,
+      // If the current user has no admin right, disable this action.
+      state: this._isAdmin() ? 'ready' : 'disabled'
+    }).start();
 
-		// reset the permissions list.
-		this.permList.reset();
+    // If the permission is temporary and requires a final save action to be applied.
+    if (permission.is_new) {
+      // Mark the row as updated.
+      $(permSelector).addClass('permission-updated');
+      // Scroll the permissions list to the last permission.
+      $(this.permList.element).scrollTop($(permSelector).offset().top);
+    }
+  },
 
-		// if the user lost his admin right, hide the add users form.
-		if (!this._isAdmin()) {
-			$('#js_permissions_create_wrapper', this.element).hide();
-		}
+  /**
+   * load permission for a given instance
+   * @param {mad.model.Model} obj The target instance
+   */
+  load: function(obj) {
+    const self = this;
+    this.options.acoInstance = obj;
+    this.options.changes = {};
 
-		// reload the component with the updated permissions
-		this.load(this.options.acoInstance)
-			.done(function() {
-				// Switch the component in ready state.
-				self.setState('ready');
-			});
-	},
+    // change the state of the component to loading.
+    this.setState('loading');
 
-	/**
-	 * Show the apply feedback.
-	 */
-	showApplyFeedback: function() {
-		var $permissionChanges = $('#js_permissions_changes');
-		$permissionChanges.removeClass('hidden');
+    // get permissions for the given resource
+    return Permission.findAll({
+      aco: 'resource',
+      aco_foreign_key: this.options.acoInstance.id,
+      contain: {group: 1, user: 1, 'user.profile': 1}
+    }).then(permissions => {
+      for (let i = 0; i < permissions.length; i++) {
+        self.loadPermission(permissions[i]);
+      }
+      /*
+       * Check the permission must have a owner case
+       * This check is not necessary if the current user has no admin right, as all actions
+       * will be disabled.
+       */
+      if (self._isAdmin()) {
+        self.checkOwner();
+      }
 
-		// Enable the save change button
-		if (this.options.saveChangesButton.state.is('disabled')) {
-			this.options.saveChangesButton.setState('ready');
-		}
-	},
+      // change the state of the component to loading
+      self.setState('ready');
+    }, function() {
+      console.log('an error occured');
+      console.log(arguments);
+    });
+  },
 
-	/**
-	 * Hide the apply feedback.
-	 */
-	hideApplyFeedback: function() {
-		var $permissionChanges = $('#js_permissions_changes');
-		$permissionChanges.addClass('hidden');
+  /**
+   * Refresh
+   */
+  refresh: function() {
+    const self = this;
 
-		// Disable the save change button
-		if (this.options.saveChangesButton.state.is('ready')) {
-			this.options.saveChangesButton.setState('disabled');
-		}
-	},
+    // hide the user feedback.
+    $('#js_permissions_changes').addClass('hidden');
 
-	/**
-	 * Owner permission check.
-	 * A permission must have at least a owner.
-	 * If there is only one owner, the permissions should be locked.
-	 */
-	checkOwner: function() {
-		var self = this,
-			ownerPermissions = [];
+    // reset the permissions list.
+    this.permList.reset();
 
-		// Get all the owner.
-		this.permList.options.items.forEach(function (item) {
-			var isOwner = false;
-			// Is owner ?
-			if (item.type == 15) {
-				isOwner = true;
-			}
-			// A permission has been updated
-			if (typeof self.options.changes[item.id] != 'undefined') {
-				// got owner right
-				if (self.options.changes[item.id].Permission.type == 15) {
-					isOwner = true;
-				} else {
-					isOwner = false;
-				}
-			}
-			// Add the permission to the list of owner permissions
-			if (isOwner) {
-				ownerPermissions.push(item);
-			}
-		});
+    // if the user lost his admin right, hide the add users form.
+    if (!this._isAdmin()) {
+      $('#js_permissions_create_wrapper', this.element).hide();
+    }
 
-		// If only one owner, make the edition of the owner permission unavailable
-		if (ownerPermissions.length == 1) {
-			var permTypeDropdown = this._permissionChangeTypeDropDowns[ownerPermissions[0].id];
-			var permDeleteButton = this._permissionDeleteButtons[ownerPermissions[0].id];
+    // reload the component with the updated permissions
+    this.load(this.options.acoInstance)
+      .done(() => {
+      // Switch the component in ready state.
+        self.setState('ready');
+      });
+  },
 
-			// Disable the permission type field and the permission delete button
-			permTypeDropdown.setState('disabled');
-			permDeleteButton.setState('disabled');
-		}
-		// If several owners, make the permission type dropdown and permission delete button enabled
-		else if (ownerPermissions.length > 1) {
-			for (var i in ownerPermissions) {
-				var permTypeDropdown = this._permissionChangeTypeDropDowns[ownerPermissions[i].id];
-				var permDeleteButton = this._permissionDeleteButtons[ownerPermissions[i].id];
+  /**
+   * Show the apply feedback.
+   */
+  showApplyFeedback: function() {
+    const $permissionChanges = $('#js_permissions_changes');
+    $permissionChanges.removeClass('hidden');
 
-				// Disable the permission type field and the permission delete button
-				permTypeDropdown.setState('ready');
-				permDeleteButton.setState('ready');
-			}
-		}
-	},
+    // Enable the save change button
+    if (this.options.saveChangesButton.state.is('disabled')) {
+      this.options.saveChangesButton.setState('ready');
+    }
+  },
 
-	/**
-	 * Add a new permission.
-	 * @param permission The permission to add
-	 */
-	addPermission: function(permission) {
-		// Load this temporary permission in the permissions list component.
-		this.loadPermission(permission);
+  /**
+   * Hide the apply feedback.
+   */
+  hideApplyFeedback: function() {
+    const $permissionChanges = $('#js_permissions_changes');
+    $permissionChanges.addClass('hidden');
 
-		// Store the change.
-		this.options.changes[permission.id] = {
-			Permission: {
-				isNew: true,
-				aco: permission.aco,
-				aco_foreign_key: permission.aco_foreign_key,
-				aro: permission.aro,
-				aro_foreign_key: permission.aro_foreign_key,
-				type: permission.type
-			}
-		};
+    // Disable the save change button
+    if (this.options.saveChangesButton.state.is('ready')) {
+      this.options.saveChangesButton.setState('disabled');
+    }
+  },
 
-		// Propagate an event notifying other component regarding the changes.
-		$(this.element).trigger('changed', this.options.changes);
-		// Display the change feedback.
-		this.showApplyFeedback();
-	},
+  /**
+   * Owner permission check.
+   * A permission must have at least a owner.
+   * If there is only one owner, the permissions should be locked.
+   */
+  checkOwner: function() {
+    const self = this;
+    const ownerPermissions = [];
 
-	/**
-	 * Update an existing permission
-	 * @param id The permission id
-	 * @param type The permission type
-	 */
-	updateTypePermission: function(id, type) {
-		// Store the change in the list of permissions changes.
-		// If a permission change already exists for the given permission id.
-		if (this.options.changes[id]) {
-			this.options.changes[id].Permission.type = type;
-		}
-		// Otherwise add a new update change.
-		else {
-			this.options.changes[id] = {
-				Permission: {
-					id: id,
-					type: type
-				}
-			}
-		}
+    // Get all the owner.
+    this.permList.options.items.forEach(item => {
+      let isOwner = false;
+      // Is owner ?
+      if (item.type == 15) {
+        isOwner = true;
+      }
+      // A permission has been updated
+      if (typeof self.options.changes[item.id] != 'undefined') {
+        // got owner right
+        if (self.options.changes[item.id].Permission.type == 15) {
+          isOwner = true;
+        } else {
+          isOwner = false;
+        }
+      }
+      // Add the permission to the list of owner permissions
+      if (isOwner) {
+        ownerPermissions.push(item);
+      }
+    });
 
-		// Propagate an event notifying other component regarding the changes.
-		domEvents.dispatch(this.element, {type: 'changed', data: this.options.changes});
-		// Display the change feedback.
-		this.showApplyFeedback();
+    // If only one owner, make the edition of the owner permission unavailable
+    if (ownerPermissions.length == 1) {
+      const permTypeDropdown = this._permissionChangeTypeDropDowns[ownerPermissions[0].id];
+      const permDeleteButton = this._permissionDeleteButtons[ownerPermissions[0].id];
 
-		// Check the permission must have a owner case
-		this.checkOwner();
-	},
+      // Disable the permission type field and the permission delete button
+      permTypeDropdown.setState('disabled');
+      permDeleteButton.setState('disabled');
+    } else if (ownerPermissions.length > 1) {
+      // If several owners, make the permission type dropdown and permission delete button enabled
+      for (const i in ownerPermissions) {
+        const permTypeDropdown = this._permissionChangeTypeDropDowns[ownerPermissions[i].id];
+        const permDeleteButton = this._permissionDeleteButtons[ownerPermissions[i].id];
 
-	/**
-	 * Delete a permission
-	 * @param permission The permission to update
-	 */
-	deletePermission: function(permission) {
-		// Remove the permission from the list.
-		this.permList.removeItem(permission);
+        // Disable the permission type field and the permission delete button
+        permTypeDropdown.setState('ready');
+        permDeleteButton.setState('ready');
+      }
+    }
+  },
 
-		// If a permission already exists and is new, remove it.
-		if (this.options.changes[permission.id] && this.options.changes[permission.id].Permission.isNew) {
-			// Remove the change.
-			delete this.options.changes[permission.id];
+  /**
+   * Add a new permission.
+   * @param permission The permission to add
+   */
+  addPermission: function(permission) {
+    // Load this temporary permission in the permissions list component.
+    this.loadPermission(permission);
 
-			// Notify the plugin, the user can be listed by the autocomplete again.
-			Plugin.shareIframeRemovePermission(permission.aro_foreign_key, true);
-		}
-		// Otherwise add a new delete change.
-		else {
-			this.options.changes[permission.id] = {
-				Permission: {
-					id : permission.id,
-					delete : 1
-				}
-			};
-			// Notify the plugin, the user shouldn't be listed by the autocomplete anymore.
-			Plugin.shareIframeRemovePermission(permission.aro_foreign_key, false);
-		}
+    // Store the change.
+    this.options.changes[permission.id] = {
+      Permission: {
+        isNew: true,
+        aco: permission.aco,
+        aco_foreign_key: permission.aco_foreign_key,
+        aro: permission.aro,
+        aro_foreign_key: permission.aro_foreign_key,
+        type: permission.type
+      }
+    };
 
-		// Regarding the length of the permissions changes show or hide the apply feedback.
-		if ($.isEmptyObject(this.options.changes)) {
-			this.hideApplyFeedback();
-		}
-		else {
-			// Propagate an event notifying other component regarding the changes.
-			$(this.element).trigger('changed', this.options.changes);
-			// Display the change feedback.
-			this.showApplyFeedback();
-		}
+    // Propagate an event notifying other component regarding the changes.
+    $(this.element).trigger('changed', this.options.changes);
+    // Display the change feedback.
+    this.showApplyFeedback();
+  },
 
-		// Check the permission must have a owner case
-		this.checkOwner();
-	},
+  /**
+   * Update an existing permission
+   * @param id The permission id
+   * @param type The permission type
+   */
+  updateTypePermission: function(id, type) {
+    /*
+     * Store the change in the list of permissions changes.
+     * If a permission change already exists for the given permission id.
+     */
+    if (this.options.changes[id]) {
+      this.options.changes[id].Permission.type = type;
+    } else {
+      // Otherwise add a new update change.
+      this.options.changes[id] = {
+        Permission: {
+          id: id,
+          type: type
+        }
+      };
+    }
 
-	/**
-	 * Save the permissions changes.
-	 * @param {array} armoreds (optional) the secret encrypted for new users.
-	 */
-	save: function(armoreds) {
-		var self = this,
-			data = {},
-			aco = this.options.acoInstance.constructor.shortName,
-			acoForeignKey = this.options.acoInstance.id;
+    // Propagate an event notifying other component regarding the changes.
+    domEvents.dispatch(this.element, {type: 'changed', data: this.options.changes});
+    // Display the change feedback.
+    this.showApplyFeedback();
 
-		// Add the changes to the array that will be send to the server.
-		data.Permissions = [];
-		for (var i in this.options.changes) {
-			data.Permissions.push(this.options.changes[i]);
-		}
+    // Check the permission must have a owner case
+    this.checkOwner();
+  },
 
-		// If the secret has been encrypted for new users, add the armored
-		// secrets.
-		if (armoreds) {
-			data.Secrets = [];
-			for (var userId in armoreds) {
-				data.Secrets.push({
-					Secret: {
-						resource_id: acoForeignKey,
-						user_id: userId,
-						data: armoreds[userId]
-					}
-				});
-			}
-		}
+  /**
+   * Delete a permission
+   * @param permission The permission to update
+   */
+  deletePermission: function(permission) {
+    // Remove the permission from the list.
+    this.permList.removeItem(permission);
 
-		// Share the resource
-		this.options.acoInstance.share(data)
-			.then(function() {
-				if (self.options.callbacks.shared) {
-					self.options.callbacks.shared();
-				}
-			});
-	},
+    // If a permission already exists and is new, remove it.
+    if (this.options.changes[permission.id] && this.options.changes[permission.id].Permission.isNew) {
+      // Remove the change.
+      delete this.options.changes[permission.id];
 
-	/* ************************************************************** */
-	/* LISTEN TO THE MODEL EVENTS */
-	/* ************************************************************** */
+      // Notify the plugin, the user can be listed by the autocomplete again.
+      Plugin.shareIframeRemovePermission(permission.aro_foreign_key, true);
+    } else {
+      // Otherwise add a new delete change.
+      this.options.changes[permission.id] = {
+        Permission: {
+          id: permission.id,
+          delete: 1
+        }
+      };
+      // Notify the plugin, the user shouldn't be listed by the autocomplete anymore.
+      Plugin.shareIframeRemovePermission(permission.aro_foreign_key, false);
+    }
 
-	/**
-	* Listen to the destroyed event on the edited/shared resource.
-	*
-	* It can happen when :
-	* * the user removes his own permission ;
-	* * someone removed remotely the user permission ;
-	* * the resource has been destroyed remotely.
-	*/
-	'{acoInstance} destroyed': function () {
-		// For now do nothing, the only case which is managed is: the user removes his own permission.
-		// This case is managed in the save function.
-	},
+    // Regarding the length of the permissions changes show or hide the apply feedback.
+    if ($.isEmptyObject(this.options.changes)) {
+      this.hideApplyFeedback();
+    } else {
+      // Propagate an event notifying other component regarding the changes.
+      $(this.element).trigger('changed', this.options.changes);
+      // Display the change feedback.
+      this.showApplyFeedback();
+    }
 
-	/* ************************************************************** */
-	/* LISTEN TO THE PLUGIN EVENTS */
-	/* ************************************************************** */
+    // Check the permission must have a owner case
+    this.checkOwner();
+  },
 
-	/**
-	 * Once the secret has been encrypted for the new users selected, the plugin
-	 * trigger resource_share_encrypted event.
-	 * Save the permission changes and the new encrypted secrets.
-	 */
-	'{mad.bus.element} resource_share_encrypted': function(el, ev) {
-		const armoreds = ev.data;
-		this.save(armoreds);
-	},
+  /**
+   * Save the permissions changes.
+   * @param {array} armoreds (optional) the secret encrypted for new users.
+   */
+  save: function(armoreds) {
+    const self = this;
+    const data = {};
+    const acoForeignKey = this.options.acoInstance.id;
 
-	/**
-	 * The encryption has been canceled.
-	 */
-	'{mad.bus.element} passbolt.plugin.share.canceled': function(el, ev) {
-		this.setState('ready');
-	},
+    // Add the changes to the array that will be send to the server.
+    data.Permissions = [];
+    for (const i in this.options.changes) {
+      data.Permissions.push(this.options.changes[i]);
+    }
 
-	/**
-	 * Listen when a permission has been added through the plugin.
-	 * @todo v1 support to be removed
-	 */
-	'{mad.bus.element} resource_share_add_permission': function(el, ev) {
-		const data = ev.data;
-		// V1 format to v2 manually.
-		var dataV2 = {
-			aco: data.aco,
-			aco_foreign_key: data.aco_foreign_key,
-			aro: data.aro,
-			aro_foreign_key: data.aro_foreign_key,
-			type: data.type,
-			is_new: true
-		};
-		if (data.User) {
-			dataV2.user = {
-				id: data.User.User.id,
-					username: data.User.User.username,
-					profile: {
-					id: data.User.Profile.id,
-						first_name: data.User.Profile.first_name,
-						last_name: data.User.Profile.last_name
-				},
-				gpgkey: {
-					id: data.User.Gpgkey.id,
-						armored_key: data.User.Gpgkey.armored_key
-				}
-			};
-		} else {
-			dataV2.group = {
-				id: data.Group.Group.id,
-				name: data.Group.Group.name
-			}
-		}
-		var permission = new Permission(dataV2);
+    // If the secret has been encrypted for new users, add the armored secrets.
+    if (armoreds) {
+      data.Secrets = [];
+      for (const userId in armoreds) {
+        data.Secrets.push({
+          Secret: {
+            resource_id: acoForeignKey,
+            user_id: userId,
+            data: armoreds[userId]
+          }
+        });
+      }
+    }
 
-		// Fake the id, so the the permission can be retrieve and associated to other components, such as the
-		// delete button or the change permission type dropdown.
-		permission.id = uuid();
-		this.addPermission(permission);
-	},
+    // Share the resource
+    this.options.acoInstance.share(data)
+      .then(() => {
+        if (self.options.callbacks.shared) {
+          self.options.callbacks.shared();
+        }
+      });
+  },
 
-	/* ************************************************************** */
-	/* LISTEN TO THE COMPONENT EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE MODEL EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * The user want to remove a permission
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	 '{element} request_permission_delete': function (el, ev) {
-		const permission = ev.data.permission;
-		this.deletePermission(permission);
-	},
+  /**
+   * Listen to the destroyed event on the edited/shared resource.
+   *
+   * It can happen when :
+   * * the user removes his own permission ;
+   * * someone removed remotely the user permission ;
+   * * the resource has been destroyed remotely.
+   */
+  '{acoInstance} destroyed': function() {
+    /*
+     * For now do nothing, the only case which is managed is: the user removes his own permission.
+     * This case is managed in the save function.
+     */
+  },
 
-	/**
-	 * A permission has been updated.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	 '{element} request_permission_edit': function (el, ev) {
-		const permission = ev.data.permission;
-		const type = ev.data.type;
-		this.updateTypePermission(permission.id, type);
-	},
+  /* ************************************************************** */
+  /* LISTEN TO THE PLUGIN EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * The user request the form to be saved.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{saveChangesButton.element} click': function(el, ev) {
-		var usersIds = [];
+  /**
+   * Once the secret has been encrypted for the new users selected, the plugin
+   * trigger resource_share_encrypted event.
+   * Save the permission changes and the new encrypted secrets.
+   */
+  '{mad.bus.element} resource_share_encrypted': function(el, ev) {
+    const armoreds = ev.data;
+    this.save(armoreds);
+  },
 
-		// Switch the component in loading state.
-		// The ready state will be restored once the component will be refreshed.
-		this.setState('loading');
+  /**
+   * The encryption has been canceled.
+   */
+  '{mad.bus.element} passbolt.plugin.share.canceled': function() {
+    this.setState('ready');
+  },
 
-		// Extract the users the secret should be encrypted for by extracting the information from the changes.
-		// This information shouldn't be trusted.
-		for (var permissionId in this.options.changes) {
+  /**
+   * Listen when a permission has been added through the plugin.
+   * @todo v1 support to be removed
+   */
+  '{mad.bus.element} resource_share_add_permission': function(el, ev) {
+    const data = ev.data;
+    // V1 format to v2 manually.
+    const dataV2 = {
+      aco: data.aco,
+      aco_foreign_key: data.aco_foreign_key,
+      aro: data.aro,
+      aro_foreign_key: data.aro_foreign_key,
+      type: data.type,
+      is_new: true
+    };
+    if (data.User) {
+      dataV2.user = {
+        id: data.User.User.id,
+        username: data.User.User.username,
+        profile: {
+          id: data.User.Profile.id,
+          first_name: data.User.Profile.first_name,
+          last_name: data.User.Profile.last_name
+        },
+        gpgkey: {
+          id: data.User.Gpgkey.id,
+          armored_key: data.User.Gpgkey.armored_key
+        }
+      };
+    } else {
+      dataV2.group = {
+        id: data.Group.Group.id,
+        name: data.Group.Group.name
+      };
+    }
+    const permission = new Permission(dataV2);
 
-			// If the permission is a new permission, add the user id the permission is targeting to the
-			// list of users the secret should be encrypted for.
-			if (this.options.changes[permissionId].Permission.isNew) {
-				usersIds.push(this.options.changes[permissionId].Permission.aro_foreign_key);
-			}
-		}
+    /*
+     * Fake the id, so the the permission can be retrieve and associated to other components, such as the
+     * delete button or the change permission type dropdown.
+     */
+    permission.id = uuid();
+    this.addPermission(permission);
+  },
 
-		// Request the plugin to encrypt the secret for the new users.
-		// Once the plugin has encrypted the secret, it sends back an event resource_share_encrypted.
-		Plugin.shareIframeEncrypt();
-	},
+  /* ************************************************************** */
+  /* LISTEN TO THE COMPONENT EVENTS */
+  /* ************************************************************** */
 
-	/* ************************************************************** */
-	/* LISTEN TO ANY STATES CHANGES */
-	/* ************************************************************** */
+  /**
+   * The user want to remove a permission
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} request_permission_delete': function(el, ev) {
+    const permission = ev.data.permission;
+    this.deletePermission(permission);
+  },
 
-	/**
-	 * Listen to any changes relative to the state Loading
-	 * Override this function if you want add a specific behavior.
-	 *
-	 * @param {boolean} go Entering or leaving the state
-	 */
-	stateLoading: function (go) {
-		var saveButton = this.options.saveChangesButton;
-		if (go) {
-			if (saveButton) {
-				saveButton.setState('disabled');
-			}
-		}
-		else {
-			if (this.options.changes.length) {
-				saveButton.setState('ready');
-			}
-		}
+  /**
+   * A permission has been updated.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} request_permission_edit': function(el, ev) {
+    const permission = ev.data.permission;
+    const type = ev.data.type;
+    this.updateTypePermission(permission.id, type);
+  },
 
-		this._super(go);
-	}
+  /**
+   * The user request the form to be saved.
+   */
+  '{saveChangesButton.element} click': function() {
+    const usersIds = [];
+
+    /*
+     * Switch the component in loading state.
+     * The ready state will be restored once the component will be refreshed.
+     */
+    this.setState('loading');
+
+    /*
+     * Extract the users the secret should be encrypted for by extracting the information from the changes.
+     * This information shouldn't be trusted.
+     */
+    for (const permissionId in this.options.changes) {
+      /*
+       * If the permission is a new permission, add the user id the permission is targeting to the
+       * list of users the secret should be encrypted for.
+       */
+      if (this.options.changes[permissionId].Permission.isNew) {
+        usersIds.push(this.options.changes[permissionId].Permission.aro_foreign_key);
+      }
+    }
+
+    /*
+     * Request the plugin to encrypt the secret for the new users.
+     * Once the plugin has encrypted the secret, it sends back an event resource_share_encrypted.
+     */
+    Plugin.shareIframeEncrypt();
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO ANY STATES CHANGES */
+  /* ************************************************************** */
+
+  /**
+   * Listen to any changes relative to the state Loading
+   * Override this function if you want add a specific behavior.
+   *
+   * @param {boolean} go Entering or leaving the state
+   */
+  stateLoading: function(go) {
+    const saveButton = this.options.saveChangesButton;
+    if (go) {
+      if (saveButton) {
+        saveButton.setState('disabled');
+      }
+    } else {
+      if (this.options.changes.length) {
+        saveButton.setState('ready');
+      }
+    }
+
+    this._super(go);
+  }
 
 });
 

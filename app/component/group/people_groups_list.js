@@ -19,7 +19,7 @@ import User from 'app/model/map/user';
 
 import 'app/view/template/component/group/group_item.stache!';
 
-var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.group.PeopleGroupsList', /** @static */ {
+const PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.group.PeopleGroupsList', /** @static */ {
 
   defaults: {
     withMenu: true
@@ -34,17 +34,16 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
    * @param {string} y The y position where the menu will be rendered
    * @param {HTMLElement} eventTarget The element the event occurred on
    */
-  showContextualMenu: function (group, x, y, eventTarget) {
-
-    var currentUser = User.getCurrent(),
-      isAdmin = currentUser.isAdmin();
+  showContextualMenu: function(group, x, y, eventTarget) {
+    const currentUser = User.getCurrent();
+    const isAdmin = currentUser.isAdmin();
 
     // Get the offset position of the clicked item.
-    var $item = $('#' + this.options.prefixItemId + group.id);
-    var item_offset = $('.more-ctrl a', $item).offset();
+    const $item = $(`#${this.options.prefixItemId}${group.id}`);
+    const item_offset = $('.more-ctrl a', $item).offset();
 
     // Instantiate the contextual menu menu.
-    var contextualMenu = ContextualMenuComponent.instantiate({
+    const contextualMenu = ContextualMenuComponent.instantiate({
       state: 'hidden',
       source: eventTarget,
       coordinates: {
@@ -55,29 +54,29 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
     contextualMenu.start();
 
     // Add Edit group action.
-    var action = new Action({
+    const editItem = new Action({
       id: 'js_group_browser_menu_edit',
       label: 'Edit group',
       initial_state: 'ready',
-      action: function (menu) {
-        MadBus.trigger('request_group_edition', {group});
+      action: function(menu) {
+        MadBus.trigger('request_group_edition', {group: group});
         menu.remove();
       }
     });
-    contextualMenu.insertItem(action);
+    contextualMenu.insertItem(editItem);
 
     // Add Delete group action if the user is an admin.
     if (isAdmin) {
-      var action = new Action({
+      const deleteItem = new Action({
         id: 'js_group_browser_menu_remove',
         label: 'Delete group',
         initial_state: 'ready',
-        action: function (menu) {
-          MadBus.trigger('request_group_deletion', {group});
+        action: function(menu) {
+          MadBus.trigger('request_group_deletion', {group: group});
           menu.remove();
         }
       });
-      contextualMenu.insertItem(action);
+      contextualMenu.insertItem(deleteItem);
     }
 
     // Display the menu.
@@ -93,7 +92,7 @@ var PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.gr
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{element} item_menu_clicked': function (el, ev) {
+  '{element} item_menu_clicked': function(el, ev) {
     const group = ev.data.group;
     const srcEv = ev.data.srcEv;
     this.showContextualMenu(group, srcEv.pageX, srcEv.pageY, srcEv.target);

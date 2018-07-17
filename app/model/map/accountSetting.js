@@ -22,43 +22,42 @@ import connectStore from 'can-connect/constructor/store/store';
 import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import Response from 'passbolt-mad/net/response';
 
-var AccountSetting = DefineMap.extend('passbolt.model.AccountSetting', {
-	id: 'string',
-	user_id: 'string',
-	property_id: 'string',
-	property: 'string',
-	value: 'string'
+const AccountSetting = DefineMap.extend('passbolt.model.AccountSetting', {
+  id: 'string',
+  user_id: 'string',
+  property_id: 'string',
+  property: 'string',
+  value: 'string'
 });
 DefineMap.setReference('AccountSetting', AccountSetting);
-AccountSetting.List = DefineList.extend({'#': { Type: AccountSetting }});
+AccountSetting.List = DefineList.extend({'#': {Type: AccountSetting}});
 
 /**
  * Store the account settings in the config.
  * @param accountSettings
  */
 AccountSetting.saveInConfig = function(accountSettings) {
-	accountSettings.forEach((accountSetting) => {
-		Config.write('accountSetting.' + accountSetting.property, accountSetting.value);
-	});
+  accountSettings.forEach(accountSetting => {
+    Config.write(`accountSetting.${accountSetting.property}`, accountSetting.value);
+  });
 };
 
 AccountSetting.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
-	Map: AccountSetting,
-	List: AccountSetting.List,
-	url: {
-		resource: '/',
-		getListData: function(params) {
-			params = params || {};
-			params['api-version'] = 'v2';
-			return Ajax.request({
-				url: '/account/settings.json',
-				type: 'GET',
-				params: params
-			});
-		}
-	}
+  Map: AccountSetting,
+  List: AccountSetting.List,
+  url: {
+    resource: '/',
+    getListData: function(params) {
+      params = params || {};
+      params['api-version'] = 'v2';
+      return Ajax.request({
+        url: '/account/settings.json',
+        type: 'GET',
+        params: params
+      });
+    }
+  }
 });
 
 export default AccountSetting;

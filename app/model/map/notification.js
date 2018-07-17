@@ -13,9 +13,9 @@
  */
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var Notification = DefineMap.extend('passbolt.model.Notification', {
-    status: 'string',
-    title: 'string'
+const Notification = DefineMap.extend('passbolt.model.Notification', {
+  status: 'string',
+  title: 'string'
 });
 DefineMap.setReference('Notification', Notification);
 

@@ -31,317 +31,308 @@ import uuid from 'uuid/v4';
 
 import template from 'app/view/template/component/settings/workspace.stache!';
 
-var SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.Workspace', /** @static */ {
+const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.Workspace', /** @static */ {
 
-	defaults: {
-		name: 'settings_workspace',
-		template: template,
-		sections : [
-			'profile',
-			'keys'
-		],
-		// Override the silentLoading parameter.
-		silentLoading: false
-	}
+  defaults: {
+    name: 'settings_workspace',
+    template: template,
+    sections: [
+      'profile',
+      'keys'
+    ],
+    // Override the silentLoading parameter.
+    silentLoading: false
+  }
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function() {
-		this._initPrimaryMenu();
-		this._initPrimarySidebar();
-		this._initBreadcrumb();
-		this._initTabs();
-	},
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    this._initPrimaryMenu();
+    this._initPrimarySidebar();
+    this._initBreadcrumb();
+    this._initTabs();
+  },
 
-	/**
-	 * Destroy the workspace.
-	 */
-	destroy: function() {
-		// Be sure that the primary workspace menu controller will be destroyed also.
-		$('#js_wsp_primary_menu_wrapper').empty();
-		// Destroy the breadcrumb too.
-		$('#js_wsp_settings_breadcrumb').empty();
+  /**
+   * Destroy the workspace.
+   */
+  destroy: function() {
+    // Be sure that the primary workspace menu controller will be destroyed also.
+    $('#js_wsp_primary_menu_wrapper').empty();
+    // Destroy the breadcrumb too.
+    $('#js_wsp_settings_breadcrumb').empty();
 
-		this._super();
-	},
+    this._super();
+  },
 
-	/**
-	 * Init the primary workspace menu.
-	 * The menu is not instantiated as a child of this component DOM Element, remove it manually from the DOM when
-	 * this component is destroyed.
-	 * @see destroy()
-	 */
-	_initPrimaryMenu: function() {
-		var menu = ComponentHelper.create(
-			$('#js_wsp_primary_menu_wrapper'),
-			'last',
-			PrimaryMenuComponent,
-			{}
-		);
-		menu.start();
-	},
+  /**
+   * Init the primary workspace menu.
+   * The menu is not instantiated as a child of this component DOM Element, remove it manually from the DOM when
+   * this component is destroyed.
+   * @see destroy()
+   */
+  _initPrimaryMenu: function() {
+    const menu = ComponentHelper.create(
+      $('#js_wsp_primary_menu_wrapper'),
+      'last',
+      PrimaryMenuComponent,
+      {}
+    );
+    menu.start();
+  },
 
-	/**
-	 * Initialize the workspace breadcrumb
-	 */
-	_initBreadcrumb: function() {
-		var component = new BreadcrumbComponent('#js_wsp_settings_breadcrumb', {});
-		component.start();
-		component.load();
-	},
+  /**
+   * Initialize the workspace breadcrumb
+   */
+  _initBreadcrumb: function() {
+    const component = new BreadcrumbComponent('#js_wsp_settings_breadcrumb', {});
+    component.start();
+    component.load();
+  },
 
-	/**
-	 * Init the primary sidebar.
-	 */
-	_initPrimarySidebar: function() {
-		var menu = new MenuComponent('#js_wk_settings_menu', {});
-		menu.start();
-		this.options.primarySidebarMenu = menu;
+  /**
+   * Init the primary sidebar.
+   */
+  _initPrimarySidebar: function() {
+    const menu = new MenuComponent('#js_wk_settings_menu', {});
+    menu.start();
+    this.options.primarySidebarMenu = menu;
 
-		// My profile
-		var profileItem = new Action({
-			id: uuid(),
-			name: 'profile',
-			label: __('Profile'),
-			action: function () {
-				const section = 'profile';
-				MadBus.trigger('request_settings_section', {section});
-			}
-		});
-		menu.insertItem(profileItem);
-		this.options.primarySidebarProfileItem = profileItem;
+    // My profile
+    const profileItem = new Action({
+      id: uuid(),
+      name: 'profile',
+      label: __('Profile'),
+      action: function() {
+        const section = 'profile';
+        MadBus.trigger('request_settings_section', {section: section});
+      }
+    });
+    menu.insertItem(profileItem);
+    this.options.primarySidebarProfileItem = profileItem;
 
-		// Theme
-		var plugins = Config.read('server.passbolt.plugins');
-		if (plugins && plugins.accountSettings) {
-			var themeItem = new Action({
-				id: uuid(),
-				name: 'keys',
-				label: __('Theme'),
-				action: function () {
-					const section = 'theme';
-					MadBus.trigger('request_settings_section', {section});
-				}
-			});
-			menu.insertItem(themeItem);
-			this.options.primarySidebarThemeItem = themeItem;
-		}
+    // Theme
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins && plugins.accountSettings) {
+      const themeItem = new Action({
+        id: uuid(),
+        name: 'keys',
+        label: __('Theme'),
+        action: function() {
+          const section = 'theme';
+          MadBus.trigger('request_settings_section', {section: section});
+        }
+      });
+      menu.insertItem(themeItem);
+      this.options.primarySidebarThemeItem = themeItem;
+    }
 
-		// Keys
-		var keysItem = new Action({
-			id: uuid(),
-			name: 'keys',
-			label: __('Keys inspector'),
-			action: function () {
-				const section = 'keys';
-				MadBus.trigger('request_settings_section', {section});
-			}
-		});
-		menu.insertItem(keysItem);
-		this.options.primarySidebarKeysItem = keysItem;
-	},
+    // Keys
+    const keysItem = new Action({
+      id: uuid(),
+      name: 'keys',
+      label: __('Keys inspector'),
+      action: function() {
+        const section = 'keys';
+        MadBus.trigger('request_settings_section', {section: section});
+      }
+    });
+    menu.insertItem(keysItem);
+    this.options.primarySidebarKeysItem = keysItem;
+  },
 
-	/**
-	 * Init the workspace tabs
-	 */
-	_initTabs: function() {
-		var tabs = new TabComponent('#js_wk_settings_main', {
-			autoMenu: false // do not generate automatically the associated tab nav
-		});
-		tabs.start();
-		this.settingsTabsCtl = tabs;
+  /**
+   * Init the workspace tabs
+   */
+  _initTabs: function() {
+    const tabs = new TabComponent('#js_wk_settings_main', {
+      autoMenu: false // do not generate automatically the associated tab nav
+    });
+    tabs.start();
+    this.settingsTabsCtl = tabs;
 
-		// Profile tab
-		tabs.addComponent(ProfileComponent, {
-			id: 'js_settings_wk_profile_controller',
-			label: 'profile',
-			user: User.getCurrent()
-		});
+    // Profile tab
+    tabs.addComponent(ProfileComponent, {
+      id: 'js_settings_wk_profile_controller',
+      label: 'profile',
+      user: User.getCurrent()
+    });
 
-		// Keys tab
-		tabs.addComponent(KeysComponent, {
-			id: 'js_settings_wk_profile_keys_controller',
-			label: 'keys'
-		});
+    // Keys tab
+    tabs.addComponent(KeysComponent, {
+      id: 'js_settings_wk_profile_keys_controller',
+      label: 'keys'
+    });
 
-		// Theme tab
-		var plugins = Config.read('server.passbolt.plugins');
-		if (plugins && plugins.accountSettings) {
-			tabs.addComponent(ThemeComponent, {
-				id: 'js_settings_wk_profile_theme_controller',
-				label: 'theme'
-			});
-		}
-	},
+    // Theme tab
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins && plugins.accountSettings) {
+      tabs.addComponent(ThemeComponent, {
+        id: 'js_settings_wk_profile_theme_controller',
+        label: 'theme'
+      });
+    }
+  },
 
-	/**
-	 * Open the user edit dialog.
-	 *
-	 * @param {User} user The target user entity.
-	 */
-	openEditUserDialog: function(user) {
-		var self = this;
-		var dialog = DialogComponent.instantiate({
-			label: __('Edit profile'),
-			cssClasses : ['edit-profile-dialog', 'dialog-wrapper']
-		}).start();
+  /**
+   * Open the user edit dialog.
+   */
+  openEditUserDialog: function() {
+    const self = this;
+    const user = User.getCurrent();
+    const dialog = DialogComponent.instantiate({
+      label: __('Edit profile'),
+      cssClasses: ['edit-profile-dialog', 'dialog-wrapper']
+    }).start();
 
-		var form = dialog.add(UserCreateForm, {
-			data: user,
-			action: 'edit',
-			callbacks : {
-				submit: function (data) {
-					user.assignDeep(data['User']);
-					self._saveUser(user, form, dialog);
-				}
-			}
-		});
-		form.load(user);
-	},
+    const form = dialog.add(UserCreateForm, {
+      data: user,
+      action: 'edit',
+      callbacks: {
+        submit: function(data) {
+          user.assignDeep(data['User']);
+          self._saveUser(user, form, dialog);
+        }
+      }
+    });
+    form.load(user);
+  },
 
-	/**
-	 * Save the user.
-	 *
-	 * @param {User} user The target user
-	 * @param {mad.Form} form The form object
-	 * @param {Dialog} dialog The dialog object
-	 */
-	_saveUser: function(user, form, dialog) {
-		user.save()
-			.then(function() {
-				dialog.remove();
-			}, function(v) {
-				form.showErrors(JSON.parse(v.responseText)['body']);
-			});
-	},
+  /**
+   * Save the user.
+   *
+   * @param {User} user The target user
+   * @param {Form} form The form object
+   * @param {Dialog} dialog The dialog object
+   */
+  _saveUser: function(user, form, dialog) {
+    user.save()
+      .then(() => {
+        dialog.remove();
+      }, v => {
+        form.showErrors(JSON.parse(v.responseText)['body']);
+      });
+  },
 
-	/**
-	 * Open the avatar edit dialog.
-	 *
-	 * @param {User} user The target user entity.
-	 */
-	openEditAvatarDialog: function(user) {
-		var dialog = DialogComponent.instantiate({
-			label: __('Edit Avatar')
-		}).start();
+  /**
+   * Open the avatar edit dialog.
+   */
+  openEditAvatarDialog: function() {
+    const user = User.getCurrent();
+    const dialog = DialogComponent.instantiate({
+      label: __('Edit Avatar')
+    }).start();
+    const form = dialog.add(UserEditAvatarForm, {
+      data: user,
+      callbacks: {
+        submit: () => this._saveAvatar(user, dialog)
+      }
+    });
+    form.load(user);
+  },
 
-		var form = dialog.add(UserEditAvatarForm, {
-			data: user,
-			callbacks : {
-				submit: () => this._saveAvatar(user, dialog)
-			}
-		});
-		form.load(user);
-	},
+  /**
+   * Save the avatar.
+   *
+   * @param {User} user The target user
+   * @param {Dialog} dialog The dialog object
+   */
+  _saveAvatar: function(user, dialog) {
+    const $fileField = $('#js_field_avatar');
+    user.saveAvatar($fileField[0].files[0]);
+    dialog.remove();
+  },
 
-	/**
-	 * Save the avatar.
-	 *
-	 * @param {User} user The target user
-	 * @param {Dialog} dialog The dialog object
-	 */
-	_saveAvatar: function(user, dialog) {
-		var $fileField = $('#js_field_avatar');
-		user.saveAvatar($fileField[0].files[0]);
-		dialog.remove();
-	},
+  /* ************************************************************** */
+  /* LISTEN TO THE APP EVENTS */
+  /* ************************************************************** */
 
-	/* ************************************************************** */
-	/* LISTEN TO THE APP EVENTS */
-	/* ************************************************************** */
+  /**
+   * Observe when the user requests a profile edition
+   */
+  '{mad.bus.element} request_profile_edition': function() {
+    this.openEditUserDialog();
+  },
 
-	/**
-	 * Observe when the user requests a profile edition
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{mad.bus.element} request_profile_edition': function (el, ev) {
-		var user = User.getCurrent();
-		this.openEditUserDialog(user);
-	},
+  /**
+   * Observe when the user requests an avatar edition
+   */
+  '{mad.bus.element} request_profile_avatar_edition': function() {
+    this.openEditAvatarDialog();
+  },
 
-	/**
-	 * Observe when the user requests an avatar edition
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{mad.bus.element} request_profile_avatar_edition': function (el, ev, user) {
-		this.openEditAvatarDialog(user);
-	},
+  /**
+   * Observe when the user requests a section.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} request_settings_section': function(el, ev) {
+    const section = ev.data.section;
+    let tabId = null;
+    let menuItem = null;
+    const menu = this.options.primarySidebarMenu;
 
-	/**
-	 * Observe when the user requests a section.
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{mad.bus.element} request_settings_section': function (el, ev) {
-		const section = ev.data.section;
-		let tabId = null;
-		let menuItem = null;
-		const menu = this.options.primarySidebarMenu;
+    switch (section) {
+      case 'keys' :
+        tabId = 'js_settings_wk_profile_keys_controller';
+        menuItem = this.options.primarySidebarKeysItem;
+        break;
+      case 'profile' :
+        tabId = 'js_settings_wk_profile_controller';
+        menuItem = this.options.primarySidebarProfileItem;
+        break;
+      case 'theme' :
+        tabId = 'js_settings_wk_profile_theme_controller';
+        menuItem = this.options.primarySidebarThemeItem;
+        break;
+    }
 
-		switch (section) {
-			case 'keys' :
-				tabId = 'js_settings_wk_profile_keys_controller';
-				menuItem = this.options.primarySidebarKeysItem;
-				break;
-			case 'profile' :
-				tabId = 'js_settings_wk_profile_controller';
-				menuItem = this.options.primarySidebarProfileItem;
-				break;
-			case 'theme' :
-				tabId = 'js_settings_wk_profile_theme_controller';
-				menuItem = this.options.primarySidebarThemeItem;
-				break;
-		}
+    // Enable the tab
+    this.settingsTabsCtl.enableTab(tabId);
 
-		// Enable the tab
-		this.settingsTabsCtl.enableTab(tabId);
+    // Set class on top container.
+    $('#container')
+      .removeClass(this.options.sections.join(" "))
+      .addClass(section);
 
-		// Set class on top container.
-		$('#container')
-			.removeClass(this.options.sections.join(" "))
-			.addClass(section);
+    // Select corresponding section in the menu.
+    menu.selectItem(menuItem);
+  },
 
-		// Select corresponding section in the menu.
-		menu.selectItem(menuItem);
-	},
+  /* ************************************************************** */
+  /* LISTEN TO THE STATE CHANGES */
+  /* ************************************************************** */
 
-	/* ************************************************************** */
-	/* LISTEN TO THE STATE CHANGES */
-	/* ************************************************************** */
+  /**
+   * The application is ready.
+   */
+  stateReady: function() {
+    const section = 'profile';
+    MadBus.trigger('request_settings_section', {section: section});
+  },
 
-	/**
-	 * The application is ready.
-	 * @param {boolean} go Enter or leave the state
-	 */
-	stateReady: function (go) {
-		const section = 'profile';
-		MadBus.trigger('request_settings_section', {section});
-	},
+  /**
+   * state disabled.
+   * @param go
+   */
+  stateDisabled: function(go) {
+    this._super(go);
+    // Remove container class.
+    $('#container')
+      .removeClass(this.options.sections.join(" "));
+  },
 
-	/**
-	 * state disabled.
-	 * @param go
-	 */
-	stateDisabled: function (go) {
-		this._super(go);
-		// Remove container class.
-		$('#container')
-			.removeClass(this.options.sections.join(" "));
-	},
-
-	/**
-	 * state hidden.
-	 * @param go
-	 */
-	stateHidden: function (go) {
-		this._super(go);
-		// Remove container class.
-		$('#container')
-			.removeClass(this.options.sections.join(" "));
-	}
+  /**
+   * state hidden.
+   * @param go
+   */
+  stateHidden: function(go) {
+    this._super(go);
+    // Remove container class.
+    $('#container')
+      .removeClass(this.options.sections.join(" "));
+  }
 });
 export default SettingsWorkspaceComponent;

@@ -13,22 +13,21 @@
  */
 import SecondarySidebarView from 'app/view/component/workspace/secondary_sidebar';
 
-var PasswordSecondarySidebarView = SecondarySidebarView.extend('passbolt.view.component.password.PasswordSecondarySidebar', /** @static */ {
+const PasswordSecondarySidebarView = SecondarySidebarView.extend('passbolt.view.component.password.PasswordSecondarySidebar', /** @static */ {
 
 }, /** @prototype */ {
 
-	/* ************************************************************** */
-	/* LISTEN TO THE VIEW EVENTS */
-	/* ************************************************************** */
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
 
-	/**
-	 * Observe when the user clicks on any h2 element, rolldown the following p tag
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'h2 click': function (el, ev) {
-		$(el).next('p').toggle();
-	}
+  /**
+   * Observe when the user clicks on any h2 element, rolldown the following p tag
+   * @param {HTMLElement} el The element the event occurred on
+   */
+  'h2 click': function(el) {
+    $(el).next('p').toggle();
+  }
 });
 
 export default PasswordSecondarySidebarView;

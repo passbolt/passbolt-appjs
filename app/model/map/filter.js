@@ -12,19 +12,18 @@
  * @since         2.0.0
  */
 import DefineMap from 'passbolt-mad/model/map/map';
-import DefineList from 'passbolt-mad/model/list/list';
 
-var Filter = DefineMap.extend('passbolt.model.Filter', {
-    id: 'string',
-    label: 'string',
-    rules: {
-        type: 'any',
-        value: {}
-    },
-    order: {
-        type: 'any',
-        value: []
-    }
+const Filter = DefineMap.extend('passbolt.model.Filter', {
+  id: 'string',
+  label: 'string',
+  rules: {
+    type: 'any',
+    value: {}
+  },
+  order: {
+    type: 'any',
+    value: []
+  }
 });
 
 /**
@@ -32,10 +31,10 @@ var Filter = DefineMap.extend('passbolt.model.Filter', {
  * @returns {*}
  */
 Filter.prototype.getOrders = function() {
-    if (this.order) {
-        return this.order;
-    }
-    return [];
+  if (this.order) {
+    return this.order;
+  }
+  return [];
 };
 
 /**
@@ -44,7 +43,7 @@ Filter.prototype.getOrders = function() {
  * @return {mixed} The rule value
  */
 Filter.prototype.getRule = function(name) {
-    return this.rules[name];
+  return this.rules[name];
 };
 
 /**
@@ -53,7 +52,7 @@ Filter.prototype.getRule = function(name) {
  * @param value {mixed} The rule value
  */
 Filter.prototype.setRule = function(name, value) {
-    this.rules[name] = value;
+  this.rules[name] = value;
 };
 
 /**
@@ -62,16 +61,16 @@ Filter.prototype.setRule = function(name, value) {
  * @return {object} Return the data that compose this filter
  */
 Filter.prototype.getRules = function(excludedRules) {
-    var returnValue = {};
-    excludedRules = excludedRules || [];
+  const returnValue = {};
+  excludedRules = excludedRules || [];
 
-    for (var ruleName in this.rules) {
-        if (excludedRules.indexOf(ruleName) == -1) {
-            returnValue[ruleName] = this.rules[ruleName];
-        }
+  for (const ruleName in this.rules) {
+    if (excludedRules.indexOf(ruleName) == -1) {
+      returnValue[ruleName] = this.rules[ruleName];
     }
+  }
 
-    return returnValue;
+  return returnValue;
 };
 
 export default Filter;

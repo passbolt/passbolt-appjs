@@ -15,25 +15,25 @@ import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_
 
 import template from 'app/view/template/component/gpgkey/gpgkey_sidebar_section.stache!';
 
-var GpgKeySidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.gpgkey.GpgKeySidebarSection', /** @static */ {
+const GpgKeySidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.gpgkey.GpgKeySidebarSection', /** @static */ {
 
-	defaults: {
-		label: 'Sidebar Section Gpgkey Controller',
-		template: template,
-		gpgkey: null
-	}
+  defaults: {
+    label: 'Sidebar Section Gpgkey Controller',
+    template: template,
+    gpgkey: null
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	beforeRender: function () {
-		this._super();
-		// pass the new resource to the view
-		var gpgkey = this.options.gpgkey;
-		this.setViewData('gpgkey', gpgkey);
-	}
+  /**
+   * @inheritdoc
+   */
+  beforeRender: function() {
+    this._super();
+    // pass the new resource to the view
+    const gpgkey = this.options.gpgkey;
+    this.setViewData('gpgkey', gpgkey);
+  }
 
 });
 

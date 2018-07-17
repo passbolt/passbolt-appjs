@@ -90,6 +90,9 @@
     "can-view-scope": "4.5.0",
     "can-view-target": "4.1.0",
     "can-zone": "0.6.22",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
     "jquery": "3.3.1",
     "jssha": "~2.0.1",
     "moment": "^2.10.0",
@@ -111,7 +114,9 @@
   "main": "passbolt",
   "scripts": {
     "build": "steal-tools build",
-    "build-watch": "steal-tools build --watch"
+    "build-watch": "steal-tools build --watch",
+    "lint": "eslint app",
+    "lint-fix": "eslint --fix app"
   },
   "steal": {
     "plugins": [

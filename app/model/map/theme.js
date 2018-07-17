@@ -22,45 +22,44 @@ import connectStore from 'can-connect/constructor/store/store';
 import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import Response from 'passbolt-mad/net/response';
 
-var Theme = DefineMap.extend('passbolt.model.Theme', {
-	id: 'string',
-	name: 'string',
-	preview: 'string'
+const Theme = DefineMap.extend('passbolt.model.Theme', {
+  id: 'string',
+  name: 'string',
+  preview: 'string'
 });
 DefineMap.setReference('Theme', Theme);
-Theme.List = DefineList.extend({'#': { Type: Theme }});
+Theme.List = DefineList.extend({'#': {Type: Theme}});
 
 /**
  * Select a theme
  * @param {Theme} theme The target theme
  */
 Theme.select = function(theme) {
-	return Ajax.request({
-		url: '/account/settings/themes.json',
-		type: 'POST',
-		params: {value: theme.name}
-	}).then(accountSetting => {
-			Config.write('accountSetting.theme', theme.name);
-		});
+  return Ajax.request({
+    url: '/account/settings/themes.json',
+    type: 'POST',
+    params: {value: theme.name}
+  }).then(() => {
+    Config.write('accountSetting.theme', theme.name);
+  });
 };
 
 Theme.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
-	Map: Theme,
-	List: Theme.List,
-	url: {
-		resource: '/',
-		getListData: function(params) {
-			params = params || {};
-			params['api-version'] = 'v2';
-			return Ajax.request({
-				url: '/account/settings/themes.json',
-				type: 'GET',
-				params: params
-			});
-		}
-	}
+  Map: Theme,
+  List: Theme.List,
+  url: {
+    resource: '/',
+    getListData: function(params) {
+      params = params || {};
+      params['api-version'] = 'v2';
+      return Ajax.request({
+        url: '/account/settings/themes.json',
+        type: 'GET',
+        params: params
+      });
+    }
+  }
 });
 
 export default Theme;

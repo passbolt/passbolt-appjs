@@ -16,15 +16,15 @@ import DefineMap from 'passbolt-mad/model/map/map';
 import Group from 'app/model/map/group';
 import User from 'app/model/map/user';
 
-var GroupUser = DefineMap.extend('passbolt.model.GroupUser', {
-	id: 'string',
-	group_id: 'string',
-	user_id: 'string',
-	is_admin: 'boolean',
-	user: User,
-	group: Group
+const GroupUser = DefineMap.extend('passbolt.model.GroupUser', {
+  id: 'string',
+  group_id: 'string',
+  user_id: 'string',
+  is_admin: 'boolean',
+  user: User,
+  group: Group
 });
 DefineMap.setReference('GroupUser', GroupUser);
-GroupUser.List = DefineList.extend({'#': { Type: GroupUser }});
+GroupUser.List = DefineList.extend({'#': {Type: GroupUser}});
 
 export default GroupUser;

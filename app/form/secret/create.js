@@ -11,50 +11,49 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 
-var CreateForm = Form.extend('passbolt.form.secret.Create', /** @static */ {
+const CreateForm = Form.extend('passbolt.form.secret.Create', /** @static */ {
 
-	defaults: {
-		action: 'create',
-		secret_i: null
-	}
+  defaults: {
+    action: 'create',
+    secret_i: null
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	afterStart: function () {
-		// Add secret id hidden field.
-		this.addElement(
-			new TextboxComponent('#js_field_secret_id_' + this.options.secret_i, {
-				modelReference: 'Secret.id',
-				validate: false
-			}).start()
-		);
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    // Add secret id hidden field.
+    this.addElement(
+      new TextboxComponent(`#js_field_secret_id_${this.options.secret_i}`, {
+        modelReference: 'Secret.id',
+        validate: false
+      }).start()
+    );
 
-		// Add secret user id hidden field.
-		this.addElement(
-			new TextboxComponent('#js_field_secret_user_id_' + this.options.secret_i, {
-				modelReference: 'Secret.user_id',
-				validate: false
-			}).start()
-		);
+    // Add secret user id hidden field.
+    this.addElement(
+      new TextboxComponent(`#js_field_secret_user_id_${this.options.secret_i}`, {
+        modelReference: 'Secret.user_id',
+        validate: false
+      }).start()
+    );
 
-		// Add secret data hidden field.
-		this.addElement(
-			new TextboxComponent('#js_field_secret_data_' + this.options.secret_i, {
-				modelReference: 'Secret.data',
-				validate: false
-			}).start()
-		);
+    // Add secret data hidden field.
+    this.addElement(
+      new TextboxComponent(`#js_field_secret_data_${this.options.secret_i}`, {
+        modelReference: 'Secret.data',
+        validate: false
+      }).start()
+    );
 
-		// Rebind controller events
-		this.on();
-	}
+    // Rebind controller events
+    this.on();
+  }
 
 });
 

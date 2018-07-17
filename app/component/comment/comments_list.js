@@ -22,86 +22,86 @@ import User from 'app/model/map/user';
 import commentDeleteConfirmTemplate from 'app/view/template/component/comment/delete_confirm.stache!';
 import itemTemplate from 'app/view/template/component/comment/comment_item.stache!';
 
-var CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsList', /** @static */ {
+const CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsList', /** @static */ {
 
-	defaults: {
-		label: 'Comments List Controller',
-		viewClass: CommentsListView,
-		itemClass: Comment,
-		itemTemplate: itemTemplate,
-		foreignModel: null,
-		foreignKey: null
-	}
+  defaults: {
+    label: 'Comments List Controller',
+    viewClass: CommentsListView,
+    itemClass: Comment,
+    itemTemplate: itemTemplate,
+    foreignModel: null,
+    foreignKey: null
+  }
 
 }, /** @prototype */ {
 
-	/**
-	 * @inheritdoc
-	 */
-	init: function (el, options) {
-		options.map = this._getMap();
-		this._super(el, options);
-	},
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    options.map = this._getMap();
+    this._super(el, options);
+  },
 
-	/**
-	 * Get the map
-	 *
-	 * @return {mad.Map}
-	 */
-	_getMap: function() {
-		return new MadMap({
-			id: 'id',
-			content: 'content',
-			modified: 'modified',
-			creatorAvatarPath: {
-				key: 'creator',
-				func: function(creator, map, obj) {
-					return creator.profile.avatarPath('small');
-				}
-			},
-			creatorName: {
-				key: 'creator',
-				func: function(creator, map, obj) {
-					return creator.profile.fullName();
-				}
-			}
-		});
-	},
-
-    /**
-     * @inheritdoc
-     */
-    insertItem: function (item, refItem, position) {
-        this._super(item, refItem, position);
-
-        // Unhide delete action if user is owner.
-        var isOwner = item.created_by != undefined && item.created_by == User.getCurrent().id;
-        if (isOwner) {
-            var $deleteActionEl = $('li#' + item.id + ' .js_delete_comment', this.element);
-            $deleteActionEl.removeClass('hidden');
+  /**
+   * Get the map
+   *
+   * @return {mad.Map}
+   */
+  _getMap: function() {
+    return new MadMap({
+      id: 'id',
+      content: 'content',
+      modified: 'modified',
+      creatorAvatarPath: {
+        key: 'creator',
+        func: function(creator) {
+          return creator.profile.avatarPath('small');
         }
-    },
+      },
+      creatorName: {
+        key: 'creator',
+        func: function(creator) {
+          return creator.profile.fullName();
+        }
+      }
+    });
+  },
 
-	/**
-	 * Catches a request_delete_comment coming from an item in the list then redistribute on mad bus
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'{element} request_delete_comment': function(el, ev) {
-		const item = ev.data.item;
-        var confirm = ConfirmComponent.instantiate({
-			label: __('Do you really want to delete?'),
-			content: commentDeleteConfirmTemplate,
-			submitButton: {
-				label: __('delete comment'),
-				cssClasses: ['warning']
-			},
-			action: function() {
-				MadBus.trigger('request_delete_comment', {item});
-			}
-		});
-		confirm.start();
-	}
+  /**
+   * @inheritdoc
+   */
+  insertItem: function(item, refItem, position) {
+    this._super(item, refItem, position);
+
+    // Unhide delete action if user is owner.
+    const isOwner = item.created_by != undefined && item.created_by == User.getCurrent().id;
+    if (isOwner) {
+      const $deleteActionEl = $(`li#${item.id} .js_delete_comment`, this.element);
+      $deleteActionEl.removeClass('hidden');
+    }
+  },
+
+  /**
+   * Catches a request_delete_comment coming from an item in the list then redistribute on mad bus
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} request_delete_comment': function(el, ev) {
+    const item = ev.data.item;
+    const confirm = ConfirmComponent.instantiate({
+      label: __('Do you really want to delete?'),
+      content: commentDeleteConfirmTemplate,
+      submitButton: {
+        label: __('delete comment'),
+        cssClasses: ['warning']
+      },
+      action: function() {
+        MadBus.trigger('request_delete_comment', {item: item});
+      }
+    });
+    confirm.start();
+  }
 });
 
 export default CommentsListComponent;

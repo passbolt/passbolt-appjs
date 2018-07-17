@@ -17,37 +17,37 @@ import TextboxComponent from 'passbolt-mad/form/element/textbox';
 
 import template from 'app/view/template/form/group/create.stache!';
 
-var CreateForm = Form.extend('passbolt.form.group.Create', /** @static */ {
+const CreateForm = Form.extend('passbolt.form.group.Create', /** @static */ {
 
-    defaults: {
-        action: 'create',
-		template: template,
-        cssClasses: ['group_edit_form'],
-        canUpdateName: true
-    }
+  defaults: {
+    action: 'create',
+    template: template,
+    cssClasses: ['group_edit_form'],
+    canUpdateName: true
+  }
 
 }, /** @prototype */ {
 
-    /**
-     * @inheritdoc
-     */
-    afterStart: function () {
-        // Add user first name field.
-        var nameField = this.addElement(
-            new TextboxComponent('#js_field_name', {
-                modelReference: 'Group.name'
-            }).start(),
-            new FeedbackComponent('#js_field_name_feedback', {}).start()
-        );
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    // Add user first name field.
+    this.addElement(
+      new TextboxComponent('#js_field_name', {
+        modelReference: 'Group.name'
+      }).start(),
+      new FeedbackComponent('#js_field_name_feedback', {}).start()
+    );
 
-        // Disable name field if the user is not allowed to update it.
-        if (this.options.canUpdateName == false) {
-            $('#js_field_name').attr('disabled', 'disabled');
-        }
-
-        // Rebind controller events
-        this.on();
+    // Disable name field if the user is not allowed to update it.
+    if (this.options.canUpdateName == false) {
+      $('#js_field_name').attr('disabled', 'disabled');
     }
+
+    // Rebind controller events
+    this.on();
+  }
 
 });
 

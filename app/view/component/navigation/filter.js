@@ -13,18 +13,16 @@
  */
 import View from 'passbolt-mad/view/view';
 
-var FilterView = View.extend('passbolt.view.component.navigation.Filter', /** @static */ {
+const FilterView = View.extend('passbolt.view.component.navigation.Filter', /** @static */ {
 
 }, /** @prototype */ {
 
-	/**
-	 * Observe when the user update the filter
-	 * @param {HTMLElement} el The element the event occurred on
-	 * @param {HTMLEvent} ev The event which occurred
-	 */
-	'form submit': function(el, ev) {
-		$(this.element).trigger('update');
-	}
+  /**
+   * Observe when the user update the filter
+   */
+  'form submit': function() {
+    $(this.element).trigger('update');
+  }
 
 });
 export default FilterView;

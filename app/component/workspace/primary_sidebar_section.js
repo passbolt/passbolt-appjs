@@ -16,12 +16,12 @@ import PrimarySidebarSectionView from 'app/view/component/workspace/primary_side
 
 //import template from 'app/view/template/component/workspace/sidebar_section.ejs!';
 
-var PrimarySidebarSectionComponent = Component.extend('passbolt.component.workspace.SecondarySidebarSection', /** @static */ {
+const PrimarySidebarSectionComponent = Component.extend('passbolt.component.workspace.SecondarySidebarSection', /** @static */ {
 
-    defaults: {
-        label: 'Primary Sidebar Section Component',
-        viewClass: PrimarySidebarSectionView
-    }
+  defaults: {
+    label: 'Primary Sidebar Section Component',
+    viewClass: PrimarySidebarSectionView
+  }
 
 }, /** @prototype */ {
 

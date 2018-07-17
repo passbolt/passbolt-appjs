@@ -17,7 +17,7 @@ import PeopleGroupsListComponent from 'app/component/group/people_groups_list';
 
 import template from 'app/view/template/component/user/groups_filter_sidebar_section.stache!';
 
-var GroupsFilterSidebarSectionComponent = Component.extend('passbolt.component.user.GroupsFilterSidebarSection', /** @static */ {
+const GroupsFilterSidebarSectionComponent = Component.extend('passbolt.component.user.GroupsFilterSidebarSection', /** @static */ {
 
   defaults: {
     template: template,
@@ -30,7 +30,7 @@ var GroupsFilterSidebarSectionComponent = Component.extend('passbolt.component.u
    * @inheritdoc
    */
   afterStart: function() {
-    var peopleGroupsList = new PeopleGroupsListComponent('#js_wsp_users_groups_list', {
+    const peopleGroupsList = new PeopleGroupsListComponent('#js_wsp_users_groups_list', {
       selectedGroups: this.options.selectedGroups
     });
     peopleGroupsList.start();

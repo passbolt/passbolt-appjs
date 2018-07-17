@@ -13,9 +13,9 @@
  */
 import DefineMap from 'passbolt-mad/model/map/map';
 
-var Secret = DefineMap.extend('passbolt.model.Secret', {
-	id: 'string',
-	data: 'string'
+const Secret = DefineMap.extend('passbolt.model.Secret', {
+  id: 'string',
+  data: 'string'
 });
 DefineMap.setReference('Secret', Secret);
 

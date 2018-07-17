@@ -17,24 +17,24 @@ import PeopleGroupsListComponent from 'app/component/group/people_groups_list';
 
 import template from 'app/view/template/component/user/workspace_groups_filter.ejs!';
 
-var WorkspaceGroupsFilterComponent = Component.extend('passbolt.component.user.workspace_groups_filter', /** @static */ {
+const WorkspaceGroupsFilterComponent = Component.extend('passbolt.component.user.workspace_groups_filter', /** @static */ {
 
-    defaults: {
-        template: template,
-        selectedGroups: new Group.List()
-    }
+  defaults: {
+    template: template,
+    selectedGroups: new Group.List()
+  }
 
 }, /** @prototype */ {
 
-    /**
-     * @inheritdoc
-     */
-    afterStart: function() {
-        var peopleGroupsList = new PeopleGroupsListComponent('#js_wsp_users_groups_list', {
-            selectedGroups: this.options.selectedGroups
-        });
-        peopleGroupsList.start();
-    }
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    const peopleGroupsList = new PeopleGroupsListComponent('#js_wsp_users_groups_list', {
+      selectedGroups: this.options.selectedGroups
+    });
+    peopleGroupsList.start();
+  }
 
 });
 

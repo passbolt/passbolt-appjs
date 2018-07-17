@@ -13,7 +13,6 @@
  */
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
-import Filter from 'app/model/map/filter';
 import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
 import uuid from 'uuid/v4';
@@ -21,108 +20,105 @@ import uuid from 'uuid/v4';
 import template from 'app/view/template/component/breadcrumb/breadcrumb.stache!';
 import breadCrumbTemplate from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
 
-var WorkspaceBreadcrumb = Component.extend('passbolt.component.user.WorkspaceBreadcrumb', /** @static */ {
+const WorkspaceBreadcrumb = Component.extend('passbolt.component.user.WorkspaceBreadcrumb', /** @static */ {
 
-    defaults: {
-        template: template,
-        status: 'hidden',
-        // Root crumb filter
-        rootFilter: null
-    }
+  defaults: {
+    template: template,
+    status: 'hidden',
+    // Root crumb filter
+    rootFilter: null
+  }
 
 }, /** @prototype */ {
 
-    /**
-     * @inheritdoc
-     */
-    afterStart: function () {
-        var menuSelector = '#' + this.getId() + ' ul';
-        this.options.menu = new MenuComponent(menuSelector, {
-            itemTemplate: breadCrumbTemplate
-        });
-        this.options.menu.start();
-    },
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    const menuSelector = `#${this.getId()} ul`;
+    this.options.menu = new MenuComponent(menuSelector, {
+      itemTemplate: breadCrumbTemplate
+    });
+    this.options.menu.start();
+  },
 
-    /**
-     * Parse the current filter
-     * @param {passbolt.model.Filter} filter The filter to load
-     * @return {array}
-     */
-    parseFilter: function (filter) {
-        var menuItems = [],
-            keywords = filter.getRule('keywords');
+  /**
+   * Parse the current filter
+   * @param {passbolt.model.Filter} filter The filter to load
+   * @return {array}
+   */
+  parseFilter: function(filter) {
+    const menuItems = [];
+    const keywords = filter.getRule('keywords');
 
-        // Add default filter as root action.
-        var menuItem = new Action({
-            id: uuid(),
-            label: __('All users'),
-            filter: this.options.rootFilter
-        });
-        menuItems.push(menuItem);
+    // Add default filter as root action.
+    const allUsersMenuItem = new Action({
+      id: uuid(),
+      label: __('All users'),
+      filter: this.options.rootFilter
+    });
+    menuItems.push(allUsersMenuItem);
 
-        // If filtered by keywords, add a breadcrumb relative to the searched keywords
-        if (keywords && keywords != '') {
-            var menuItem = new Action({
-                id: uuid(),
-                label: __('Search : %s', keywords)
-            });
-            menuItems.push(menuItem);
-        }
-        // For any other filters than the default one, add a breadcrumb entry.
-        else if (filter.id != 'default') {
-            var menuItem = new Action({
-                id: uuid(),
-                label: filter.label
-            });
-            menuItems.push(menuItem);
-        }
-
-        return menuItems;
-    },
-
-    /**
-     * Load the current filter
-     * @param {passbolt.model.Filter} filter The filter to load
-     */
-    load: function (filter) {
-        var menuItems = this.parseFilter(filter);
-
-        this.options.menu.reset();
-        this.options.menu.load(menuItems);
-    },
-
-    /* ************************************************************** */
-    /* LISTEN TO THE VIEW EVENTS */
-    /* ************************************************************** */
-
-    /**
-     * An item has been selected
-     * @parent mad.component.Menu.view_events
-     * @param {HTMLElement} el The element the event occured on
-     * @param {HTMLEvent} ev The event which occured
-     */
-    '{element} item_selected': function (el, ev) {
-        const item = ev.data.item;
-        if (item.filter) {
-            MadBus.trigger('filter_workspace', {filter: item.filter});
-        }
-    },
-
-    /* ************************************************************** */
-    /* LISTEN TO APP EVENTS */
-    /* ************************************************************** */
-
-    /**
-     * Listen to the browser filter
-     * @param {jQuery} element The source element
-     * @param {Event} event The jQuery event
-     */
-    '{mad.bus.element} filter_workspace': function (el, ev) {
-        const filter = ev.data.filter;
-        this.options.menu.reset();
-        var menuItems = this.parseFilter(filter);
-        this.options.menu.load(menuItems);
+    // If filtered by keywords, add a breadcrumb relative to the searched keywords
+    if (keywords && keywords != '') {
+      const searchMenuItem = new Action({
+        id: uuid(),
+        label: __('Search : %s', keywords)
+      });
+      menuItems.push(searchMenuItem);
+    } else if (filter.id != 'default') {
+      // For any other filters than the default one, add a breadcrumb entry.
+      const thirdFilterMenuItem = new Action({
+        id: uuid(),
+        label: filter.label
+      });
+      menuItems.push(thirdFilterMenuItem);
     }
+
+    return menuItems;
+  },
+
+  /**
+   * Load the current filter
+   * @param {Filter} filter The filter to load
+   */
+  load: function(filter) {
+    const menuItems = this.parseFilter(filter);
+    this.options.menu.reset();
+    this.options.menu.load(menuItems);
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO THE VIEW EVENTS */
+  /* ************************************************************** */
+
+  /**
+   * An item has been selected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} item_selected': function(el, ev) {
+    const item = ev.data.item;
+    if (item.filter) {
+      MadBus.trigger('filter_workspace', {filter: item.filter});
+    }
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO APP EVENTS */
+  /* ************************************************************** */
+
+  /**
+   * Listen to the browser filter
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} filter_workspace': function(el, ev) {
+    const filter = ev.data.filter;
+    this.options.menu.reset();
+    const menuItems = this.parseFilter(filter);
+    this.options.menu.load(menuItems);
+  }
 
 });
 
