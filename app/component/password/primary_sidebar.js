@@ -24,7 +24,9 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
   defaults: {
     label: 'Password Workspace Primary Sidebar',
     template: template,
-    defaultFilter: null
+    defaultFilter: null,
+    // State strategy
+    state: 'loading'
   }
 
 }, /** @prototype */ {

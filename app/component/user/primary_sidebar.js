@@ -20,10 +20,9 @@ import template from 'app/view/template/component/user/primary_sidebar.stache!';
 const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt.component.user.PrimarySidebar', /** @static */ {
 
   defaults: {
-    label: 'USer Workspace Primary Sidebar',
+    label: 'User Workspace Primary Sidebar',
     template: template,
     defaultFilter: null,
-    selectedRs: null,
     selectedGroups: null
   }
 

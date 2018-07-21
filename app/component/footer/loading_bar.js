@@ -45,10 +45,9 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
    * Complete a loading.
    */
   loading_complete: function(callback) {
-    const self = this;
     this.options.progressionLeft = 100;
     this.view.update(100, true, () => {
-      self.view.update(0, false);
+      this.view.update(0, false);
       if (callback) {
         callback();
       }
@@ -59,8 +58,6 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
    * Refresh the loading bar
    */
   update: function(postponedUpdate) {
-    const self = this;
-
     /*
      * If we are in a postponed update.
      * Release the lock and allow other requests to be postponed.
@@ -75,7 +72,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
       if (!this.options.postponedUpdate) {
         this.options.postponedUpdate = true;
         setTimeout(() => {
-          self.update(true);
+          this.update(true);
         }, 100);
       }
       return;
@@ -89,33 +86,27 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
      * Measurement are based on these variables, and they can change asynchronously.
      */
     const currentProcs = this.options.currentProcs;
-    // If we have more processus in the queue than during the previous execution.
+    // If we have more processes in the queue than during the previous execution.
     if (this.options.maxProcs < currentProcs) {
       this.options.maxProcs = currentProcs;
     }
-    // The variation of processus compare to the latest execution of the function.
+    // The variation of processes compare to the latest execution of the function.
     const diffProcs = currentProcs - this.options.previousProcs;
 
-    /*
-     * As much as processus than during the previous execution.
-     * In asynchronous context it can happened.
-     */
+    // As much as processes than during the previous execution. In asynchronous context it can happened.
     if (!diffProcs) {
       this.state.removeState('updating');
     } else if (!currentProcs) {
-      /*
-       * All processus have been completed.
-       * Even if the bar is not in "progressing" state, complete it.
-       */
+      // All processes have been completed. Even if the bar is not in "progressing" state, complete it.
       this.state.addState('completing');
-      this.loading_complete(function() {
+      this.loading_complete(() => {
         /*
          * Broadcast an event on the app event bus to notify all other components about the
-         * the completion of the currents processus.
+         * the completion of the currents processes.
          */
         MadBus.trigger('passbolt_application_loading_completed', [this]);
         // Mark the loading bar component as ready.
-        self.state.setState('ready');
+        this.state.setState('ready');
       });
     } else {
       /*
@@ -133,7 +124,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
 
       /*
        * A new processus will fill the loading bar at 50%.
-       * The other 50% will be filled while the processus will be completed.
+       * The other 50% will be filled while the processes will be completed.
        */
       const procSpace = (100 / this.options.maxProcs) * 1 / 2;
       const spaceLeft = (this.options.maxProcs - (this.options.maxProcs - this.options.currentProcs)) * procSpace;
@@ -145,7 +136,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
 
       // Update the view.
       this.view.update(100 - this.options.progressionLeft, true, () => {
-        self.state.removeState('updating');
+        this.state.removeState('updating');
       });
     }
 

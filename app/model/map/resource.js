@@ -21,12 +21,13 @@ import connectStore from 'can-connect/constructor/store/store';
 import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
+import getObject from 'can-util/js/get/get';
 import Favorite from 'app/model/map/favorite';
+import Permission from 'app/model/map/permission';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';
 import 'urijs/src/IPv6';
 import URI from 'urijs/src/URI';
-import Permission from 'app/model/map/permission';
 /*
  *import Secret from 'app/model/map/secret';
  *import Tag from 'app/model/map/tag';
@@ -201,7 +202,7 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
       return Ajax.request({
         url: 'resources.json?api-version=v2',
         type: 'GET',
-        params: params
+        params
       });
     },
     destroyData: function(params) {

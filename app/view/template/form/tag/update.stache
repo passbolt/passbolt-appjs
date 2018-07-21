@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="actions">
-            <a id="js_tags_editor_submit" class="button tag-editor-submit" href="#"><span>{{ __('save') }}</span></a>
+            <a id="js_tags_editor_submit" class="button tag-editor-submit"><span>{{ __('save') }}</span></a>
             <a id="js_tags_editor_cancel" class="button cancel tag-editor-cancel" role="button"><span>cancel</span></a>
         </div>
     </div>

@@ -5,7 +5,7 @@
             <span class="name sidebar-header-title">{{ name }}</span>
             <span class="type">{{ __('group') }}</span>
         </h3>
-        <a href="#" class="js_sidebar_close dialog-close">
+        <a class="js_sidebar_close dialog-close">
             <i class="fa fa-fw fa-close"></i>
             <span class="visuallyhidden">{{ __('close') }}</span>
         </a>

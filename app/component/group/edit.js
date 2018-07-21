@@ -535,9 +535,9 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
    * Listen when a group could not be saved by the plugin.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {json} errorResponse the response sent by the server in json format.
    */
-  '{mad.bus.element} group_edit_save_error': function(el, ev, errorResponse) {
+  '{mad.bus.element} group_edit_save_error': function(el, ev) {
+    const errorResponse = ev.data;
     if (errorResponse.header.status_code == 400) {
       // If it' an error with the group name, display validation error.
       if (errorResponse.body.Group != undefined

@@ -35,7 +35,6 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
   /**
    * Observe when the item is updated
-   * @param {passbolt.model} item The updated item
    */
   '{group} updated': function() {
     this.refresh();

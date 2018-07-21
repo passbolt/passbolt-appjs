@@ -2,13 +2,13 @@
     <div class="row ">
         <div class="main-cell-wrapper">
             <div class="main-cell">
-                <a href="#" title="{{ mappedItem.label }}'"><span>{{ mappedItem.label }}</span></a>
+                <a title="{{ mappedItem.label }}'"><span>{{ mappedItem.label }}</span></a>
             </div>
         </div>
         {{#if(withMenu)}}
         {{#if(mappedItem.canEdit)}}
         <div class="right-cell more-ctrl">
-            <a href="#"><span>more</span></a>
+            <a><span>more</span></a>
         </div>
         {{/if}}
         {{/if}}

@@ -45,7 +45,7 @@ const GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.exten
   /**
    *
    * Initialize the tree
-   * @return {mad.Component}
+   * @return {Group}
    */
   _initTree: function(group) {
     const map = this._getTreeMap();
@@ -64,8 +64,7 @@ const GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.exten
 
   /**
    * Get the tree map
-   *
-   * @return {mad.Map}
+   * @return {UtilMap}
    */
   _getTreeMap: function() {
     return new MadMap({
@@ -88,7 +87,6 @@ const GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.exten
 
   /**
    * Observe when the item is updated
-   * @param {passbolt.model} item The updated item
    */
   '{group} updated': function() {
     this.refresh();
@@ -106,7 +104,7 @@ const GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.exten
   '{element} a#js_edit_members_button click': function(el, ev) {
     ev.preventDefault();
     const group = this.options.group;
-    MadBus.trigger('request_group_edition', group);
+    MadBus.trigger('request_group_edition', {group: group});
   },
 
   /**

@@ -95,7 +95,7 @@ const PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.
   '{element} item_menu_clicked': function(el, ev) {
     const group = ev.data.group;
     const srcEv = ev.data.srcEv;
-    this.showContextualMenu(group, srcEv.pageX, srcEv.pageY, srcEv.target);
+    this.showContextualMenu(group, srcEv.pageX - 3, srcEv.pageY, srcEv.target);
   }
 
 });
