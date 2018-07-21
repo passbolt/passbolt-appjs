@@ -31,7 +31,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     label: 'Workspace Menu Controller',
     tag: 'ul',
     // the selected resources, you can pass an existing list as parameter of the constructor to share the same list
-    selectedRs: new Resource.List(),
+    selectedResources: new Resource.List(),
     template: template
   }
 
@@ -138,7 +138,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Copy login to clipboard.
    */
   _copyLogin: function() {
-    const item = this.options.selectedRs[0];
+    const item = this.options.selectedResources[0];
     Clipboard.copy(item.username, 'username');
   },
 
@@ -146,7 +146,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Decrypt and copy secret to clipboard
    */
   _copySecret: function() {
-    const secret = this.options.selectedRs[0].secrets[0];
+    const secret = this.options.selectedResources[0].secrets[0];
     Plugin.decryptAndCopyToClipboard(secret.data);
   },
 
@@ -154,7 +154,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Delete
    */
   _delete: function() {
-    const resource = this.options.selectedRs[0];
+    const resource = this.options.selectedResources[0];
     MadBus.trigger('request_resource_deletion', {resource: resource});
   },
 
@@ -162,7 +162,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Edit
    */
   _edit: function() {
-    const resource = this.options.selectedRs[0];
+    const resource = this.options.selectedResources[0];
     MadBus.trigger('request_resource_edition', {resource: resource});
   },
 
@@ -170,7 +170,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Share
    */
   _share: function() {
-    const resource = this.options.selectedRs[0];
+    const resource = this.options.selectedResources[0];
     MadBus.trigger('request_resource_sharing', {resource: resource});
   },
 
@@ -189,11 +189,11 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   /**
    * Observe when a resource is selected
    */
-  '{selectedRs} add': function() {
+  '{selectedResources} add': function() {
     // If a resource is selected
-    if (this.options.selectedRs.length == 1) {
+    if (this.options.selectedResources.length == 1) {
       this.setState('selection');
-    } else if (this.options.selectedRs.length == 0) {
+    } else if (this.options.selectedResources.length == 0) {
       this.setState('ready');
     }
   },
@@ -201,11 +201,11 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   /**
    * Observe when a resource is unselected
    */
-  '{selectedRs} remove': function() {
+  '{selectedResources} remove': function() {
     // If a resource is selected
-    if (this.options.selectedRs.length == 1) {
+    if (this.options.selectedResources.length == 1) {
       this.setState('selection');
-    } else if (this.options.selectedRs.length == 0) {
+    } else if (this.options.selectedResources.length == 0) {
       this.setState('ready');
     }
   },
@@ -220,23 +220,23 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   stateSelection: function(go) {
     if (go) {
-      const permission = this.options.selectedRs[0].permission;
+      const permission = this.options.selectedResources[0].permission;
       // Is the resource editable ?
       const updatable = permission.isAllowedTo(PermissionType.UPDATE);
       // Is the resource administrable ?
       const administrable = permission.isAllowedTo(PermissionType.ADMIN);
 
       this.options.secretCopyButton
-        .setValue(this.options.selectedRs[0])
+        .setValue(this.options.selectedResources[0])
         .setState('ready');
       this.options.editButton
-        .setValue(this.options.selectedRs[0])
+        .setValue(this.options.selectedResources[0])
         .setState(updatable ? 'ready' : 'disabled');
       this.options.shareButton
-        .setValue(this.options.selectedRs)
+        .setValue(this.options.selectedResources)
         .setState(administrable ? 'ready' : 'disabled');
       this.options.moreButton
-        .setValue(this.options.selectedRs[0])
+        .setValue(this.options.selectedResources[0])
         .setState('ready');
       this.options.moreButton.setItemState('js_wk_menu_delete_action', updatable ? 'ready' : 'disabled');
     } else {

@@ -23,7 +23,7 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
   defaults: {
     label: 'Group Details Controller',
     template: template,
-    selectedItem: null
+    group: null
   }
 
 }, /** @prototype */ {
@@ -32,25 +32,24 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
    * @inheritdoc
    */
   beforeRender: function() {
+    this.setViewData('name', this.options.group.name);
     this._super();
-    this.setViewData('name', this.options.selectedItem.name);
   },
 
   /**
    * @inheritdoc
    */
   afterStart: function() {
-    this._findGroup(this.options.selectedItem.id)
+    this._findGroup(this.options.group.id)
       .then(() => this._initInformationSection())
       .then(() => this._initGroupUsersSection());
-
     this._super();
   },
 
   /**
    * Retrieve the group and the associated required information
-   * @param groupId
-   * @return {Group}
+   * @param {string} groupId The group id to find
+   * @return {Promise}
    * @private
    */
   _findGroup: function(groupId) {
@@ -65,7 +64,7 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
 
     return Group.findOne(options)
       .then(group => {
-        this.options.selectedItem = group;
+        this.options.group = group;
       });
   },
 
@@ -74,41 +73,27 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
    * @private
    */
   _initInformationSection: function() {
-    const component = new InformationSectionComponent('#js_group_details_information', {
-      group: this.options.selectedItem
-    });
+    const group = this.options.group;
+    const component = new InformationSectionComponent('#js_group_details_information', {group});
     component.start();
   },
 
   /**
    * Init the group user section.
+   * @private
    */
   _initGroupUsersSection: function() {
-    const component = new GroupUsersSectionComponent('#js_group_details_members', {
-      group: this.options.selectedItem,
-      cssClasses: ['closed']
-    });
+    const group = this.options.group;
+    const cssClasses = ['closed'];
+    const component = new GroupUsersSectionComponent('#js_group_details_members', {group, cssClasses});
     component.start();
   },
 
   /**
-   * Observer when the group is updated.
+   * Observe when the group is updated.
    */
-  '{selectedItem} updated': function() {
+  '{group} updated': function() {
     this.setTitle(this.options.selectedItem.name);
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
-  /**
-   * Listen to the event user_selected
-   */
-  '{mad.bus.element} user_selected': function() {
-    if (!this.state.is(null) && !this.state.is('hidden')) {
-      this.setState('hidden');
-    }
   }
 
 });

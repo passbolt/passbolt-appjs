@@ -16,7 +16,6 @@ import GpgkeySectionComponent from 'app/component/gpgkey/gpgkey_sidebar_section'
 import InformationSectionComponent from 'app/component/user/information_sidebar_section';
 import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
 import UserGroupsSidebarSectionComponent from 'app/component/group_user/user_groups_sidebar_section';
-import UserSecondarySidebarView from 'app/view/component/user/user_secondary_sidebar';
 
 import template from 'app/view/template/component/user/user_secondary_sidebar.stache!';
 
@@ -24,9 +23,8 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
 
   defaults: {
     label: 'User Details Controller',
-    viewClass: UserSecondarySidebarView,
     template: template,
-    selectedItem: null
+    user: null
   }
 
 }, /** @prototype */ {
@@ -36,7 +34,7 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
    */
   beforeRender: function() {
     this._super();
-    this.setViewData('user', this.options.selectedItem);
+    this.setViewData('user', this.options.user);
   },
 
   /**
@@ -54,7 +52,7 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
    */
   _initInformationSection: function() {
     const informationComponent = new InformationSectionComponent('#js_user_details_information', {
-      user: this.options.selectedItem
+      user: this.options.user
     });
     informationComponent.start();
   },
@@ -67,10 +65,10 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
      * active field will not be provided for non admin users,
      * but we still want to display information regarding groups.
      */
-    if (this.options.selectedItem.active === undefined || this.options.selectedItem.active == '1') {
+    if (this.options.user.active === undefined || this.options.user.active == '1') {
       // Instantiate the groups list component for the current user.
       const userGroups = new UserGroupsSidebarSectionComponent('#js_user_groups', {
-        user: this.options.selectedItem
+        user: this.options.user
       });
       userGroups.start();
     }
@@ -80,34 +78,30 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
    * Initialize the gpgkey section
    */
   _initGpgkeySection: function() {
-    if (!this.options.selectedItem.gpgkey) {
+    if (!this.options.user.gpgkey) {
       return;
     }
 
     const gpgkeyComponent = new GpgkeySectionComponent('#js_user_gpgkey', {
-      gpgkey: this.options.selectedItem.gpgkey,
+      gpgkey: this.options.user.gpgkey,
       cssClasses: ['closed']
     });
     gpgkeyComponent.start();
   },
 
   /**
-   * Observer when the user is updated.
+   * Observe when the user is updated.
    */
-  '{selectedItem} updated': function() {
-    this.setTitle(this.options.selectedItem.profile.fullName());
-    this.setSubtitle(this.options.selectedItem.username);
+  '{user} updated': function() {
+    this.setTitle(this.options.user.profile.fullName());
+    this.setSubtitle(this.options.user.username);
   },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE VIEW EVENTS */
-  /* ************************************************************** */
 
   /**
    * Listen when a user clicks on copy public key.
    */
-  '{element} request_copy_publickey': function() {
-    const gpgkey = this.options.selectedItem.gpgkey;
+  '{element} a.copy-public-key click': function() {
+    const gpgkey = this.options.user.gpgkey;
     Clipboard.copy(gpgkey.armored_key, 'public key');
   }
 

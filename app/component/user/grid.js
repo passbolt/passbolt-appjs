@@ -19,7 +19,6 @@ import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/user/grid_contextual_menu';
 import Group from 'app/model/map/group';
 import GroupUser from 'app/model/map/group_user';
-import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import User from 'app/model/map/user';
 import UserGridView from 'app/view/component/user/grid';
@@ -36,11 +35,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     selectedUsers: new User.List(),
     prefixItemId: 'user_',
     silentLoading: false,
-    /*
-     * For now we are using the can-connect/can/model/model to migrate our v2 models.
-     * Canjs should be able to observe Map in a Control as a function, however it doesn't.
-     * Test it again after we completed the migration of the model to the canjs style.
-     */
+    state: 'loading',
+    // Model observed in templated functions
     Group: Group,
     GroupUser: GroupUser,
     User: User
@@ -70,7 +66,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
 
   /**
    * Get the grid map
-   * @return {mad.Map}
+   * @return {UtilMap}
    */
   _getGridMap: function() {
     return new MadMap({
@@ -196,7 +192,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
 
   /**
    * Show the contextual menu
-   * @param {passbolt.model.Resource} resource The resource to show the contextual menu for
+   * @param {User} user The user to show the contextual menu for
    * @param {string} x The x position where the menu will be rendered
    * @param {string} y The y position where the menu will be rendered
    */
@@ -243,7 +239,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
 
   /**
    * Before selecting an item
-   * @param {mad.model.Model} item The item to select
+   * @param {User} item The item to select
    */
   beforeSelect: function(item) {
     let returnValue = true;
@@ -268,73 +264,39 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
   },
 
   /**
-   * Select an item
-   * @param {mad.model.Model} item The item to select
-   * @param {boolean} silent Do not propagate any event (default:false)
+   * Is the item selected
+   * @param {User}
+   * @return {bool}
    */
-  select: function(item) {
-    // If the item doesn't exist
-    if (!this.itemExists(item)) {
-      return;
-    }
-
-    // Unselect the previously selected user, if not in multipleSelection.
-    if (!this.state.is('multipleSelection') &&
-			this.options.selectedUsers.length > 0) {
-      this.unselect(this.options.selectedUsers[0]);
-    }
-
-    // Add the user to the list of selected items.
-    this.options.selectedUsers.push(item);
-
-    // Check the checkbox (if it is not already done).
-    const checkbox = this._selectCheckboxComponents[item.id];
-    checkbox.setValue([item.id]);
-
-    // Make the item selected in the view.
-    this.view.selectItem(item);
-
-    // Notify the application about this selection.
-    MadBus.trigger('user_selected', item);
+  isSelected: function(item) {
+    return this.options.selectedUsers.length > 0
+      && this.options.selectedUsers[0].id == item.id;
   },
 
   /**
-   * Before unselecting an item
+   * Select an item
+   * @param {User} item The item to select
    */
-  beforeUnselect: function() {
-    const returnValue = true;
-    return returnValue;
+  select: function(item) {
+    if (!this.itemExists(item)) {
+      return;
+    }
+    const checkbox = this._selectCheckboxComponents[item.id];
+    checkbox.setValue([item.id]);
+    this.view.selectItem(item);
   },
 
   /**
    * Unselect an item
-   * @param {mad.model.Model} item The item to unselect
-   * @param {boolean} silent Do not propagate any event (default:false)
+   * @param {User} item The item to unselect
    */
-  unselect: function(item, silent) {
-    silent = typeof silent == 'undefined' ? false : silent;
-
-    // If the item doesn't exist
+  unselect: function(item) {
     if (!this.itemExists(item)) {
       return;
     }
-
-    // Uncheck the associated checkbox (if it is not already done).
     const checkbox = this._selectCheckboxComponents[item.id];
-
-    // Uncheck the checkbox by reseting it. Brutal.
     checkbox.reset();
-
-    // Unselect the item in grid.
     this.view.unselectItem(item);
-
-    // Remove the resource from the previously selected resources.
-    this.options.selectedUsers.remove(item);
-
-    // Notify the app about the just unselected resource.
-    if (!silent) {
-      MadBus.trigger('user_unselected', item);
-    }
   },
 
   /**
@@ -423,9 +385,9 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
 
   /**
    * Observe when a user is created.
-   * @param {mad.model.Model} model The model reference
+   * @param {User.prototype} model The model reference
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Resource} resource The created resource
+   * @param {User} resource The created resource
    */
   '{User} created': function(model, ev, user) {
     this.insertItem(user, null, 'first');
@@ -437,9 +399,9 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * If the user is displayed by he grid, refresh it.
    * note : We listen the model directly, listening on changes on
    * a list seems too much here (one event for each updated attribute)
-   * @param {mad.model.Model} model The model reference
+   * @param {User.prototype} model The model reference
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.User} user The updated user
+   * @param {User} user The updated user
    */
   '{User} updated': function(model, ev, user) {
     if (this.options.items.indexOf(user) != -1) {
@@ -459,9 +421,10 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    */
   '{element} item_selected': function(el, ev) {
     const item = ev.data.item;
-    this.setState('selection');
-    if (this.beforeSelect(item)) {
-      this.select(item);
+    if (this.isSelected(item)) {
+      this.options.selectedUsers.splice(0);
+    } else {
+      this.options.selectedUsers.splice(0, this.options.selectedUsers.length, item);
     }
   },
 
@@ -473,10 +436,28 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
   '{element} item_right_selected': function(el, ev) {
     const item = ev.data.item;
     const srcEv = ev.data.srcEv;
-    this.select(item);
+    this.options.selectedUsers.splice(0, this.options.selectedUsers.length, item);
     const $item = $(`#${this.options.prefixItemId}${item.id}`);
     const itemOffset = $item.offset();
     this.showContextualMenu(item, srcEv.pageX - 3, itemOffset.top);
+  },
+
+  /**
+   * Listen to the check event on any checkbox form element components.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} .js_checkbox_multiple_select checked': function(el, ev) {
+    const id = ev.data;
+    const user = this.options.items.filter({id: id}).pop();
+    this.options.selectedUsers.splice(0, this.options.selectedUsers.length, user);
+  },
+
+  /**
+   * Listen to the uncheck event on any checkbox form element components.
+   */
+  '{element} .js_checkbox_multiple_select unchecked': function() {
+    this.options.selectedUsers.splice(0, this.options.selectedUsers.length);
   },
 
   /* ************************************************************** */
@@ -485,8 +466,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
 
   /**
    * Listen to the browser filter
-   * @param {jQuery} element The source element
-   * @param {Event} event The jQuery event
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
     const filter = ev.data.filter;
@@ -497,15 +478,27 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
   },
 
   /**
-   * Observe when an item is unselected
+   * Observe when a user is unselected
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Resource|array} items The unselected items
+   * @param {array<User>} items The target users
    */
   '{selectedUsers} remove': function(el, ev, items) {
-    for (const i in items) {
-      this.unselect(items[i]);
-    }
+    items.forEach(item => {
+      this.unselect(item);
+    });
+  },
+
+  /**
+   * Observe when a user is selected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<User>} items The target users
+   */
+  '{selectedUsers} add': function(el, ev, items) {
+    items.forEach(item => {
+      this.select(item);
+    });
   }
 
 });

@@ -21,11 +21,12 @@ import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import GridComponent from 'app/component/password/grid';
 import MadBus from 'passbolt-mad/control/bus';
+import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
 import PrimaryMenuComponent from 'app/component/password/workspace_primary_menu';
 import PrimarySidebarComponent from 'app/component/password/primary_sidebar';
 import ResourceCreateForm from 'app/form/resource/create';
+import route from 'can-route';
 import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
-import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
 
 import Favorite from 'app/model/map/favorite';
 import Filter from 'app/model/filter';
@@ -43,7 +44,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     name: 'password_workspace',
     template: template,
     // The current selected resources
-    selectedRs: new Resource.List(),
+    selectedResources: new Resource.List(),
     //// The current selected groups
     selectedGroups: new Group.List(),
     // The current filter
@@ -72,21 +73,76 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   /**
    * @inheritdoc
    */
+  init: function(el, options) {
+    this._initRouteListener();
+    return this._super(el, options);
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    route.data.on('action', () => {
+      if (route.data.controller == 'Password') {
+        this._dispatchRoute();
+      }
+    });
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    switch (route.data.action) {
+      case 'view': {
+        const id = route.data.id;
+        const resource = Resource.connection.instanceStore.get(id);
+        if (resource) {
+          this.options.selectedResources.push(resource);
+        } else {
+          MadBus.trigger('passbolt_notify', {
+            status: 'error',
+            title: `app_passwords_view_error_not_found`
+          });
+        }
+        break;
+      }
+      case 'edit': {
+        const id = route.data.id;
+        const resource = Resource.connection.instanceStore.get(id);
+        if (resource) {
+          this.openEditResourceDialog(resource);
+        } else {
+          MadBus.trigger('passbolt_notify', {
+            status: 'error',
+            title: `app_passwords_edit_error_not_found`
+          });
+        }
+        break;
+      }
+    }
+  },
+
+  /**
+   * @inheritdoc
+   */
   afterStart: function() {
     this._initPrimaryMenu();
     this._initSecondaryMenu();
-    this.options.mainButton = this._initMainActionButton();
+    this._initMainActionButton();
     this._initImportButton();
     this._initBreadcrumb();
     this._initPrimarySidebar();
-    this.options.grid = this._initGrid();
-    this._initSecondarySidebar();
+    this._initGrid();
 
     // Filter the workspace
     const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
     MadBus.trigger('filter_workspace', {filter: filter});
 
     this.on();
+    this._super();
   },
 
   /**
@@ -97,11 +153,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     $('#js_wsp_primary_menu_wrapper').empty();
     $('#js_wsp_secondary_menu_wrapper').empty();
     $('.main-action-wrapper').empty();
-
-    // Destroy Selected resource.
-    this.options.selectedRs.splice(0, this.options.selectedRs.length);
-
-    // Call parent.
+    // Flush the selectedResources list.
+    this.options.selectedResources.splice(0, this.options.selectedResources.length);
     this._super();
   },
 
@@ -116,7 +169,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       $('#js_wsp_primary_menu_wrapper'),
       'last',
       PrimaryMenuComponent, {
-        selectedRs: this.options.selectedRs
+        selectedResources: this.options.selectedResources
       }
     );
     menu.start();
@@ -133,7 +186,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       $('#js_wsp_secondary_menu_wrapper'),
       'last',
       SecondaryMenuComponent, {
-        selectedItems: this.options.selectedRs
+        selectedItems: this.options.selectedResources
       }
     );
     menu.start();
@@ -141,7 +194,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Initialize the workspace main action button.
-   * @returns {mad.Component}
    */
   _initMainActionButton: function() {
     const button = ComponentHelper.create(
@@ -155,12 +207,11 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       }
     );
     button.start();
-    return button;
+    this.options.mainButton = button;
   },
 
   /**
    * Initialize the workspace import action button.
-   * @returns {mad.Component}
    */
   _initImportButton: function() {
     if (Config.read('server.passbolt.plugins.import')) {
@@ -176,9 +227,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       );
       button.start();
       this.options.importButton = button;
-      return this.options.importButton;
     }
-    return null;
   },
 
   /**
@@ -197,7 +246,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   _initPrimarySidebar: function() {
     const component = new PrimarySidebarComponent('#js_password_workspace_primary_sidebar', {
       defaultFilter: PasswordWorkspaceComponent.getDefaultFilterSettings(),
-      selectedRs: this.options.selectedRs,
+      selectedResources: this.options.selectedResources,
       selectedGroups: this.options.selectedGroups
     });
     component.start();
@@ -208,24 +257,14 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   _initGrid: function() {
     const component = new GridComponent('#js_wsp_pwd_browser', {
-      selectedRs: this.options.selectedRs
+      selectedResources: this.options.selectedResources
     });
     component.start();
-    return component;
-  },
-
-  /**
-   * Initialize the secondary sidebar component
-   */
-  _initSecondarySidebar: function() {
-    new PasswordSecondarySidebarComponent('.js_wsp_pwd_sidebar_second', {
-      selectedItems: this.options.selectedRs
-    });
+    this.options.grid = component;
   },
 
   /**
    * Open the resource create dialog.
-   *
    * @param {Resource} resource The target resource entity.
    */
   openCreateResourceDialog: function(resource) {
@@ -251,9 +290,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Save a resource after creating/editing it with the create/edit forms.
-   *
    * @param {Resource} resource The target resource
-   * @param {mad.Form} form The form object
+   * @param {Form} form The form object
    * @param {Dialog} dialog The dialog object
    */
   _saveResource: function(resource, form, dialog) {
@@ -367,7 +405,40 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {DefineMap} destroyedItem The destroyed item
    */
   '{Resource} destroyed': function(model, event, destroyedItem) {
-    this.options.selectedRs.remove(destroyedItem);
+    this.options.selectedResources.remove(destroyedItem);
+  },
+
+  /**
+   * Observe when resources are selected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<Group>} items The selected items change
+   */
+  '{selectedResources} add': function(el, ev, items) {
+    if (this.options.passwordSecondarySidebar) {
+      this.options.passwordSecondarySidebar.remove();
+    }
+    const resource = items[0];
+    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
+    const options = {
+      id: 'js_pwd_details',
+      resource: resource,
+      silentLoading: false,
+      cssClasses: ['panel', 'aside', 'js_wsp_pwd_sidebar_second'],
+      state: state
+    };
+    const component = ComponentHelper.create(this.element, 'last', PasswordSecondarySidebarComponent, options);
+    component.start();
+    this.options.passwordSecondarySidebar = component;
+  },
+
+  /**
+   * Observe when resources are selected
+   */
+  '{selectedResources} remove': function() {
+    if (this.options.passwordSecondarySidebar) {
+      this.options.passwordSecondarySidebar.remove();
+    }
   },
 
   /* ************************************************************** */
@@ -388,15 +459,15 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     MadBus.trigger('passbolt.import-passwords');
   },
 
-  /**
-   * When a new filter is applied to the workspace.
-   */
-  '{mad.bus.element} filter_workspace': function() {
-    // When filtering the resources browser, unselect all the resources.
-    this.options.selectedRs.splice(0, this.options.selectedRs.length);
-    // Enable the create button
-    this.options.mainButton.setState('ready');
-  },
+  ///**
+  // * When a new filter is applied to the workspace.
+  // */
+  //'{mad.bus.element} filter_workspace': function() {
+  //  // When filtering the resources browser, unselect all the resources.
+  //  this.options.selectedResources.splice(0, this.options.selectedResources.length);
+  //  // Enable the create button
+  //  this.options.mainButton.setState('ready');
+  //},
 
   /**
    * Observe when the user requests a resource creation
@@ -501,6 +572,20 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       // else, we simply refresh the entire workspace.
       const workspace = 'password';
       MadBus.trigger('request_workspace', {workspace: workspace});
+    }
+  },
+
+  /* ************************************************************** */
+  /* LISTEN TO THE STATE CHANGES */
+  /* ************************************************************** */
+
+  /**
+   * The application is ready.
+   * @param {boolean} go Enter or leave the state
+   */
+  stateReady: function(go) {
+    if (go) {
+      this._dispatchRoute();
     }
   }
 });

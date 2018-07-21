@@ -36,18 +36,32 @@ const GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exten
     const groupList = new PasswordCategoriesGroupsList('#js_wsp_password_categories_groups_list', {
       selectedGroups: this.options.selectedGroups,
       defaultGroupFilter: {
-        "has-users": User.getCurrent().id
+        'has-users': User.getCurrent().id
       }
     });
-    // If the group list contains groups display the section
-    groupList.state.current.on('add', () => {
-      if (groupList.state.current.indexOf('ready') != -1) {
-        if (groupList.options.items.length) {
-          this.setState('ready');
-        }
-      }
-    });
+    this._listenGroupListStateChanges(groupList);
     groupList.start();
+    this._super();
+  },
+
+  /**
+   * Listen to the group list child component state changes and adapt this component state in function.
+   * @param {Component} groupList
+   */
+  _listenGroupListStateChanges: function(groupList) {
+    const state = this.state;
+    const groupListState = groupList.state;
+    const isEmpty = groupList.options.items.length;
+    groupListState.current.on('length', () => {
+      // Mark this component as ready when its child is ready.
+      if (groupListState.is('ready')) {
+        state.addState('ready');
+      }
+      // Display the group list only if it contains groups.
+      if (isEmpty) {
+        state.removeState('hidden');
+      }
+    });
   }
 });
 

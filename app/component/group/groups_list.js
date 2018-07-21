@@ -119,8 +119,7 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
 
   /**
    * Insert a group in the list following an alphabetical order.
-   * @param {passbolt.model.Group} group The group to insert
-   * @param item
+   * @param {Group} group The group to insert
    */
   insertAlphabetically: function(group) {
     let inserted = false;
@@ -142,29 +141,13 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
    * @inheritsDoc
    */
   selectItem: function(item) {
-    this.view.selectItem(item);
-    this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
-    this.options.selectedGroups.push(item);
-    if (!this.options.selectedGroup || (this.options.selectedGroup && this.options.selectedGroup.id != item.id)) {
-      this.options.selectedGroup = item;
-      this.on();
-    }
     this._filterWorkspaceByGroup(item);
-  },
-
-  /**
-   * @inheritsDoc
-   */
-  unselectAll: function() {
-    this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
-    this.selectedGroup = null;
-    this.on();
-    this._super();
+    this._super(item);
   },
 
   /**
    * Filter the workspace by group.
-   * @param {passbolt.model.Group} group The group to filter the workspace with
+   * @param {Group} group The group to filter the workspace with
    */
   _filterWorkspaceByGroup: function(group) {
     this.selectedFilter = new Filter({
@@ -183,21 +166,31 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
 
   /**
    * Observe when a group is created and add it to the list.
-   * @param {Object} Constructor The constructor
+   * @param {Group.prototype} Constructor The constructor
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Group} group The created group
+   * @param {Group} group The created group
    */
   '{Group} created': function(Constructor, ev, group) {
     this.insertAlphabetically(group);
   },
 
   /**
-   * Listen when a group is updated.
-   * @param {mad.model.Model} model The model reference
+   * Observe when a group is destroyed.
+   * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {Group} group The updated group
+   * @param {Group} group The destroyed group
    */
-  '{mad.bus.element} group_replaced': function(model, ev) {
+  '{Group} destroyed': function(el, ev, group) {
+    this.removeItem(group);
+  },
+
+  /**
+   * Listen when a group is updated.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @todo Explain the group_replaced event
+   */
+  '{mad.bus.element} group_replaced': function(el, ev) {
     const group = ev.data.group;
     this.refreshItem(group);
 
@@ -208,18 +201,27 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
   },
 
   /**
-   * Listen when a group model has been destroyed.
-   *
-   * And update the component accordingly by removing it from the list, and unselecting all groups.
-   *
-   * @param el
-   * @param ev
-   * @param data
+   * Observe when groups are unselected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<Group>} items The unselected items
    */
-  '{Group} destroyed': function(el, ev, group) {
-    this.unselectAll();
-    this.removeItem(group);
-    MadBus.trigger('reset_filters');
+  '{selectedGroups} remove': function(el, ev, items) {
+    items.forEach(item => {
+      this.unselectItem(item);
+    });
+  },
+
+  /**
+   * Observe when groups are selected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<Group>} items The selected items change
+   */
+  '{selectedGroups} add': function(el, ev, items) {
+    items.forEach(item => {
+      this.selectItem(item);
+    });
   },
 
   /* ************************************************************** */
@@ -227,15 +229,17 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
   /* ************************************************************** */
 
   /**
-   * Listen to the browser filter
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
+   * @inheritsDoc
    */
-  '{mad.bus.element} filter_workspace': function(el, ev) {
-    const filter = ev.data.filter;
-    if (!filter.id.match(/^workspace_filter_group_/)) {
-      this.unselectAll();
-    }
+  '{element} item_selected': function(el, ev) {
+    const item = ev.data.item;
+    const groups = this.options.selectedGroups;
+    /*
+     * Insert the group in the list of selected groups.
+     * The component is listening to any changes to this list.
+     * @see the "{selectedGroups} add" templated function
+     */
+    groups.splice(0, groups.length, item);
   }
 
 });

@@ -20,8 +20,6 @@ import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/password/grid_contextual_menu';
-import List from 'passbolt-mad/model/list';
-import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PasswordGridView from 'app/view/component/password/grid';
 import Plugin from 'app/util/plugin';
@@ -43,7 +41,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     // the view class to use. Overridden so we can put our own logic.
     viewClass: PasswordGridView,
     // the selected resources, you can pass an existing list as parameter of the constructor to share the same list
-    selectedRs: new Resource.List(),
+    selectedResources: new Resource.List(),
     // Prefix each row id with resource_
     prefixItemId: 'resource_',
     // Override the silentLoading parameter.
@@ -62,13 +60,13 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
   /**
    * The filter used to filter the browser.
-   * @type {passbolt.model.Filter}
+   * @type {Filter}
    */
   filterSettings: null,
 
   /**
    * Keep a trace of the old filter used to filter the browser.
-   * @type {passbolt.model.Filter}
+   * @type {Filter}
    */
   oldFilterSettings: null,
 
@@ -88,7 +86,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
   /**
    * Init the grid map.
-   * @return {mad.Map}
+   * @return {UtilMap}
    */
   _getGridMap: function() {
     const map = new MadMap({
@@ -247,7 +245,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
   /**
    * Show the contextual menu
-   * @param {passbolt.model.Resource} resource The resource to show the contextual menu for
+   * @param {Resource} resource The resource to show the contextual menu for
    * @param {string} x The x position where the menu will be rendered
    * @param {string} y The y position where the menu will be rendered
    */
@@ -266,7 +264,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
   /**
    * Refresh item
-   * @param {mad.model.Model} item The item to refresh
+   * @param {Resource} item The item to refresh
    */
   refreshItem: function(resource) {
     // If the item doesn't exist
@@ -289,116 +287,45 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   },
 
   /**
-   * Before selecting an item
-   * @param {mad.model.Model} item The item to select
-   */
-  beforeSelect: function(item) {
-    let returnValue = true;
-
-    if (this.state.is('selection')) {
-      /*
-       * if an item has already been selected
-       * if the item is already selected, unselect it
-       */
-      if (this.isSelected(item)) {
-        this.unselect(item);
-        this.setState('ready');
-        returnValue = false;
-      } else {
-        for (let i = this.options.selectedRs.length - 1; i > -1; i--) {
-          this.unselect(this.options.selectedRs[i]);
-        }
-      }
-    }
-
-    return returnValue;
-  },
-
-  /**
    * Is the item selected
    *
-   * @param {mad.Model}
+   * @param {Resource}
    * @return {bool}
    */
   isSelected: function(item) {
-    return this.options.selectedRs.length > 0
-			&& this.options.selectedRs[0].id == item.id;
+    return this.options.selectedResources.length > 0
+			&& this.options.selectedResources[0].id == item.id;
   },
 
   /**
    * Select an item
-   * @param {mad.model.Model} item The item to select
+   * @param {Resource} item The item to select
    */
   select: function(item) {
-    // If the item doesn't exist
     if (!this.itemExists(item)) {
       return;
     }
-
-    /*
-     * If resource is already selected, we do nothing.
-     * Refresh the view
-     */
-    if (this.isSelected(item)) {
-      return;
-    }
-
-    // Unselect the previously selected resources, if not in multipleSelection.
-    if (!this.state.is('multipleSelection') &&
-			this.options.selectedRs.length > 0) {
-      this.unselect(this.options.selectedRs[0]);
-    }
-
-    // Add the resource to the list of selected items.
-    this.options.selectedRs.push(item);
-
-    // Select the checkbox (if it is not already done).
     const checkbox = this._selectCheckboxComponents[item.id];
     checkbox.setValue([item.id]);
-
-    // Make the item selected in the view.
     this.view.selectItem(item);
-
-    /*
-     * Notify the application about this selection.
-     *MadBus.trigger('resource_selected', item);
-     */
   },
 
   /**
    * Unselect an item
-   * @param {mad.model.Model} item The item to unselect
-   * @param {boolean} silent Do not propagate any event (default:false)
+   * @param {Resource} item The item to unselect
    */
-  unselect: function(item, silent) {
-    silent = silent || false;
-
-    // If the item doesn't exist
+  unselect: function(item) {
     if (!this.itemExists(item)) {
       return;
     }
-
-    // Uncheck the associated checkbox (if it is not already done).
     const checkbox = this._selectCheckboxComponents[item.id];
-
-    // Uncheck the checkbox by reseting it. Brutal.
     checkbox.reset();
-
-    // Unselect the item in grid.
     this.view.unselectItem(item);
-
-    // Remove the resource from the previously selected resources.
-    this.options.selectedRs.remove(item);
-
-    // Notify the app about the just unselected resource.
-    if (!silent) {
-      MadBus.trigger('resource_unselected', item);
-    }
   },
 
   /**
    * Filter the browser using a filter settings object
-   * @param {passbolt.model.Filter} filter The filter to
+   * @param {Filter} filter The filter to
    * @return {Jquery.Deferred}
    */
   filterBySettings: function(filter) {
@@ -415,7 +342,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     // If new filter or the filter changed, request the API.
     if (!this.filterSettings || this.filterSettings.id !== filter.id) {
       const findOptions = {
-        silentLoading: false,
         contain: {creator: 1, favorite: 1, modifier: 1, secret: 1, permission: 1, tag: 1},
         // All rules except keywords that is filtered on the browser.
         filter: filter.getRules(['keywords']),
@@ -499,7 +425,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * Observe when a resource is created and add it to the browser.
    * @param {Object} Constructor The constructor
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Resource} resource The created resource
+   * @param {Resource} resource The created resource
    */
   '{Resource} created': function(Constructor, ev, resource) {
     if (this.state.is('empty')) {
@@ -513,9 +439,9 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * If the resource is displayed by he grid, refresh it.
    * note : We listen the model directly, listening on changes on
    * a list seems too much here (one event for each updated attribute)
-   * @param {mad.model.Model} model The model reference
+   * @param {DefineMap.prototype} model The model reference
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Resource} resource The updated resource
+   * @param {Resource} resource The updated resource
    */
   '{Resource} updated': function(model, ev, resource) {
     if (this.options.items.indexOf(resource) != -1) {
@@ -535,9 +461,10 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    */
   '{element} item_selected': function(el, ev) {
     const item = ev.data.item;
-    this.setState('selection');
-    if (this.beforeSelect(item)) {
-      this.select(item);
+    if (this.isSelected(item)) {
+      this.options.selectedResources.splice(0);
+    } else {
+      this.options.selectedResources.splice(0, this.options.selectedResources.length, item);
     }
   },
 
@@ -550,7 +477,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     const item = ev.data.item;
     const srcEv = ev.data.srcEv;
     // Select item.
-    this.select(item);
+    this.options.selectedResources.splice(0, this.options.selectedResources.length, item);
     // Get the offset position of the clicked item.
     const $item = $(`#${this.options.prefixItemId}${item.id}`);
     const itemOffset = $item.offset();
@@ -581,48 +508,20 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
   /**
    * Listen to the check event on any checkbox form element components.
-   *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {mixed} rsId The id of the resource which has been checked
    */
-  '{element} .js_checkbox_multiple_select checked': function(el, ev, rsId) {
-    // if the grid is in initial state, switch it to selected
-    if (this.state.is('ready')) {
-      this.setState('selection');
-    }
-
-    // find the resource to select functions of its id
-    const i = List.indexOf(this.options.items, rsId);
-    const resource = this.options.items[i];
-
-    if (this.beforeSelect(resource)) {
-      this.select(resource);
-    }
+  '{element} .js_checkbox_multiple_select checked': function(el, ev) {
+    const id = ev.data;
+    const resource = this.options.items.filter({id: id}).pop();
+    this.options.selectedResources.splice(0, this.options.selectedResources.length, resource);
   },
 
   /**
    * Listen to the uncheck event on any checkbox form element components.
-   *
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {mixed} rsId The id of the resource which has been unchecked
    */
-  '{element} .js_checkbox_multiple_select unchecked': function(el, ev, rsId) {
-    // find the resource to select functions of its id
-    const i = List.indexOf(this.options.items, rsId);
-    const resource = this.options.items[i];
-
-    this.unselect(resource);
-
-    // if there is no more selected resources, switch the grid to its initial state
-    if (!this.options.selectedRs.length) {
-      this.setState('ready');
-
-      // else if only one resource is selected
-    } else if (this.options.selectedRs.length == 1) {
-      this.setState('selection');
-    }
+  '{element} .js_checkbox_multiple_select unchecked': function() {
+    this.options.selectedResources.splice(0, this.options.selectedResources.length);
   },
 
   /* ************************************************************** */
@@ -631,11 +530,11 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
   /**
    * Listen to the workspace filter event.
-   * @param {jQuery} element The source element
-   * @param {Event} event The jQuery event
-   * @param {passbolt.model.Filter} filter The filter settings
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
+    console.log('catch filter workspace');
     const filter = ev.data.filter;
     this.filterBySettings(filter);
   },
@@ -644,12 +543,24 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * Observe when an item is unselected
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {passbolt.model.Resource|array} items The unselected items
+   * @param {array<Resource>} items The unselected items
    */
-  '{selectedRs} remove': function(el, ev, items) {
-    for (const i in items) {
-      this.unselect(items[i]);
-    }
+  '{selectedResources} remove': function(el, ev, items) {
+    items.forEach(item => {
+      this.unselect(item);
+    });
+  },
+
+  /**
+   * Observe when an item is unselected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<Resource>} items The selected items change
+   */
+  '{selectedResources} add': function(el, ev, items) {
+    items.forEach(item => {
+      this.select(item);
+    });
   },
 
   /* ************************************************************** */

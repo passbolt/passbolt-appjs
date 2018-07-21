@@ -13,8 +13,9 @@
  */
 import Action from 'passbolt-mad/model/map/action';
 import DomData from 'can-dom-data';
-import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
+import route from 'can-route';
+import String from 'can-string';
 
 const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft', /** @static */ {
 
@@ -23,6 +24,43 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
   }
 
 }, /** @prototype */ {
+
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    this._initRouteListener();
+    return this._super(el, options);
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    route.data.on('controller', () => {
+      this._dispatchRoute();
+    });
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    const workspace = String.underscore(route.data.controller);
+    if (this.options.selected != workspace) {
+      const li = $(`li.${workspace}`);
+      const itemClass = this.getItemClass();
+
+      if (itemClass) {
+        const data = DomData.get(li[0], itemClass.shortName);
+        if (typeof data != 'undefined') {
+          this.selectItem(data);
+        }
+      }
+    }
+  },
 
   /**
    * @inheritdoc
@@ -54,20 +92,19 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
       action: () => this._goHelp()
     });
     this.insertItem(helpItem);
+
+    this._super();
+    this._dispatchRoute();
   },
 
   // Go to the password workspace
   _goToPasswordWorkspace: function() {
-    const workspace = 'password';
-    this.options.selected = workspace;
-    MadBus.trigger('request_workspace', {workspace: workspace});
+    location.hash = '/passwords';
   },
 
   // Go to the user workspace
   _goToUserWorkspace: function() {
-    const workspace = 'user';
-    this.options.selected = workspace;
-    MadBus.trigger('request_workspace', {workspace: workspace});
+    location.hash = '/users';
   },
 
   // Go to the passbolt help
@@ -75,30 +112,6 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
     const helpWindow = window.open();
     helpWindow.opener = null;
     helpWindow.location = 'https://help.passbolt.com';
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
-  /**
-   * Observe when the user wants to switch to another workspace
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_workspace': function(el, ev) {
-    const workspace = ev.data.workspace;
-    if (this.options.selected != workspace) {
-      const li = $(`li.${workspace}`);
-      const itemClass = this.getItemClass();
-
-      if (itemClass) {
-        const data = DomData.get(li[0], itemClass.shortName);
-        if (typeof data != 'undefined') {
-          this.selectItem(data);
-        }
-      }
-    }
   }
 
 });

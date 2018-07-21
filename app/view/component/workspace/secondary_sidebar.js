@@ -19,30 +19,6 @@ const SecondarySidebarView = View.extend('passbolt.view.component.SecondarySideb
 
 }, /** @prototype */ {
 
-  /**
-   * Set the title
-   * @param {string} title The new title
-   */
-  setTitle: function(title) {
-    $('.sidebar .sidebar-header .sidebar-header-title', this.element).text(title);
-  },
-
-  /**
-   * Set the subtitle
-   * @param {string} subtitle The new subtitle
-   */
-  setSubtitle: function(subtitle) {
-    $('.sidebar .sidebar-header .sidebar-header-subtitle', this.element).text(subtitle);
-  },
-
-  /**
-   * Observe when the user clicks on the close button
-   */
-  ' .js_sidebar_close click': function() {
-    Config.write('ui.workspace.showSidebar', false);
-    MadBus.trigger('workspace_sidebar_hide');
-  }
-
 });
 
 export default SecondarySidebarView;

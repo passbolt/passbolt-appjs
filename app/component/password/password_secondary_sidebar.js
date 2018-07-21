@@ -15,7 +15,6 @@ import CommentsSection from 'app/component/comment/comments_sidebar_section';
 import Config from 'passbolt-mad/config/config';
 import DescriptionSection from 'app/component/password/description_sidebar_section';
 import InformationSection from 'app/component/password/information_sidebar_section';
-import PasswordSecondarySidebarView from 'app/view/component/password/password_secondary_sidebar';
 import PermissionsSection from 'app/component/permission/permissions_sidebar_section';
 import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
 import TagsSection from 'app/component/password/tags_sidebar_section';
@@ -26,7 +25,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
 
   defaults: {
     label: 'Resource Details',
-    viewClass: PasswordSecondarySidebarView,
+    resource: null,
     template: template
   }
 
@@ -36,10 +35,8 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    * @inheritdoc
    */
   beforeRender: function() {
+    this.setViewData('resource', this.options.resource);
     this._super();
-    if (this.options.selectedItem != null) {
-      this.setViewData('resource', this.options.selectedItem);
-    }
   },
 
   /**
@@ -59,7 +56,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    */
   _initInformationSection: function() {
     const informationComponent = new InformationSection('#js_rs_details_information', {
-      resource: this.options.selectedItem
+      resource: this.options.resource
     });
     informationComponent.start();
   },
@@ -69,7 +66,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    */
   _initDescriptionSection: function() {
     const descriptionComponent = new DescriptionSection('#js_rs_details_description', {
-      resource: this.options.selectedItem,
+      resource: this.options.resource,
       cssClasses: ['closed']
     });
     descriptionComponent.start();
@@ -82,7 +79,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
     const plugins = Config.read('server.passbolt.plugins');
     if (plugins && plugins.tags) {
       const tagsComponent = new TagsSection('#js_rs_details_tags', {
-        resource: this.options.selectedItem,
+        resource: this.options.resource,
         cssClasses: ['closed']
       });
       tagsComponent.start();
@@ -94,7 +91,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    */
   _initPermissionsSection: function() {
     const permissionsComponent = new PermissionsSection('#js_rs_details_permissions', {
-      acoInstance: this.options.selectedItem,
+      acoInstance: this.options.resource,
       cssClasses: ['closed']
     });
     permissionsComponent.start();
@@ -105,9 +102,9 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    */
   _initCommentsSection: function() {
     const commentsComponent = new CommentsSection('#js_rs_details_comments', {
-      resource: this.options.selectedItem,
+      resource: this.options.resource,
       foreignModel: 'Resource',
-      foreignKey: this.options.selectedItem.id,
+      foreignKey: this.options.resource.id,
       cssClasses: ['closed']
     });
     commentsComponent.start();

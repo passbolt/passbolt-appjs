@@ -25,15 +25,24 @@
 			"app_users_delete_success": {
 				"msg": "The user has been deleted"
 			},
+			"app_users_delete_error_not_found": {
+				"msg": "The user does not exist"
+			},
 			"app_users_editPost_success": {
 				"msg": "The user has been updated successfully"
 			},
 			"app_users_editavatar_success": {
 				"msg": "The picture of the user has been updated successfully"
 			},
-            "app_users_editavatar_error": {
-                "msg": "%header.message%"
-            },
+			"app_users_editavatar_error": {
+				"msg": "%header.message%"
+			},
+			"app_users_edit_error_not_found": {
+				"msg": "The user does not exist"
+			},
+			"app_users_view_error_not_found": {
+				"msg": "The user does not exist"
+			},
 			"plugin_secret_copy_success": {
 				"msg": "The password has been copied to clipboard"
 			},
@@ -69,6 +78,15 @@
 			},
 			"secret_decrypt_error": {
 				"msg": "The secret cannot be decrypted"
+			},
+			"app_passwords_edit_error_not_found": {
+				"msg": "The password does not exist"
+			},
+			"app_passwords_delete_error_not_found": {
+				"msg": "The password does not exist"
+			},
+			"app_passwords_view_error_not_found": {
+				"msg": "The password does not exist"
 			},
 			"export_passwords_success": {
 				"msg": "The passwords were exported successfully"

@@ -14,7 +14,6 @@
 import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
 import MadBus from 'passbolt-mad/control/bus';
-import Resource from 'app/model/map/resource';
 import ToggleButton from 'passbolt-mad/component/toggle_button';
 import template from 'app/view/template/component/workspace/secondary_menu.stache!';
 
@@ -23,9 +22,7 @@ const WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSec
   defaults: {
     label: 'Workspace Secondary Menu',
     template: template,
-    tag: 'ul',
-    // Selected items list
-    selectedItems: new Resource.List()
+    tag: 'ul'
   }
 
 }, /** @prototype */ {
@@ -45,17 +42,12 @@ const WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSec
     this.on();
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
   /**
-   * Observe when sidebar is close by another component.
+   * Observe when the workspace sidebar setting change.
    */
-  '{mad.bus.element} workspace_sidebar_hide': function() {
-    if (this.options.viewSidebarButton.state.is('selected')) {
-      this.options.viewSidebarButton.setState('ready');
-    }
+  '{mad.bus.element} workspace_sidebar_state_change': function() {
+    const state = Config.read('ui.workspace.showSidebar') ? 'selected' : 'ready';
+    this.options.viewSidebarButton.setState(state);
   },
 
   /**
@@ -63,19 +55,8 @@ const WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSec
    */
   '{viewSidebarButton.element} click': function() {
     const showSidebar = !Config.read('ui.workspace.showSidebar');
-    const isSelection = this.options.selectedItems.length > 0;
-
-    // Set new status in the settings.
     Config.write('ui.workspace.showSidebar', showSidebar);
-
-    if (isSelection) {
-      // Trigger show sidebar event with the new status.
-      if (showSidebar) {
-        MadBus.trigger('workspace_sidebar_show');
-      } else {
-        MadBus.trigger('workspace_sidebar_hide');
-      }
-    }
+    MadBus.trigger('workspace_sidebar_state_change');
   }
 });
 

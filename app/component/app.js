@@ -23,7 +23,9 @@ import NavigationLeftComponent from 'app/component/navigation/left';
 import NotificationComponent from 'app/component/footer/notification';
 import PasswordWorkspaceComponent from 'app/component/password/workspace';
 import ProfileHeaderDropdownComponent from 'app/component/profile/header_dropdown';
+import route from 'can-route';
 import SettingsWorkspaceComponent from 'app/component/settings/workspace';
+import String from 'can-string';
 import User from 'app/model/map/user';
 import UserWorkspaceComponent from 'app/component/user/workspace';
 
@@ -38,17 +40,38 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
 }, /** @prototype */ {
 
   /**
-   * The currently enabled workspace.
-   * @type {passbolt.Component}
+   * @inheritdoc
    */
-  workspace: null,
+  init: function(el, options) {
+    this._initRouteListener();
+    return this._super(el, options);
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    route.data.on('controller', () => {
+      this._dispatchRoute();
+    });
+  },
+
+  /**
+   * Dispatch route.
+   * @private
+   */
+  _dispatchRoute: function() {
+    const workspaceName = String.underscore(route.data.controller);
+    this._initWorkspace(workspaceName);
+  },
 
   /**
    * @inheritdoc
    */
   beforeRender: function() {
-    this._super();
     this.setViewData('APP_URL', APP_URL);
+    this._super();
   },
 
   /**
@@ -58,6 +81,8 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     this._initHeader();
     this._initFooter();
     this._initSessionLookup();
+    this._dispatchRoute();
+    this._super();
   },
 
   /**
@@ -177,13 +202,11 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * Observe when the user wants to switch to another workspace
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param {string} workspaceName The target workspace name
-   * @param {array} options Workspace's options
    */
   '{mad.bus.element} request_workspace': function(el, ev) {
-    const workspace = ev.data.workspace;
+    const workspaceName = ev.data.workspace;
     const options = ev.data.options || {};
-    this._initWorkspace(workspace, options);
+    this._initWorkspace(workspaceName, options);
   },
 
   /**
@@ -248,10 +271,10 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * The application is ready.
    * @param {boolean} go Enter or leave the state
    */
-  stateReady: function() {
-    $('html').removeClass('launching');
-    const workspace = 'password';
-    MadBus.trigger('request_workspace', {workspace: workspace});
+  stateReady: function(go) {
+    if (go) {
+      $('html').removeClass('launching');
+    }
   }
 
 });

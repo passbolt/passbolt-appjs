@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import 'app/config/routes.js';
 import cookies from 'browser-cookies/src/browser-cookies';
 import AccountSetting from 'app/model/map/accountSetting';
 import Bootstrap from 'passbolt-mad/bootstrap';

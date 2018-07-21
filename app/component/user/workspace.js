@@ -16,9 +16,11 @@ import BreadcrumbComponent from 'app/component/user/workspace_breadcrumb';
 import ButtonDropdownComponent from 'passbolt-mad/component/button_dropdown';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
+import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import Filter from 'app/model/filter';
+import getObject from 'can-util/js/get/get';
 import GridComponent from 'app/component/user/grid';
 import Group from 'app/model/map/group';
 import GroupEditComponent from 'app/component/group/edit';
@@ -26,7 +28,9 @@ import GroupSecondarySidebarComponent from 'app/component/group/group_secondary_
 import MadBus from 'passbolt-mad/control/bus';
 import PrimaryMenuComponent from 'app/component/user/workspace_primary_menu';
 import PrimarySidebarComponent from 'app/component/user/primary_sidebar';
+import route from 'can-route';
 import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
+import setObject from 'passbolt-mad/util/set/set';
 import User from 'app/model/map/user';
 import UserCreateForm from 'app/form/user/create';
 import UserSecondarySidebarComponent from 'app/component/user/user_secondary_sidebar';
@@ -52,6 +56,8 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     filter: null,
     // Override the silentLoading parameter.
     silentLoading: false,
+    // State strategy
+    state: 'ready',
     // Filter the workspace with this filter settings.
     filterSettings: null,
     // Models to listen to
@@ -76,19 +82,141 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /**
    * @inheritdoc
    */
+  init: function(el, options) {
+    this._initRouteListener();
+    return this._super(el, options);
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    route.data.on('action', () => {
+      if (route.data.controller == 'User') {
+        this._dispatchRoute();
+      }
+    });
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    switch (route.data.action) {
+      case 'view': {
+        const id = route.data.id;
+        const user = User.connection.instanceStore.get(id);
+        if (user) {
+          this.options.selectedUsers.push(user);
+        } else {
+          MadBus.trigger('passbolt_notify', {
+            status: 'error',
+            title: `app_users_view_error_not_found`
+          });
+        }
+        break;
+      }
+      case 'delete': {
+        const id = route.data.id;
+        const user = User.connection.instanceStore.get(id);
+        if (user) {
+          this.deleteUser(user);
+        } else {
+          MadBus.trigger('passbolt_notify', {
+            status: 'error',
+            title: `app_users_delete_error_not_found`
+          });
+        }
+        break;
+      }
+      case 'groupDelete': {
+        const id = route.data.id;
+        // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
+        Group.findOne({id: id})
+          .then(group => {
+            this.deleteGroup(group);
+          });
+        break;
+      }
+      case 'groupEdit': {
+        const id = route.data.id;
+        // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
+        Group.findOne({id: id})
+          .then(group => {
+            this.openEditGroupDialog(group);
+          });
+        break;
+      }
+      case 'groupView': {
+        const id = route.data.id;
+        // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
+        Group.findOne({id: id})
+          .then(group => {
+            this.options.selectedGroups.splice(0, this.options.selectedGroups.length, group);
+          });
+        break;
+      }
+      case 'groupViewGroupsUsers': {
+        const id = route.data.id;
+        // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
+        Group.findOne({id: id})
+          .then(group => {
+            this.options.selectedGroups.splice(0, this.options.selectedGroups.length, group);
+          });
+        break;
+      }
+      case 'add': {
+        const data = {
+          username: getObject(route.data, 'username'),
+          profile: {
+            first_name: getObject(route.data, 'first_name'),
+            last_name: getObject(route.data, 'last_name')
+          }
+        };
+        const user = new User(data);
+        this.openCreateUserDialog(user);
+        break;
+      }
+      case 'edit': {
+        const id = route.data.id;
+        const user = this.options.grid.options.items.filter({id: id}).pop();
+        if (user) {
+          const data = {};
+          const firstName = getObject(route.data, 'first_name');
+          const lastName = getObject(route.data, 'last_name');
+          if (firstName) {
+            setObject(data, 'profile.first_name', firstName);
+          }
+          if (lastName) {
+            setObject(data, 'profile.last_name', lastName);
+          }
+          user.assignDeep(data);
+          this.openEditUserDialog(user);
+        } else {
+          MadBus.trigger('passbolt_notify', {
+            status: 'error',
+            title: `app_users_edit_error_not_found`
+          });
+        }
+        break;
+      }
+    }
+  },
+
+  /**
+   * @inheritdoc
+   */
   afterStart: function() {
     this._initPrimaryMenu();
     this._initSecondaryMenu();
-    this.options.mainButton = this._initMainActionButton();
+    this._initMainActionButton();
     this._initBreadcrumb();
     this._initPrimarySidebar();
     this._initGrid();
-    this._initSecondarySidebar();
 
-    /*
-     * A filter has been given in options.
-     * If not given, set one by default.
-     */
+    // Apply a filter to the workspace
     let filter = null;
     if (this.options.filterSettings == undefined) {
       filter = this.constructor.getDefaultFilterSettings();
@@ -100,6 +228,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     MadBus.trigger('filter_workspace', {filter: filter});
 
     this.on();
+    this._super();
   },
 
   /**
@@ -155,15 +284,13 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Initialize the workspace main action button.
-   * @returns {mad.Component}
    */
   _initMainActionButton: function() {
-    let button = null;
     const role = User.getCurrent().role.name;
 
     // Create user / group capability is only available to admin user.
     if (role == 'admin') {
-      button = ComponentHelper.create(
+      const button = ComponentHelper.create(
         $('.main-action-wrapper'),
         'last',
         ButtonDropdownComponent, {
@@ -199,9 +326,9 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         }
       });
       button.options.menu.insertItem(groupItem);
-    }
 
-    return button;
+      this.options.mainButton = button;
+    }
   },
 
   /**
@@ -227,6 +354,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       silentLoading: false
     });
     component.start();
+    this.options.primarySidebar = component;
   },
 
   /**
@@ -238,26 +366,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       silentLoading: false
     });
     component.start();
-  },
-
-  /**
-   * Initialize the secondary sidebar components
-   */
-  _initSecondarySidebar: function() {
-    // Instantiate the user details controller
-    new UserSecondarySidebarComponent('.js_wsp_users_sidebar_second', {
-      id: 'js_user_details',
-      selectedItems: this.options.selectedUsers
-    });
-    $('.js_wsp_users_sidebar_second', this.element).hide();
-
-    // Instantiate the group details controller
-    new GroupSecondarySidebarComponent('.js_wsp_groups_sidebar_second', {
-      id: 'js_group_details',
-      selectedItems: this.options.selectedGroups,
-      silentLoading: false
-    });
-    $('.js_wsp_groups_sidebar_second', this.element).hide();
+    this.options.grid = component;
   },
 
   /**
@@ -339,7 +448,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Save a user after creating/editing it with the create/edit forms.
    *
    * @param {User} user The target user
-   * @param {mad.Form} form The form object
+   * @param {Form} form The form object
    * @param {Dialog} dialog The dialog object
    */
   _saveUser: function(user, form, dialog) {
@@ -353,8 +462,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Perform a group deletion.
-   *
-   * @param group
+   * @param {Group} group
    */
   deleteGroup: function(group) {
     const self = this;
@@ -370,7 +478,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Request the user to confirm the group delete operation.
-   *
    * @param {Group} group The target group
    * @param {array<Resource>} resources The resources that are shared with
    */
@@ -396,7 +503,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Let the user know why the group cannot be deleted
-   *
    * @param {Group} group The target group
    * @param {array<Resource>} resources The resources that need a permission transfer
    */
@@ -433,14 +539,14 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     const self = this;
 
     user.deleteDryRun()
-    // In case of success.
+      // In case of success.
       .then(() => {
       // Display the delete confirmation dialog.
         self._deleteUserConfirm(user);
       })
-    // In case of error.
+      // In case of error.
       .then(null, response => {
-      // Display the error dialog.
+        // Display the error dialog.
         if (response.body) {
           const data = response.body;
           self._deleteUserError(user, data);
@@ -450,7 +556,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Request the user to confirm the user delete operation.
-   *
    * @param {User} user The user to delete.
    */
   _deleteUserConfirm: function(user) {
@@ -489,6 +594,15 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     }).start();
   },
 
+  /**
+   * Reset the workspace filter
+   * @private
+   */
+  _resetFilter: function() {
+    const filter = UserWorkspaceComponent.getDefaultFilterSettings();
+    MadBus.trigger('filter_workspace', {filter: filter});
+  },
+
   /* ************************************************************** */
   /* LISTEN TO THE MODEL EVENTS */
   /* ************************************************************** */
@@ -498,36 +612,116 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * - Remove it from the list of selected users;
    * @param {DefineMap} model The target model
    * @param {Event} event The even
-   * @param {DefineMap} destroyedItem The destroyed item
+   * @param {User} user The destroyed item
    */
-  '{User} destroyed': function(model, event, destroyedItem) {
-    this.options.selectedUsers.remove(destroyedItem);
+  '{User} destroyed': function(model, event, user) {
+    const selectedUsers = this.options.selectedUsers;
+    selectedUsers.remove(user);
+  },
+
+  /**
+   * Observe when a group is destroyed.
+   * - Remove it from the list of selected groups;
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Group} group The destroyed group
+   */
+  '{Group} destroyed': function(el, ev, group) {
+    const selectedGroups = this.options.selectedGroups;
+    if (selectedGroups.indexOf({id:group.id}) != -1) {
+      selectedGroups.remove(group);
+      this._resetFilter();
+    }
+  },
+
+  /**
+   * Observe when groups are selected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<Group>} items The selected items change
+   */
+  '{selectedGroups} add': function(el, ev, items) {
+    if (this.options.groupSecondarySidebar) {
+      this.options.groupSecondarySidebar.remove();
+    }
+    const group = items[0];
+    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
+    const options = {
+      id: 'js_group_details',
+      group: group,
+      silentLoading: false,
+      cssClasses: ['panel', 'aside', 'js_wsp_groups_sidebar_second'],
+      state: state
+    };
+    const component = ComponentHelper.create(this.element, 'last', GroupSecondarySidebarComponent, options);
+    component.start();
+    this.options.groupSecondarySidebar = component;
+  },
+
+  /**
+   * Observe when users are selected
+   */
+  '{selectedGroups} remove': function() {
+    if (this.options.groupSecondarySidebar) {
+      this.options.groupSecondarySidebar.remove();
+    }
+  },
+
+  /**
+   * Observe when users are selected
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {array<User>} items The selected items change
+   */
+  '{selectedUsers} add': function(el, ev, items) {
+    if (this.options.groupSecondarySidebar) {
+      this.options.groupSecondarySidebar.remove();
+    }
+    if (this.options.userSecondarySidebar) {
+      this.options.userSecondarySidebar.remove();
+    }
+    const user = items[0];
+    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
+    const options = {
+      id: 'js_user_details',
+      user: user,
+      silentLoading: false,
+      cssClasses: ['panel', 'aside', 'js_wsp_users_sidebar_second'],
+      state: state
+    };
+    const component = ComponentHelper.create(this.element, 'last', UserSecondarySidebarComponent, options);
+    component.start();
+    this.options.userSecondarySidebar = component;
+  },
+
+  /**
+   * Observe when users are selected
+   */
+  '{selectedUsers} remove': function() {
+    if (this.options.userSecondarySidebar) {
+      this.options.userSecondarySidebar.remove();
+    }
   },
 
   /* ************************************************************** */
   /* LISTEN TO THE APP EVENTS */
   /* ************************************************************** */
 
-  /**
-   * When a new filter is applied to the workspace.
-   *
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} filter_workspace': function(el, ev) {
-    const filter = ev.data.filter;
-    // If the filter applied is "all users", then empty the list of selected groups.
-    if (typeof filter.name != 'undefined') {
-      if (filter.name == 'all') {
-        this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
-      }
-    }
-    this.options.selectedUsers.splice(0, this.options.selectedUsers.length);
-
-    // Update the breadcrumb with the new filter.
-    this.breadcrumCtl.load(filter);
-  },
-
+  ///**
+  // * When a new filter is applied to the workspace.
+  // *
+  // * @param {HTMLElement} el The element the event occurred on
+  // * @param {HTMLEvent} ev The event which occurred
+  // */
+  //'{mad.bus.element} filter_workspace': function(el, ev) {
+  //  const filter = ev.data.filter;
+  //  // Unselect all group if the filter does not target a group (dirty).
+  //  if (!filter.rules['has-groups']) {
+  //    this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
+  //  }
+  //  this.options.selectedUsers.splice(0, this.options.selectedUsers.length);
+  //  this.breadcrumCtl.load(filter);
+  //},
 
   /**
    * Observe when the user requests a group creation
@@ -589,15 +783,19 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     this.deleteUser(user);
   },
 
-  /**
-   * Reset the filters.
-   * Unselect the group if it was selected, and select All users instead.
-   */
-  '{mad.bus.element} reset_filters': function() {
-    const filter = UserWorkspaceComponent.getDefaultFilterSettings();
-    MadBus.trigger('filter_workspace', {filter: filter});
-  }
+  /* ************************************************************** */
+  /* LISTEN TO THE STATE CHANGES */
+  /* ************************************************************** */
 
+  /**
+   * The application is ready.
+   * @param {boolean} go Enter or leave the state
+   */
+  stateReady: function(go) {
+    if (go) {
+      this._dispatchRoute();
+    }
+  }
 });
 
 export default UserWorkspaceComponent;
