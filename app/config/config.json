@@ -26,8 +26,5 @@
   },
   "net": {
 	"ResponseHandlerClassName": "passbolt.net.ResponseHandler"
-  },
-  "session": {
-	"checkTimeInterval": 60000
   }
 }

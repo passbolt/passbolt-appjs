@@ -11,10 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
-import Config from 'passbolt-mad/config/config';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import FilterComponent from 'app/component/navigation/filter';
 import LoadingBarComponent from 'app/component/footer/loading_bar';
@@ -24,6 +22,7 @@ import NotificationComponent from 'app/component/footer/notification';
 import PasswordWorkspaceComponent from 'app/component/password/workspace';
 import ProfileHeaderDropdownComponent from 'app/component/profile/header_dropdown';
 import route from 'can-route';
+import SessionCheck from 'app/model/session_check';
 import SettingsWorkspaceComponent from 'app/component/settings/workspace';
 import String from 'can-string';
 import User from 'app/model/map/user';
@@ -34,7 +33,8 @@ import template from 'app/view/template/app.stache!';
 const App = Component.extend('passbolt.component.App', /** @static */ {
 
   defaults: {
-    template: template
+    template: template,
+    loadedOnStart: false
   }
 
 }, /** @prototype */ {
@@ -63,7 +63,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   _dispatchRoute: function() {
     const workspaceName = String.underscore(route.data.controller);
-    this._initWorkspace(workspaceName);
+    this._enableWorkspace(workspaceName);
   },
 
   /**
@@ -80,9 +80,22 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   afterStart: function() {
     this._initHeader();
     this._initFooter();
-    this._initSessionLookup();
+    SessionCheck.instantiate();
     this._dispatchRoute();
     this._super();
+  },
+
+  /**
+   * Observer when the component is loaded / loading
+   * @param {boolean} loaded True if loaded, false otherwise
+   */
+  onLoadedChange: function(loaded) {
+    if (loaded) {
+      $('html').removeClass('loading launching').addClass('loaded');
+    } else {
+      $('html').removeClass('loaded').addClass('loading');
+    }
+    this._super(loaded);
   },
 
   /**
@@ -92,7 +105,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     const navigationLeftComponent = new NavigationLeftComponent('#js_app_navigation_left');
     navigationLeftComponent.start();
 
-    const filterComponent = new FilterComponent('#js_app_filter', {});
+    const filterComponent = new FilterComponent('#js_app_filter');
     filterComponent.start();
 
     const profileHeaderDropdownComponent = new ProfileHeaderDropdownComponent('#js_app_profile_dropdown', {
@@ -111,56 +124,26 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   },
 
   /**
-   * Initialise the session lookup process.
-   * If the user has been logged out, the server will answer a 403 message that is  caught by the
-   * passbolt.net.ResponseHandler and redirect the user to the login page.
-   */
-  _initSessionLookup: function() {
-    setTimeout(() => {
-      const interval = setInterval(() => {
-        Ajax.request({
-          url: `${APP_URL}auth/checkSession.json`,
-          type: 'GET'
-        }).then(null, () => {
-          clearInterval(interval);
-        });
-      }, Config.read('session.checkTimeInterval'));
-    }, Config.read('session.checkTimeInterval'));
-  },
-
-  /**
    * Initialize the target workspace.
    * @param {string} name The name of the workspace
    * @param {array} options The additional options to use during the workspace creation
    */
-  _initWorkspace: function(name, options) {
-    const workspaceOptions = {
-      id: `js_passbolt_${name}_workspace_controller`,
-      label: name
-    };
-    // Extend default workspace options with the ones given in params.
-    $.extend(workspaceOptions, options);
-
-    // Destroy the previously instantiated workspace.
+  _enableWorkspace: function(name, options) {
     this._destroyWorkspace();
-
-    // Init the workspace
-    this.workspace = ComponentHelper.create(
-      $('#js_app_panel_main'),
-      'last',
-      this._getWorkspaceClassByName(name),
-      workspaceOptions
-    );
-    this.workspace.start();
-
-    $('#container').addClass(`page ${name}`);
-    MadBus.trigger('workspace_enabled', {workspace: this.workspace});
+    /**
+     * We have to initialize the workspace in a timeout in order to allow all the events of this scope to be resolve.
+     * Such as the previous workspace destroy function() which is called by an event and clean some DOM element.
+     * Another way to do this would be to treat the destroy sequentially.
+     */
+    setTimeout(() => {
+      this._initWorkspace(name, options);
+    }, 0);
   },
 
   /**
    * Get a workspace class by name
    * @param {string} name The target workspace name
-   * @return {passbolt.Component}
+   * @return {Component}
    */
   _getWorkspaceClassByName: function(name) {
     let WorkspaceClass = null;
@@ -180,18 +163,42 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
 
   /**
    * Destroy the previously instantiated workspace.
+   * @param {string} name The name of the workspace
+   * @param {array} options The additional options to use during the workspace creation
    */
   _destroyWorkspace: function() {
-    if (this.workspace != null) {
-      // Remove all the classes
-      $('#container').removeClass();
-      // Destroy the previous workspace controller.
-      this.workspace.destroy();
-      // Remove any HTMLElements relative to the previous workspace.
-      $('#js_app_panel_main').empty();
-      // Remove any existing contextual menu.
-      ContextualMenuComponent.remove();
+    // Destroy common adaptable area
+    $('#js_wsp_primary_menu_wrapper').empty();
+    $('#js_wsp_secondary_menu_wrapper').empty();
+    $('.main-action-wrapper').empty();
+    // Remove all the classes
+    $('#container').removeClass();
+    // Remove any HTMLElements relative to the previous workspace.
+    $('#js_app_panel_main').empty();
+    // Remove any existing contextual menu.
+    if (ContextualMenuComponent._instance) {
+      ContextualMenuComponent._instance.destroyAndRemove();
     }
+  },
+
+  /**
+   * Init workspace
+   */
+  _initWorkspace: function(name, options) {
+    this.state.loaded = false;
+    const workspaceOptions = {
+      id: `js_passbolt_${name}_workspace_controller`,
+      label: name
+    };
+    $.extend(workspaceOptions, options);
+    const selector = $('#js_app_panel_main');
+    const WorkspaceComponent = this._getWorkspaceClassByName(name);
+    const workspace = ComponentHelper.create(selector, 'last', WorkspaceComponent, workspaceOptions);
+    this.addLoadedDependency(workspace);
+    workspace.start();
+
+    $('#container').addClass(`page ${name}`);
+    MadBus.trigger('workspace_enabled', {workspace: workspace});
   },
 
   /* ************************************************************** */
@@ -206,7 +213,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   '{mad.bus.element} request_workspace': function(el, ev) {
     const workspaceName = ev.data.workspace;
     const options = ev.data.options || {};
-    this._initWorkspace(workspaceName, options);
+    this._enableWorkspace(workspaceName, options);
   },
 
   /**
@@ -220,61 +227,11 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   },
 
   /**
-   * Observe when the application processus have been all completed.
-   */
-  '{mad.bus.element} passbolt_application_loading_completed': function() {
-    if (!$('html').hasClass('loaded')) {
-      $('html')
-        .removeClass('loading')
-        .addClass('loaded');
-    }
-  },
-
-  /**
-   * Observe when the user wants to close the latest dialog.
-   */
-  '{mad.bus.element} passbolt_application_loading': function() {
-    if (!$('html').hasClass('loading')) {
-      $('html')
-        .removeClass('loaded')
-        .addClass('loading');
-    }
-  },
-
-  /**
    * The p3 narrow external lib caught a window resize event and
    * set the appropriated classes to the body HTML Element.
    */
   '{window} p3_narrow_checked': function() {
     MadBus.trigger('passbolt.html_helper.window_resized');
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
-  /**
-   * Listen to the change relative to the state Loading
-   * @param {boolean} go Enter or leave the state
-   */
-  stateLoading: function(go) {
-    /*
-     * If the view has already been instantiated.
-     * Notify it that the component is now loading.
-     */
-    if (this.view) {
-      this.view.loading(go);
-    }
-  },
-
-  /**
-   * The application is ready.
-   * @param {boolean} go Enter or leave the state
-   */
-  stateReady: function(go) {
-    if (go) {
-      $('html').removeClass('launching');
-    }
   }
 
 });

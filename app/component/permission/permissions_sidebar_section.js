@@ -29,8 +29,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     label: 'Sidebar Section Permissions Component',
     viewClass: PermissionsSidebarSectionView,
     template: template,
-    acoInstance: null,
-    state: 'loading'
+    acoInstance: null
   }
 
 }, /** @prototype */ {
@@ -39,6 +38,16 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * The permissions list.
    */
   permissionsList: null,
+
+  /**
+   * @inheritdoc
+   */
+  beforeRender: function() {
+    this._super();
+    const permission = this.options.acoInstance.permission;
+    const canAdmin = permission.isAllowedTo(PermissionType.ADMIN);
+    this.setViewData('canAdmin', canAdmin);
+  },
 
   /**
    * @inheritdoc
@@ -67,8 +76,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
   /**
    * Get the list map
-   *
-   * @returns {UtilMap}
+   * @return {UtilMap}
    */
   _getPermissionsListMap: function() {
     return new MadMap({
@@ -119,40 +127,23 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
   },
 
   /**
-   * @inheritdoc
-   */
-  beforeRender: function() {
-    this._super();
-
-    // Tell the view if the user has the admin right for the given resource.
-    const permission = this.options.acoInstance.permission;
-    const administrable = permission.isAllowedTo(PermissionType.ADMIN);
-    this.setViewData('administrable', administrable);
-  },
-
-  /**
    * Retrieve and load permissions in the list.
-   *
-   * @returns {promise}
+   * @return {promise}
    */
   _loadPermissions: function() {
     const self = this;
     const aco_name = 'resource';
     const aco_foreign_key = this.options.acoInstance.id;
 
-    this.setState('loading');
-
-    // Reset the list
+    this.state.loaded = false;
     this.permissionsList.reset();
-
-    // Retrieve the permissions.
     return Permission.findAll({
       aco: aco_name,
       aco_foreign_key: aco_foreign_key,
       contain: {group: 1, user: 1, 'user.profile': 1}
     }).then(permissions => {
       self.permissionsList.load(permissions);
-      self.setState('ready');
+      this.state.loaded = true;
     });
   },
 
@@ -163,14 +154,10 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     this.refresh();
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE VIEW EVENTS                                      */
-  /* ************************************************************** */
-
   /**
-   * Observe when the user want to edit the instance's resource description
+   * Observe when the edit permission button is clicked
    */
-  '{element} request_resource_permissions_edit': function() {
+  '{element} a#js_edit_permissions_button click': function() {
     const resource = this.options.acoInstance;
     MadBus.trigger('request_resource_sharing', {resource: resource});
   }

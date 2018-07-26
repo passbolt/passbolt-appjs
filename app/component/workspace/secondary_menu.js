@@ -33,21 +33,28 @@ const WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSec
   afterStart: function() {
     const showSidebar = Config.read('ui.workspace.showSidebar');
     const viewSidebarButton = new ToggleButton('#js_wk_secondary_menu_view_sidebar_button', {
-      state: showSidebar ? 'selected' : 'ready'
+      state: {selected: showSidebar}
     });
     viewSidebarButton.start();
-    this.options.viewSidebarButton = viewSidebarButton;
+    this.viewSidebarButton = viewSidebarButton;
+    this.viewSidebarButton.state.on('selected', (ev, selected) => this._onViewSidebarSelectedChange(selected));
+  },
 
-    // Rebind controller events
-    this.on();
+  /**
+   * Observe when the viewbar show/hide button selected property changed
+   * @param {boolean} showSidebar Show / hide the sidebar
+   * @private
+   */
+  _onViewSidebarSelectedChange: function(showSidebar) {
+    Config.write('ui.workspace.showSidebar', showSidebar);
+    MadBus.trigger('workspace_sidebar_state_change');
   },
 
   /**
    * Observe when the workspace sidebar setting change.
    */
   '{mad.bus.element} workspace_sidebar_state_change': function() {
-    const state = Config.read('ui.workspace.showSidebar') ? 'selected' : 'ready';
-    this.options.viewSidebarButton.setState(state);
+    this.viewSidebarButton.state.selected = Config.read('ui.workspace.showSidebar');
   },
 
   /**

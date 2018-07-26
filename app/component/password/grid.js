@@ -36,23 +36,12 @@ import gridEmptyTemplate from 'app/view/template/component/password/grid/grid_em
 const PasswordGridComponent = GridComponent.extend('passbolt.component.password.Grid', /** @static */ {
 
   defaults: {
-    // the type of the item rendered by the grid
     itemClass: Resource,
-    // the view class to use. Overridden so we can put our own logic.
     viewClass: PasswordGridView,
-    // the selected resources, you can pass an existing list as parameter of the constructor to share the same list
     selectedResources: new Resource.List(),
-    // Prefix each row id with resource_
     prefixItemId: 'resource_',
-    // Override the silentLoading parameter.
     silentLoading: false,
-    // Default state at loading
-    state: 'loading',
-    /*
-     * For now we are using the can-connect/can/model/model to migrate our v2 models.
-     * Canjs should be able to observe Map in a Control as a function, however it doesn't.
-     * Test it again after we completed the migration of the model to the canjs style.
-     */
+    loadedOnStart: false,
     Resource: Resource
   }
 
@@ -250,16 +239,9 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @param {string} y The y position where the menu will be rendered
    */
   showContextualMenu: function(resource, x, y) {
-    const contextualMenu = GridContextualMenuComponent.instantiate({
-      state: 'hidden',
-      resource: resource,
-      coordinates: {
-        x: x,
-        y: y
-      }
-    });
+    const coordinates = {x: x, y: y};
+    const contextualMenu = GridContextualMenuComponent.instantiate({resource: resource, coordinates: coordinates});
     contextualMenu.start();
-    contextualMenu.setState('ready');
   },
 
   /**
@@ -330,17 +312,10 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    */
   filterBySettings: function(filter) {
     let def = null;
-    const readyStates = [];
-
-    this.setState('loading');
-    /*
-     * The states to apply when the component will be ready.
-     * @todo the css except the class all_items in case the grid is empty to display the empty background image
-     */
-    readyStates.push(filter.id == 'default' ? 'all_items' : filter.id);
 
     // If new filter or the filter changed, request the API.
     if (!this.filterSettings || this.filterSettings.id !== filter.id) {
+      this.state.loaded = false;
       const findOptions = {
         contain: {creator: 1, favorite: 1, modifier: 1, secret: 1, permission: 1, tag: 1},
         // All rules except keywords that is filtered on the browser.
@@ -351,16 +326,13 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       this.reset();
       def = Resource.findAll(findOptions)
         .then(resources => {
-        // If the browser has been destroyed before the request completed.
-          if (this.state.is('destroyed')) {
+          if (this.state.destroyed) {
             return;
           }
           if (!resources.length) {
-            readyStates.push('empty');
+            this.state.empty = true;
           }
-          // If the grid was marked as filtered, reset it.
           this.filtered = false;
-          // Load the resources in the browser.
           this.load(resources);
         });
     } else {
@@ -369,10 +341,12 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
     // When the resources have been retrieved.
     def.then(() => {
-      if (this.state.is('destroyed')) {
+      if (this.state.destroyed) {
         return;
       }
+      this.oldFilterSettings = this.filterSettings;
       this.filterSettings = filter;
+      this._showHideEmptyFeeback();
 
       // Mark the ordered column if any.
       const orders = filter.getOrders();
@@ -409,17 +383,28 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
         this.select(filter.resource);
       }
 
-      // Mark the component as ready
-      readyStates.push('ready');
-      this.setState(readyStates);
+      this.state.loaded = true;
     });
 
     return def;
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE MODEL EVENTS */
-  /* ************************************************************** */
+  /**
+   * Display an empty feedback for the all items filter
+   * @private
+   */
+  _showHideEmptyFeeback: function() {
+    const isEmpty = this.options.items.length == 0;
+    const isAllItemsFilter = this.filterSettings.id == 'default';
+    if (isEmpty && isAllItemsFilter) {
+      $(this.element).addClass('empty all_items');
+      const empty_html = View.render(gridEmptyTemplate);
+      $('.tableview-content', this.element).prepend(empty_html);
+    } else {
+      $(this.element).removeClass('empty all_items');
+      $('.empty-content', this.element).remove();
+    }
+  },
 
   /**
    * Observe when a resource is created and add it to the browser.
@@ -428,10 +413,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @param {Resource} resource The created resource
    */
   '{Resource} created': function(Constructor, ev, resource) {
-    if (this.state.is('empty')) {
-      this.setState('ready');
-    }
     this.insertItem(resource, null, 'first');
+    this._showHideEmptyFeeback();
   },
 
   /**
@@ -448,10 +431,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       this.refreshItem(resource);
     }
   },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE VIEW EVENTS */
-  /* ************************************************************** */
 
   /**
    * Observe when an item is selected in the grid.
@@ -524,17 +503,12 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     this.options.selectedResources.splice(0, this.options.selectedResources.length);
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
   /**
    * Listen to the workspace filter event.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
-    console.log('catch filter workspace');
     const filter = ev.data.filter;
     this.filterBySettings(filter);
   },
@@ -561,29 +535,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     items.forEach(item => {
       this.select(item);
     });
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
-  /**
-   * Listen to changes related to state empty (when there are no passwords to show).
-   * @param {boolean} go Enter or leave the state
-   */
-  stateEmpty: function(go) {
-    if (go) {
-      if (this.filterSettings.id == 'default') {
-        const empty_html = View.render(gridEmptyTemplate);
-        $('.tableview-content', this.element).prepend(empty_html);
-      }
-    } else {
-      /*
-       * Remove any empty content html from page.
-       * (empty content is the html displayed when the workspace is empty).
-       */
-      $('.empty-content', this.element).remove();
-    }
   }
 
 });

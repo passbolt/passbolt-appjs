@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import domEvents from 'can-dom-events';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import MadBus from 'passbolt-mad/control/bus';
@@ -248,7 +249,7 @@ const CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
    * Listen when the plugin observed a change on the password.
    */
   '{mad.bus.element} secret_edition_secret_changed': function() {
-    $(this.element).trigger('changed', 'secret');
+    domEvents.dispatch(this.element, {type: 'changed'});
   },
 
   /* ************************************************************** */

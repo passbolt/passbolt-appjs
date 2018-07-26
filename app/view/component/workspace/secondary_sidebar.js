@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Config from 'passbolt-mad/config/config';
-import MadBus from 'passbolt-mad/control/bus';
 import View from 'passbolt-mad/view/view';
 
 const SecondarySidebarView = View.extend('passbolt.view.component.SecondarySidebar', /** @static */ {

@@ -15,7 +15,7 @@ import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import Clipboard from 'app/util/clipboard';
 import Config from 'passbolt-mad/config/config';
-import ButtonComponent from 'passbolt-mad/component/button';
+import Button from 'passbolt-mad/component/button';
 import ButtonDropdownComponent from 'passbolt-mad/component/button_dropdown';
 import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
@@ -30,7 +30,6 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   defaults: {
     label: 'Workspace Menu Controller',
     tag: 'ul',
-    // the selected resources, you can pass an existing list as parameter of the constructor to share the same list
     selectedResources: new Resource.List(),
     template: template
   }
@@ -42,34 +41,38 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   afterStart: function() {
     // Copy secret button
-    const copySecretButton = new ButtonComponent('#js_wk_menu_secretcopy_button', {
-      state: 'disabled',
+    const copySecretButton = new Button('#js_wk_menu_secretcopy_button', {
+      state: {disabled: true},
       events: {
         click: () => this._copySecret()
       }
     });
     copySecretButton.start();
-    this.options.secretCopyButton = copySecretButton;
+    /*
+     * @todo Check how the click event is resolved, if the stopImmediatePropagation/stopPropagation of the button avoid this callback to eb called, it would be magic ... magic...
+     * copySecretButton.on('click', () => this._copySecret());
+     */
+    this.secretCopyButton = copySecretButton;
 
     // Edit button
-    const editButton = new ButtonComponent('#js_wk_menu_edition_button', {
-      state: 'disabled',
+    const editButton = new Button('#js_wk_menu_edition_button', {
+      state: {disabled: true},
       events: {
         click: () => this._edit()
       }
     });
     editButton.start();
-    this.options.editButton = editButton;
+    this.editButton = editButton;
 
     // Share button
-    const shareButton = new ButtonComponent('#js_wk_menu_sharing_button', {
-      state: 'disabled',
+    const shareButton = new Button('#js_wk_menu_sharing_button', {
+      state: {disabled: true},
       events: {
         click: () => this._share()
       }
     });
     shareButton.start();
-    this.options.shareButton = shareButton;
+    this.shareButton = shareButton;
 
     // Export
     this._initExportButton();
@@ -105,15 +108,12 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     moreButtonMenuItems.push(deleteItem);
 
     const moreButton = new ButtonDropdownComponent('#js_wk_menu_more_button', {
-      state: 'disabled',
+      state: {disabled: true},
       items: moreButtonMenuItems,
       template: null
     });
     moreButton.start();
-    this.options.moreButton = moreButton;
-
-    // @todo URGENT, buggy, it rebinds 2 times external element event (such as madbus)
-    this.on();
+    this.moreButton = moreButton;
   },
 
   /**
@@ -124,7 +124,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     if (Config.read('server.passbolt.plugins.export')) {
       const exportButtonSelector = '#js_wk_menu_export_button';
       $(exportButtonSelector).removeClass('hidden');
-      const exportButton = new ButtonComponent(exportButtonSelector, {
+      const exportButton = new Button(exportButtonSelector, {
         events: {
           click: () => this._export()
         }
@@ -182,19 +182,15 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     MadBus.trigger('request_export', {type: type});
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE MODEL EVENTS */
-  /* ************************************************************** */
-
   /**
    * Observe when a resource is selected
    */
   '{selectedResources} add': function() {
-    // If a resource is selected
-    if (this.options.selectedResources.length == 1) {
-      this.setState('selection');
-    } else if (this.options.selectedResources.length == 0) {
-      this.setState('ready');
+    const resourceSelected = this.options.selectedResources.length == 1;
+    if (resourceSelected) {
+      this.resourceSelected();
+    } else {
+      this.reset();
     }
   },
 
@@ -202,58 +198,37 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Observe when a resource is unselected
    */
   '{selectedResources} remove': function() {
-    // If a resource is selected
-    if (this.options.selectedResources.length == 1) {
-      this.setState('selection');
-    } else if (this.options.selectedResources.length == 0) {
-      this.setState('ready');
+    this.reset();
+  },
+
+  /**
+   * A resource is selected, adapt the buttons states.
+   */
+  resourceSelected: function() {
+    const resource = this.options.selectedResources[0];
+    const permission = resource.permission;
+    const canEdit = permission.isAllowedTo(PermissionType.UPDATE);
+    const canAdmin = permission.isAllowedTo(PermissionType.ADMIN);
+    const moreButtonDeleteItemId = 'js_wk_menu_delete_action';
+    this.secretCopyButton.state.disabled = false;
+    this.editButton.state.disabled = !canEdit;
+    this.shareButton.state.disabled = !canAdmin;
+    this.moreButton.state.disabled = false;
+    if (canEdit) {
+      this.moreButton.enableItem(moreButtonDeleteItemId);
+    } else {
+      this.moreButton.disableItem(moreButtonDeleteItemId);
     }
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
   /**
-   * Listen to the change relative to the state selected
-   * @param {boolean} go Enter or leave the state
+   * Reset the buttons states to their original.
    */
-  stateSelection: function(go) {
-    if (go) {
-      const permission = this.options.selectedResources[0].permission;
-      // Is the resource editable ?
-      const updatable = permission.isAllowedTo(PermissionType.UPDATE);
-      // Is the resource administrable ?
-      const administrable = permission.isAllowedTo(PermissionType.ADMIN);
-
-      this.options.secretCopyButton
-        .setValue(this.options.selectedResources[0])
-        .setState('ready');
-      this.options.editButton
-        .setValue(this.options.selectedResources[0])
-        .setState(updatable ? 'ready' : 'disabled');
-      this.options.shareButton
-        .setValue(this.options.selectedResources)
-        .setState(administrable ? 'ready' : 'disabled');
-      this.options.moreButton
-        .setValue(this.options.selectedResources[0])
-        .setState('ready');
-      this.options.moreButton.setItemState('js_wk_menu_delete_action', updatable ? 'ready' : 'disabled');
-    } else {
-      this.options.secretCopyButton
-        .setValue(null)
-        .setState('disabled');
-      this.options.editButton
-        .setValue(null)
-        .setState('disabled');
-      this.options.shareButton
-        .setValue(null)
-        .setState('disabled');
-      this.options.moreButton
-        .setValue(null)
-        .setState('disabled');
-      this.options.moreButton.setItemState('js_wk_menu_delete_action', 'disabled');
-    }
+  reset: function() {
+    this.secretCopyButton.state.disabled = true;
+    this.editButton.state.disabled = true;
+    this.shareButton.state.disabled = true;
+    this.moreButton.state.disabled = true;
   }
 
 });

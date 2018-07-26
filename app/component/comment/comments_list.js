@@ -12,25 +12,20 @@
  * @since         2.0.0
  */
 import Comment from 'app/model/map/comment';
-import CommentsListView from 'app/view/component/comment/comments_list';
-import ConfirmComponent from 'passbolt-mad/component/confirm';
+import DomData from 'can-dom-data';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import Tree from 'passbolt-mad/component/tree';
 import User from 'app/model/map/user';
 
-import commentDeleteConfirmTemplate from 'app/view/template/component/comment/delete_confirm.stache!';
 import itemTemplate from 'app/view/template/component/comment/comment_item.stache!';
 
 const CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsList', /** @static */ {
 
   defaults: {
     label: 'Comments List Controller',
-    viewClass: CommentsListView,
     itemClass: Comment,
-    itemTemplate: itemTemplate,
-    foreignModel: null,
-    foreignKey: null
+    itemTemplate: itemTemplate
   }
 
 }, /** @prototype */ {
@@ -46,7 +41,7 @@ const CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsLi
   /**
    * Get the map
    *
-   * @return {mad.Map}
+   * @return {UtilMap}
    */
   _getMap: function() {
     return new MadMap({
@@ -55,52 +50,30 @@ const CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsLi
       modified: 'modified',
       creatorAvatarPath: {
         key: 'creator',
-        func: function(creator) {
-          return creator.profile.avatarPath('small');
-        }
+        func: creator => creator.profile.avatarPath('small')
       },
       creatorName: {
         key: 'creator',
-        func: function(creator) {
-          return creator.profile.fullName();
-        }
+        func: creator => creator.profile.fullName()
+      },
+      isOwner: {
+        key: 'created_by',
+        func: createdBy => createdBy == User.getCurrent().id
       }
     });
   },
 
   /**
-   * @inheritdoc
-   */
-  insertItem: function(item, refItem, position) {
-    this._super(item, refItem, position);
-
-    // Unhide delete action if user is owner.
-    const isOwner = item.created_by != undefined && item.created_by == User.getCurrent().id;
-    if (isOwner) {
-      const $deleteActionEl = $(`li#${item.id} .js_delete_comment`, this.element);
-      $deleteActionEl.removeClass('hidden');
-    }
-  },
-
-  /**
-   * Catches a request_delete_comment coming from an item in the list then redistribute on mad bus
+   * Observe when the user clicks on the delete button for comment
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{element} request_delete_comment': function(el, ev) {
-    const item = ev.data.item;
-    const confirm = ConfirmComponent.instantiate({
-      label: __('Do you really want to delete?'),
-      content: commentDeleteConfirmTemplate,
-      submitButton: {
-        label: __('delete comment'),
-        cssClasses: ['warning']
-      },
-      action: function() {
-        MadBus.trigger('request_delete_comment', {item: item});
-      }
-    });
-    confirm.start();
+  '{element} .actions a.js_delete_comment click': function(el, ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    const $li = $(el).parents('li.comment-wrapper');
+    const comment = DomData.get($li[0], Comment.shortName);
+    MadBus.trigger('request_delete_comment', {comment: comment});
   }
 });
 

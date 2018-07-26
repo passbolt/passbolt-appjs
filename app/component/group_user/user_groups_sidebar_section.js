@@ -26,7 +26,7 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
     label: 'Sidebar Section User Groups Component',
     template: template,
     user: null,
-    state: 'loading'
+    Group: Group
   }
 
 }, /** @prototype */ {
@@ -35,33 +35,31 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
    * @inheritdoc
    */
   afterStart: function() {
-    const self = this;
-
     const tree = this._initTree();
     this._findUserGroups()
       .then(groups => {
         tree.load(groups);
-        self.setState('ready');
-        tree.setState('ready');
+        this.state.loaded = true;
+        tree.state.loaded = true;
       });
   },
 
   /**
    *
    * Initialize the tree
-   * @return {mad.Component}
+   * @return {Component}
    */
   _initTree: function() {
     const map = this._getTreeMap();
 
     const tree = new Tree('#js_user_groups_list', {
+      loadedOnStart: false,
       cssClasses: ['groups', 'shared-with'],
       viewClass: TreeView,
       itemClass: Group,
       itemTemplate: groupListItemTemplate,
       prefixItemId: 'js_user_groups_list_',
-      map: map,
-      state: 'loading'
+      map: map
     });
     tree.start();
 
@@ -122,7 +120,7 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
    * Observe when a group is created.
    * Update the component.
    */
-  '{passbolt.model.Group} created': function() {
+  '{Group} created': function() {
     this.refresh();
   },
 
@@ -130,7 +128,7 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
    * Observe when a group is updated.
    * Update the component.
    */
-  '{passbolt.model.Group} updated': function() {
+  '{Group} updated': function() {
     this.refresh();
   },
 
@@ -138,7 +136,7 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
    * Observe when a group is deleted.
    * Update the component.
    */
-  '{passbolt.model.Group} deleted': function() {
+  '{Group} deleted': function() {
     this.refresh();
   }
 

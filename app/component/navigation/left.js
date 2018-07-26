@@ -44,28 +44,19 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
   },
 
   /**
-   * Dispatch route
-   * @private
-   */
-  _dispatchRoute: function() {
-    const workspace = String.underscore(route.data.controller);
-    if (this.options.selected != workspace) {
-      const li = $(`li.${workspace}`);
-      const itemClass = this.getItemClass();
-
-      if (itemClass) {
-        const data = DomData.get(li[0], itemClass.shortName);
-        if (typeof data != 'undefined') {
-          this.selectItem(data);
-        }
-      }
-    }
-  },
-
-  /**
    * @inheritdoc
    */
   afterStart: function() {
+    this._initMenu();
+    this._dispatchRoute();
+    this._super();
+  },
+
+  /**
+   * Init the menu.
+   * @private
+   */
+  _initMenu: function() {
     // passwords
     const passwordsItem = new Action({
       id: 'js_app_nav_left_password_wsp_link',
@@ -92,22 +83,46 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
       action: () => this._goHelp()
     });
     this.insertItem(helpItem);
-
-    this._super();
-    this._dispatchRoute();
   },
 
-  // Go to the password workspace
+  /**
+   * Go to the password workspace.
+   * @private
+   */
   _goToPasswordWorkspace: function() {
     location.hash = '/passwords';
   },
 
-  // Go to the user workspace
+  /**
+   * Go to the user workspace
+   */
   _goToUserWorkspace: function() {
     location.hash = '/users';
   },
 
-  // Go to the passbolt help
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    const workspace = String.underscore(route.data.controller);
+    if (this.options.selected != workspace) {
+      const li = $(`li.${workspace}`);
+      const itemClass = this.getItemClass();
+
+      if (itemClass) {
+        const data = DomData.get(li[0], itemClass.shortName);
+        if (typeof data != 'undefined') {
+          this.selectItem(data);
+        }
+      }
+    }
+  },
+
+  /**
+   * Go to the passbolt help
+   * @private
+   */
   _goHelp: function() {
     const helpWindow = window.open();
     helpWindow.opener = null;

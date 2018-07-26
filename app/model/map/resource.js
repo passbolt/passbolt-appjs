@@ -21,7 +21,6 @@ import connectStore from 'can-connect/constructor/store/store';
 import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import getObject from 'can-util/js/get/get';
 import Favorite from 'app/model/map/favorite';
 import Permission from 'app/model/map/permission';
 import 'urijs/src/punycode';
@@ -192,17 +191,19 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
   url: {
     resource: '/',
     getData: function(params) {
+      params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'resources/{id}.json?api-version=v2',
+        url: 'resources/{id}.json',
         type: 'GET',
         params: params
       });
     },
     getListData: function(params) {
+      params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'resources.json?api-version=v2',
+        url: 'resources.json',
         type: 'GET',
-        params
+        params: params
       });
     },
     destroyData: function(params) {

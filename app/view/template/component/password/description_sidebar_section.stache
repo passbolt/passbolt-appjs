@@ -1,5 +1,5 @@
 <div class="accordion-header">
-	<h4><a role="button">{{ __('Description') }}</a></h4>
+	<h4><a class="accordion-trigger" role="button">{{ __('Description') }}</a></h4>
 </div>
 
 <div class="accordion-content">
@@ -11,6 +11,4 @@
 	{{/if}}
 
 	<p class="description_content">{{ resource.description }}</p>
-	<!-- edit description form -->
-	<div id="js_rs_details_edit_description"></div>
 </div>

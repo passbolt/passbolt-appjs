@@ -25,6 +25,7 @@ import UserGridView from 'app/view/component/user/grid';
 
 import cellAvatarTemplate from 'app/view/template/component/user/grid/cell_avatar.stache!';
 import columnHeaderSelectTemplate from 'app/view/template/component/user/grid/column_header_select.stache!';
+import itemTemplate from 'app/view/template/component/user/grid/grid_item.stache!';
 
 const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /** @static */ {
 
@@ -35,8 +36,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     selectedUsers: new User.List(),
     prefixItemId: 'user_',
     silentLoading: false,
-    state: 'loading',
-    // Model observed in templated functions
+    loadedOnStart: false,
+    itemTemplate: itemTemplate,
     Group: Group,
     GroupUser: GroupUser,
     User: User
@@ -206,7 +207,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
       }
     });
     contextualMenu.start();
-    contextualMenu.setState('ready');
   },
 
   /**
@@ -235,32 +235,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     const sortedColumnModel = this.getColumnModel('name');
     this.view.markColumnAsSorted(sortedColumnModel, true);
     this._super();
-  },
-
-  /**
-   * Before selecting an item
-   * @param {User} item The item to select
-   */
-  beforeSelect: function(item) {
-    let returnValue = true;
-
-    if (this.state.is('selection')) {
-      /*
-       * if an item has already been selected
-       * if the item is already selected, unselect it
-       */
-      if (this.options.selectedUsers.length > 0 && this.options.selectedUsers[0].id == item.id) {
-        this.unselect(item);
-        this.setState('ready');
-        returnValue = false;
-      } else {
-        for (let i = this.options.selectedUsers.length - 1; i > -1; i--) {
-          this.unselect(this.options.selectedUsers[i]);
-        }
-      }
-    }
-
-    return returnValue;
   },
 
   /**
@@ -309,10 +283,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
 
     // If new filter or the filter changed, request the API.
     if (!this.filterSettings || this.filterSettings.id !== filter.id) {
-      this.setState('loading');
-      this.reset();
-
-      // Request the API.
+      this.state.loaded = false;
       const findOptions = {
         silentLoading: false,
         filter: filter.getRules(['keywords']), // All rules except keywords that is filtered on the browser.
@@ -321,23 +292,13 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
           LastLoggedIn: 1
         }
       };
+
+      this.reset();
       def = User.findAll(findOptions).then(users => {
-        // If the browser has been destroyed before the request completed.
-        if (this.state.is('destroyed')) {
+        if (this.state.destroyed) {
           return;
         }
-
-        // Load the resources in the browser.
         this.load(users);
-        this.setState('ready');
-
-        // If the results is ordered by the server, mark the relative column.
-        if (filter.order) {
-          const sortedColumnModel = this.getColumnModel(filter.order);
-          if (sortedColumnModel) {
-            this.view.markColumnAsSorted(sortedColumnModel, true);
-          }
-        }
       });
     } else {
       def = Promise.resolve();
@@ -376,6 +337,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
         // Otherwise reset the local filtering.
         this.resetFilter();
       }
+
+      this.state.loaded = true;
     });
   },
 
@@ -471,9 +434,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
     const filter = ev.data.filter;
-    if (this.state.is('destroyed')) {
-      return;
-    }
     this.filterBySettings(filter);
   },
 

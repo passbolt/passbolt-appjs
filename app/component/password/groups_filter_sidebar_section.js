@@ -23,8 +23,7 @@ const GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exten
   defaults: {
     template: template,
     selectedGroups: new Group.List(),
-    // Hidden by default, show it if there are groups to show.
-    state: 'hidden'
+    state: {hidden: true}
   }
 
 }, /** @prototype */ {
@@ -39,29 +38,20 @@ const GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exten
         'has-users': User.getCurrent().id
       }
     });
-    this._listenGroupListStateChanges(groupList);
+    this.groupList = groupList;
+    groupList.state.on('loaded', (ev, loaded) => this._onGroupListLoadedChange(loaded));
     groupList.start();
     this._super();
   },
 
   /**
-   * Listen to the group list child component state changes and adapt this component state in function.
-   * @param {Component} groupList
+   * @inheritdoc
    */
-  _listenGroupListStateChanges: function(groupList) {
-    const state = this.state;
-    const groupListState = groupList.state;
-    const isEmpty = groupList.options.items.length;
-    groupListState.current.on('length', () => {
-      // Mark this component as ready when its child is ready.
-      if (groupListState.is('ready')) {
-        state.addState('ready');
-      }
-      // Display the group list only if it contains groups.
-      if (isEmpty) {
-        state.removeState('hidden');
-      }
-    });
+  _onGroupListLoadedChange: function(loaded) {
+    if (loaded) {
+      const isEmpty = this.groupList.options.items.length == 0;
+      this.state.hidden = isEmpty;
+    }
   }
 });
 

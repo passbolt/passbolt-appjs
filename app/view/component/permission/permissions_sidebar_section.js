@@ -11,25 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import domEvents from 'can-dom-events';
 import SecondarySidebarSectionView from 'app/view/component/workspace/secondary_sidebar_section';
 
 const PermissionsView = SecondarySidebarSectionView.extend('passbolt.view.component.permission.Permissions', /** @static */ {
 
 }, /** @prototype */ {
 
-  /* ************************************************************** */
-  /* LISTEN TO THE VIEW EVENTS */
-  /* ************************************************************** */
-
-  /**
-   * Observe when the user clicks on the edit button
-   */
-  '{element} a#js_edit_permissions_button click': function() {
-    if (this.getController().getViewData('administrable') !== false) {
-      domEvents.dispatch(this.element, {type: 'request_resource_permissions_edit'});
-    }
-  }
 });
 
 export default PermissionsView;

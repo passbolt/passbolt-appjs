@@ -15,7 +15,7 @@ import Comment from 'app/model/map/comment';
 import CommentCreateForm from 'app/form/comment/create';
 import CommentsListComponent from 'app/component/comment/comments_list';
 import CommentsSidebarSectionView from 'app/view/component/comment/comments_sidebar_section';
-import MadBus from 'passbolt-mad/control/bus';
+import ComponentHelper from 'passbolt-mad/helper/component';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 
 import template from 'app/view/template/component/comment/comments_sidebar_section.stache!';
@@ -25,16 +25,11 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
   defaults: {
     label: 'Comments Controller',
     viewClass: CommentsSidebarSectionView,
+    loadedOnStart: false,
     resource: null,
     foreignModel: null,
     foreignKey: null,
     template: template,
-    state: 'loading',
-    /*
-     * For now we are using the can-connect/can/model/model to migrate our v2 models.
-     * Canjs should be able to observe Map in a Control as a function, however it doesn't.
-     * Test it again after we completed the migration of the model to the canjs style.
-     */
     Comment: Comment
   }
 
@@ -43,25 +38,18 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
   /**
    * @inheritdoc
    */
-  afterStart: function() {
-    this._initForm();
-    this._initCommentsList();
-    this._loadComments();
-
-    this._super();
+  init: function(el, options) {
+    this._super(el, options);
   },
 
   /**
-   * Initialize the form
+   * @inheritdoc
    */
-  _initForm: function() {
-    const form = new CommentCreateForm('#js_rs_details_comments_add_form', {
-      foreignModel: this.options.foreignModel,
-      foreignKey: this.options.foreignKey,
-      state: 'hidden'
-    });
-    form.start();
-    this.addForm = form;
+  afterStart: function() {
+    this._initCommentsList();
+    this._findComments()
+      .then(comments => this._loadComments(comments));
+    this._super();
   },
 
   /**
@@ -79,71 +67,105 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
   },
 
   /**
-   * Retrieve and load the comments
+   * Find the comments
    */
-  _loadComments: function() {
-    const self = this;
-
-    // Retrieve the comments
-    Comment.findAll({
+  _findComments: function() {
+    const findOptions = {
       foreignModel: this.options.foreignModel,
       foreignKey: this.options.foreignKey,
       contain: {creator: 1}
-    }).then(comments => {
-      // If no comments, display the comment add form.
-      if (!comments.length) {
-        self.addForm.setState('visible');
-      } else {
-        self.commentsList.load(comments);
+    };
+    return Comment.findAll(findOptions);
+  },
+
+  /**
+   * Load comments in the list or display the form.
+   * @param {Comment.List} comments
+   * @private
+   */
+  _loadComments: function(comments) {
+    if (this.state.destroyed) {
+      return;
+    }
+    if (comments.length) {
+      this.commentsList.load(comments);
+    } else {
+      this._enableForm();
+    }
+    this.commentsList.state.loaded = true;
+    this.state.loaded = true;
+  },
+
+  /**
+   * Initialize the form
+   */
+  _enableForm: function() {
+    if (this.form) {
+      return;
+    }
+    const formOptions = {
+      id: 'js_rs_details_comments_add_form',
+      foreignModel: this.options.foreignModel,
+      foreignKey: this.options.foreignKey,
+      tag: 'div',
+      callbacks: {
+        submit: formData => {
+          this._saveComment(formData, form);
+        }
       }
-      self.commentsList.setState('ready');
-      self.setState('ready');
-    });
+    };
+    const selector = $('.accordion-content #js_rs_details_comments_list', this.element);
+    const form = ComponentHelper.create(selector, 'before', CommentCreateForm, formOptions);
+    form.start();
+    this.form = form;
+  },
+
+  /**
+   * Save a comment
+   * @param {array} formData Data returned by the form
+   * @private
+   */
+  _saveComment: function(formData) {
+    const comment = new Comment(formData['Comment']);
+    comment.save()
+      .then(() => {
+        this.form = null;
+      });
   },
 
   /**
    * Listen when a comment is created.
-   * If the comment belong to the selected resource, display it.
-   * @param model
-   * @param ev
-   * @param comment
+   * @param {Comment.prototype} Comment The comment defined map
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {Comment} comment The created comment
    */
   '{Comment} created': function(model, ev, comment) {
-    // If the new comment belongs to the displayed resource.
+    // If the new comment belongs to the displayed resource, refresh the component.
     if (comment.foreign_key == this.options.resource.id) {
-      this.setState('loading');
+      // @todo Starter/loaded ? What to do with it here. Refresh should take care of the mechanism
+      this.state.loaded = false;
       this.refresh();
     }
   },
 
   /**
-   * Catches event request_delete_comment, and proceed with deleting a comment
-   * @param model
+   * Listen when a comment is created.
+   * @param {Comment.prototype} Comment The comment defined map
    * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
+   * @param {Comment} comment The created comment
    */
-  '{mad.bus.element} request_delete_comment': function(el, ev) {
-    const item = ev.data.item;
-    this.setState('loading');
-    item.destroy().then(() => {
-      MadBus.trigger('comment_deleted', {item: item});
-    });
+  '{Comment} destroyed': function(model, ev, comment) {
+    this.commentsList.removeItem(comment);
+    if (this.commentsList.options.items.length == 0) {
+      this._enableForm();
+    }
   },
 
   /**
-   * Listen when a comment entity is deleted.
-   * If the comment belongs to the selected resource, remove it from the list.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
+   * Observe when the user clicks on the plus button, to add a comment
    */
-  '{mad.bus.element} comment_deleted': function(el, ev) {
-    const item = ev.data.item;
-    this.commentsList.removeItem(item);
-    if (this.commentsList.options.items.length == 0) {
-      this.addForm.emptyContent();
-      this.addForm.setState('visible');
-    }
-    this.setState('ready');
+  '{element} a.js_add_comment click': function() {
+    this._enableForm();
   }
 });
 

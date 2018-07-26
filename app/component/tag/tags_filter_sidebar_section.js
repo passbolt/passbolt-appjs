@@ -27,11 +27,14 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   defaults: {
     template: template,
     selectedTags: new Tag.List(),
-    state: 'hidden', // Is hidden by default, and will be displayed only when there are tags to show.
     silentLoading: false,
+    loadedOnStart: false,
     tree: null,
     filter: null,
-    treeFilter: 'all_tags'
+    treeFilter: 'all_tags',
+    state: {
+      disabled: true
+    }
   }
 
 }, /** @prototype */ {
@@ -43,7 +46,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     this._initTree();
     this._findTags()
       .then(tags => {
-        if (this.state.is('destroyed')) {
+        if (this.state.destroyed) {
           return;
         }
         this._loadTree(tags);
@@ -123,10 +126,11 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    */
   _loadTree: function(tags) {
     this.options.tree.reset();
-    this.options.tree.load(tags);
     if (tags.length) {
-      this.setState('ready');
+      this.options.tree.load(tags);
+      this.state.hidden = false;
     }
+    this.state.loaded = true;
   },
 
   /**
@@ -135,7 +139,6 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   _showTreeFilterMenu: function(x, y) {
     // Instantiate the contextual menu menu.
     const contextualMenu = ContextualMenuComponent.instantiate({
-      state: 'hidden',
       coordinates: {
         x: x,
         y: y
@@ -151,7 +154,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
       action: () => {
         this._setTitle(__('All tags'));
         this._filterTree('all_tags');
-        contextualMenu.destroy();
+        contextualMenu.destroyAndRemove();
       }
     });
     contextualMenu.insertItem(allTagsFilter);
@@ -164,7 +167,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
       action: () => {
         this._setTitle(__('My tags'));
         this._filterTree('my_tags');
-        contextualMenu.destroy();
+        contextualMenu.destroyAndRemove();
       }
     });
     contextualMenu.insertItem(myTagsFilter);
@@ -177,11 +180,10 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
       action: () => {
         this._setTitle(__('Shared tags'));
         this._filterTree('shared_tags');
-        contextualMenu.destroy();
+        contextualMenu.destroyAndRemove();
       }
     });
     contextualMenu.insertItem(sharedTagsFilter);
-    contextualMenu.setState('ready');
   },
 
   /**
@@ -194,12 +196,11 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
 
   /**
    * Observe when the user select a tag.
-   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occured
-   * @param {Tag} tag The selected item
-   * @return {void}
    */
-  ' item_selected': function(el, ev, tag) {
+  '{element} item_selected': function(el, ev) {
+    const tag = ev.data.item;
     this.options.selectedTags.splice(0, this.options.selectedTags.length);
     this.options.selectedTags.push(tag);
 
@@ -253,7 +254,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     // Refresh the list of tags.
     this._findTags()
       .then(tags => {
-        if (this.state.is('destroyed')) {
+        if (this.state.destroyed) {
           return;
         }
         this._loadTree(tags);
@@ -300,7 +301,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     // Refresh the list of tags.
     this._findTags()
       .then(tags => {
-        if (this.state.is('destroyed')) {
+        if (this.state.destroyed) {
           return;
         }
         this._loadTree(tags);
@@ -331,16 +332,18 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
 
   /**
    * Observe when the tree filter button launcher is clicked.
-   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occured
-   * @return {void}
    */
-  ' #js_wsp_pwd_password_filter_tags_more click': function(el, ev) {
+  '{element} #js_wsp_pwd_password_filter_tags_more click': function(el, ev) {
     ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    ev.preventDefault();
     const p = $(el).offset();
     const x = p.left - 4;
     const y = p.top + 16;
     this._showTreeFilterMenu(x, y);
+    return false;
   }
 
 });

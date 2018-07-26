@@ -30,12 +30,10 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
     itemTemplate: itemTemplate,
     prefixItemId: 'group_',
     selectedGroups: new Group.List(),
-    selectedGroup: null,
     selectedFilter: null,
-    // the view class to use. Overriden so we can put our own logic.
     viewClass: GroupListView,
     map: null,
-    state: 'loading',
+    loadedOnStart: false,
     silentLoading: false,
     defaultGroupFilter: {},
     /*
@@ -71,6 +69,7 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
     options = options || {};
     options.map = this._getTreeMap();
     this._super(el, options);
+    this._latestGroupModified = null;
   },
 
   /**
@@ -103,15 +102,14 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
       order: ['Group.name ASC'],
       filter: filter
     };
+    this.state.loaded = false;
     Group.findAll(findOptions)
       .then(groups => {
-      // @todo could throw a specific exception and catch it globally (this is not an error).
-        if (this.state.is('destroyed')) {
+        if (this.state.destroyed) {
           return;
         }
-        // Load the tree component with the groups.
         this.load(groups);
-        this.setState('ready');
+        this.state.loaded = true;
       }, error => {
         throw error;
       });
@@ -141,6 +139,7 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
    * @inheritsDoc
    */
   selectItem: function(item) {
+    this._latestGroupModified = item.modified;
     this._filterWorkspaceByGroup(item);
     this._super(item);
   },
@@ -175,6 +174,29 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
   },
 
   /**
+   * Observe when a group is updated.
+   * @param {Group.prototype} Constructor The constructor
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Group} group The created group
+   */
+  '{Group} updated': function(Constructor, ev, group) {
+    this.refreshItem(group);
+    const selectedGroups = this.options.selectedGroups;
+    const id = group.id;
+    if (selectedGroups.indexOf({id: id}) != -1) {
+      this.view.selectItem(group);
+      /*
+       * This component drive the selection of a group in the workspace.
+       * @todo It's should be moved somewhere else (later :*)
+       */
+      const isGroupUpdated = this._latestGroupModified != group.modified;
+      if (isGroupUpdated) {
+        this.selectItem(group);
+      }
+    }
+  },
+
+  /**
    * Observe when a group is destroyed.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
@@ -182,22 +204,6 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
    */
   '{Group} destroyed': function(el, ev, group) {
     this.removeItem(group);
-  },
-
-  /**
-   * Listen when a group is updated.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @todo Explain the group_replaced event
-   */
-  '{mad.bus.element} group_replaced': function(el, ev) {
-    const group = ev.data.group;
-    this.refreshItem(group);
-
-    // If the group was selected, mark it as selected
-    if (this.options.selectedGroup && this.options.selectedGroup.id == group.id) {
-      this.selectItem(group);
-    }
   },
 
   /**

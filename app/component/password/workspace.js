@@ -22,6 +22,7 @@ import DialogComponent from 'passbolt-mad/component/dialog';
 import GridComponent from 'app/component/password/grid';
 import MadBus from 'passbolt-mad/control/bus';
 import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
+
 import PrimaryMenuComponent from 'app/component/password/workspace_primary_menu';
 import PrimarySidebarComponent from 'app/component/password/primary_sidebar';
 import ResourceCreateForm from 'app/form/resource/create';
@@ -33,6 +34,7 @@ import Filter from 'app/model/filter';
 import Group from 'app/model/map/group';
 import Resource from 'app/model/map/resource';
 
+import commentDeleteConfirmTemplate from 'app/view/template/component/comment/delete_confirm.stache!';
 import createButtonTemplate from 'app/view/template/component/workspace/create_button.stache!';
 import importButtonTemplate from 'app/view/template/component/workspace/import_button.stache!';
 import resourceDeleteConfirmTemplate from 'app/view/template/component/password/delete_confirm.stache!';
@@ -51,6 +53,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     filter: null,
     // Override the silentLoading parameter.
     silentLoading: false,
+    loadedOnStart: false,
     // Models to listen to
     Resource: Resource
   },
@@ -74,8 +77,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @inheritdoc
    */
   init: function(el, options) {
+    this._super(el, options);
     this._initRouteListener();
-    return this._super(el, options);
   },
 
   /**
@@ -129,13 +132,23 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @inheritdoc
    */
   afterStart: function() {
-    this._initPrimaryMenu();
-    this._initSecondaryMenu();
-    this._initMainActionButton();
-    this._initImportButton();
-    this._initBreadcrumb();
-    this._initPrimarySidebar();
-    this._initGrid();
+    const primaryMenu = this._initPrimaryMenu();
+    const secondaryMenu = this._initSecondaryMenu();
+    const mainActionButton = this._initMainActionButton();
+    const importButton = this._initImportButton();
+    const breadcrumb = this._initBreadcrumb();
+    const primarySidebar = this._initPrimarySidebar();
+    const grid = this._initGrid();
+
+    primaryMenu.start();
+    secondaryMenu.start();
+    mainActionButton.start();
+    if (importButton) {
+      importButton.start();
+    }
+    breadcrumb.start();
+    primarySidebar.start();
+    grid.start();
 
     // Filter the workspace
     const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
@@ -146,33 +159,18 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   },
 
   /**
-   * Destroy the workspace.
-   */
-  destroy: function() {
-    // Be sure that the primary & secondary workspace menus controllers will be destroyed also.
-    $('#js_wsp_primary_menu_wrapper').empty();
-    $('#js_wsp_secondary_menu_wrapper').empty();
-    $('.main-action-wrapper').empty();
-    // Flush the selectedResources list.
-    this.options.selectedResources.splice(0, this.options.selectedResources.length);
-    this._super();
-  },
-
-  /**
    * Init the primary workspace menu.
    * The menu is not instantiated as a child of this component DOM Element, remove it manually from the DOM when
    * this component is destroyed.
    * @see destroy()
+   * @return {Component}
    */
   _initPrimaryMenu: function() {
-    const menu = ComponentHelper.create(
-      $('#js_wsp_primary_menu_wrapper'),
-      'last',
-      PrimaryMenuComponent, {
-        selectedResources: this.options.selectedResources
-      }
-    );
-    menu.start();
+    const $el = $('#js_wsp_primary_menu_wrapper');
+    const options =  {selectedResources: this.options.selectedResources};
+    const component = ComponentHelper.create($el, 'last', PrimaryMenuComponent, options);
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
@@ -180,68 +178,73 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * The menu is not instantiated as a child of this component DOM Element, remove it manually from the DOM when
    * this component is destroyed.
    * @see destroy()
+   * @return {Component}
    */
   _initSecondaryMenu: function() {
-    const menu = ComponentHelper.create(
+    const component = ComponentHelper.create(
       $('#js_wsp_secondary_menu_wrapper'),
       'last',
       SecondaryMenuComponent, {
         selectedItems: this.options.selectedResources
       }
     );
-    menu.start();
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the workspace main action button.
+   * @return {Component}
    */
   _initMainActionButton: function() {
-    const button = ComponentHelper.create(
-      $('.main-action-wrapper'),
-      'last',
-      ButtonComponent, {
-        id: 'js_wsp_create_button',
-        template: createButtonTemplate,
-        tag: 'button',
-        cssClasses: ['button', 'primary']
-      }
-    );
-    button.start();
-    this.options.mainButton = button;
+    const selector = $('.main-action-wrapper');
+    const options = {
+      id: 'js_wsp_create_button',
+      template: createButtonTemplate,
+      tag: 'button',
+      cssClasses: ['button', 'primary']
+    };
+    const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
+    this.options.mainButton = component;
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the workspace import action button.
+   * @return {Component}
    */
   _initImportButton: function() {
     if (Config.read('server.passbolt.plugins.import')) {
-      const button = ComponentHelper.create(
-        $('.main-action-wrapper'),
-        'last',
-        ButtonComponent, {
-          id: 'js_wsp_pwd_import_button',
-          template: importButtonTemplate,
-          tag: 'button',
-          cssClasses: ['button']
-        }
-      );
-      button.start();
-      this.options.importButton = button;
+      const selector = $('.main-action-wrapper');
+      const options = {
+        id: 'js_wsp_pwd_import_button',
+        template: importButtonTemplate,
+        tag: 'button',
+        cssClasses: ['button']
+      };
+      const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
+      this.options.importButton = component;
+      this.addLoadedDependency(component);
+      return component;
     }
   },
 
   /**
    * Initialize the workspace breadcrumb
+   * @return {Component}
    */
   _initBreadcrumb: function() {
     const component = new BreadcrumbComponent('#js_wsp_password_breadcrumb', {
       rootFilter: PasswordWorkspaceComponent.getDefaultFilterSettings()
     });
-    component.start();
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the primary sidebar component
+   * @return {Component}
    */
   _initPrimarySidebar: function() {
     const component = new PrimarySidebarComponent('#js_password_workspace_primary_sidebar', {
@@ -249,18 +252,56 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       selectedResources: this.options.selectedResources,
       selectedGroups: this.options.selectedGroups
     });
-    component.start();
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the grid component
+   * @return {Component}
    */
   _initGrid: function() {
     const component = new GridComponent('#js_wsp_pwd_browser', {
       selectedResources: this.options.selectedResources
     });
-    component.start();
     this.options.grid = component;
+    this.addLoadedDependency(component);
+    return component;
+  },
+
+  /**
+   * Init the secondary sidebar.
+   * @return {Component}
+   * @private
+   */
+  _initSecondarySidebar: function() {
+    this._destroySecondarySidebar();
+    const showSidebar = Config.read('ui.workspace.showSidebar');
+    if (!showSidebar) {
+      return;
+    }
+    const resource = this.options.selectedResources[0];
+    const options = {
+      id: 'js_pwd_details',
+      resource: resource,
+      silentLoading: false,
+      cssClasses: ['panel', 'aside', 'js_wsp_pwd_sidebar_second']
+    };
+    const component = ComponentHelper.create(this.element, 'last', PasswordSecondarySidebarComponent, options);
+    this.options.passwordSecondarySidebar = component;
+    this.addLoadedDependency(component);
+    return component;
+  },
+
+  /**
+   * Destroy the secondary sidebar
+   * @private
+   */
+  _destroySecondarySidebar: function() {
+    if (this.options.passwordSecondarySidebar) {
+      this.options.passwordSecondarySidebar.destroyAndRemove();
+      this.options.passwordSecondarySidebar = null;
+    }
   },
 
   /**
@@ -393,6 +434,25 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       });
   },
 
+  /**
+   * Delete a comment
+   * @param {Comment} comment The target comment
+   */
+  deleteComment: function(comment) {
+    const confirm = ConfirmDialogComponent.instantiate({
+      label: __('Do you really want to delete?'),
+      content: commentDeleteConfirmTemplate,
+      submitButton: {
+        label: __('delete comment'),
+        cssClasses: ['warning']
+      },
+      action: function() {
+        comment.destroy();
+      }
+    });
+    confirm.start();
+  },
+
   /* ************************************************************** */
   /* LISTEN TO THE MODEL EVENTS */
   /* ************************************************************** */
@@ -411,33 +471,26 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   /**
    * Observe when resources are selected
    * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {array<Group>} items The selected items change
    */
-  '{selectedResources} add': function(el, ev, items) {
-    if (this.options.passwordSecondarySidebar) {
-      this.options.passwordSecondarySidebar.remove();
+  '{selectedResources} length': function() {
+    const init = this.options.selectedResources.length == 1;
+    if (init) {
+      const component = this._initSecondarySidebar();
+      if (component) {
+        component.start();
+      }
+    } else {
+      this._destroySecondarySidebar();
     }
-    const resource = items[0];
-    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
-    const options = {
-      id: 'js_pwd_details',
-      resource: resource,
-      silentLoading: false,
-      cssClasses: ['panel', 'aside', 'js_wsp_pwd_sidebar_second'],
-      state: state
-    };
-    const component = ComponentHelper.create(this.element, 'last', PasswordSecondarySidebarComponent, options);
-    component.start();
-    this.options.passwordSecondarySidebar = component;
   },
 
   /**
-   * Observe when resources are selected
+   * Observe when the workspace sidebar setting change.
    */
-  '{selectedResources} remove': function() {
-    if (this.options.passwordSecondarySidebar) {
-      this.options.passwordSecondarySidebar.remove();
+  '{mad.bus.element} workspace_sidebar_state_change': function() {
+    const resource = this.options.selectedResources[0];
+    if (resource) {
+      this._initSecondarySidebar(resource).start();
     }
   },
 
@@ -459,15 +512,13 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     MadBus.trigger('passbolt.import-passwords');
   },
 
-  ///**
-  // * When a new filter is applied to the workspace.
-  // */
-  //'{mad.bus.element} filter_workspace': function() {
-  //  // When filtering the resources browser, unselect all the resources.
-  //  this.options.selectedResources.splice(0, this.options.selectedResources.length);
-  //  // Enable the create button
-  //  this.options.mainButton.setState('ready');
-  //},
+  /**
+   * When a new filter is applied to the workspace.
+   */
+  '{mad.bus.element} filter_workspace': function() {
+    // When filtering the resources browser, unselect all the resources.
+    this.options.selectedResources.splice(0, this.options.selectedResources.length);
+  },
 
   /**
    * Observe when the user requests a resource creation
@@ -552,7 +603,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       format: type,
       resources: resourcesFormated
     };
-    MadBus.trigger('passbolt.export-passwords', data);
+    Plugin.send('passbolt.export-passwords', data);
   },
 
   /**
@@ -575,18 +626,14 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     }
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
   /**
-   * The application is ready.
-   * @param {boolean} go Enter or leave the state
+   * Observe to comment delete request.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
-  stateReady: function(go) {
-    if (go) {
-      this._dispatchRoute();
-    }
+  '{mad.bus.element} request_delete_comment': function(el, ev) {
+    const comment = ev.data.comment;
+    this.deleteComment(comment);
   }
 });
 

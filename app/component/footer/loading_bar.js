@@ -11,229 +11,219 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Ajax from 'passbolt-mad/net/ajax';
 import Component from 'passbolt-mad/component/component';
-import LoadingBarView from 'app/view/component/footer/loading_bar';
-import MadBus from 'passbolt-mad/control/bus';
+import LoadingState from 'app/model/state/loadingState';
 
 const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingBar', /** @static */ {
 
   defaults: {
     label: 'Loading Bar Component',
-    viewClass: LoadingBarView,
-    currentProcs: 0,
-    previousProcs: 0,
-    maxProcs: 0,
-    loadingPercent: 0,
-    postponedUpdate: false,
-    progressionLeft: 100
+    stateClass: LoadingState,
+    components: Component._components,
+    requests: Ajax._requests
   }
 
 }, /** @prototype */ {
 
+  init: function(el, options) {
+    this._super(el, options);
+    this._maxProcesses = 0;
+    this._initialized = false;
+    this._progressing = false;
+    this._completing = false;
+    this._progressedSpace = 0;
+    this._scheduledProgress = null;
+    this._initListeners();
+  },
+
   /**
-   * Start a loading.
+   * Listen to application loading events :
+   * - When components are instantiated
+   * - When request are executed
+   * @private
    */
-  loading_start: function(callback) {
-    this.view.update(20, true, () => {
-      if (callback) {
-        callback();
+  _initListeners: function() {
+    Component._components.on('add', (ev, components) => this._listenComponentInitialized(components));
+    Ajax._requests.on('add', (ev, requests) => this._listenRequestExecuted(requests));
+    Ajax._requests.on('remove', (ev, requests) => this._listenRequestCompleted(requests));
+    this.state.on('loadingProcesses', () => this._update());
+  },
+
+  /**
+   * Handle components instantiation
+   * @param {DefineList} components List of instantiated components.
+   * @private
+   */
+  _listenComponentInitialized: function(components) {
+    components.forEach(component => {
+      if (!component.options.silentLoading) {
+        if (!component.state.loaded && !component.state.destroyed) {
+          this.state.loadingProcesses++;
+        }
+        this._initComponentListeners(component);
       }
     });
   },
 
   /**
-   * Complete a loading.
+   * Handle request execution
+   * @param {DefineList} request List of executed requests.
+   * @private
    */
-  loading_complete: function(callback) {
-    this.options.progressionLeft = 100;
-    this.view.update(100, true, () => {
-      this.view.update(0, false);
-      if (callback) {
-        callback();
+  _listenRequestExecuted: function(requests) {
+    requests.forEach(request => {
+      if (!request.silentLoading) {
+        this.state.loadingProcesses++;
       }
     });
   },
 
   /**
-   * Refresh the loading bar
+   * Handle request completion
+   * @param {DefineList} request List of completed requests.
+   * @private
    */
-  update: function(postponedUpdate) {
-    /*
-     * If we are in a postponed update.
-     * Release the lock and allow other requests to be postponed.
-     */
-    if (typeof postponedUpdate != 'undefined' && postponedUpdate) {
-      this.options.postponedUpdate = false;
+  _listenRequestCompleted: function(requests) {
+    requests.forEach(request => {
+      if (!request.silentLoading) {
+        if (this.state.loadingProcesses) {
+          this.state.loadingProcesses--;
+        }
+      }
+    });
+  },
+
+  /**
+   * Listen to component state changes :
+   * - A component is loading
+   * - A component is loaded
+   * - A component is destroyed
+   * @param {DefineList} request List of executed requests.
+   * @private
+   */
+  _initComponentListeners: function(component) {
+    component.state.on('loaded', (ev, loaded) => this._listenComponentLoadedChanges(component, loaded));
+    component.state.on('destroyed', (ev, loaded) => this._listenComponentDestroyedChanges(component, loaded));
+  },
+
+  /**
+   * Handle components loading / loaded
+   * @param {Component} component
+   * @param {boolean} loaded
+   * @private
+   */
+  _listenComponentLoadedChanges: function(component, loaded) {
+    if (loaded) {
+      if (this.state.loadingProcesses) {
+        this.state.loadingProcesses--;
+      }
+    } else {
+      this.state.loadingProcesses++;
     }
+  },
 
-    // If the loading bar is currently updating.
-    if (this.state.is('updating')) {
-      // Postpone an update, unless one is already scheduled.
-      if (!this.options.postponedUpdate) {
-        this.options.postponedUpdate = true;
-        setTimeout(() => {
-          this.update(true);
-        }, 100);
+  /**
+   * Handle components destroyed
+   * @param {Component} component
+   * @param {boolean} destroyed
+   * @private
+   */
+  _listenComponentDestroyedChanges: function(component, destroyed) {
+    if (destroyed) {
+      if (this.state.loadingProcesses) {
+        this.state.loadingProcesses--;
       }
+    }
+  },
+
+  /**
+   * Update the loading bar.
+   * @param {integer} size Loading percentage
+   * @param {integer} duration The duration of the animation (default 400)
+   */
+  _animateBar: function(size, duration) {
+    duration = duration || 400;
+    const width = `${size}%`;
+    const animateOptions = {width: width, duration: duration};
+    return new Promise(resolve => {
+      $('.progress-bar span', this.element).animate(animateOptions, resolve);
+    });
+  },
+
+  /**
+   * The loading processes number is evolving, update the component.
+   * @private
+   */
+  _update: function() {
+    // If the view is already updating, schedule a new update.
+    if (this._progressing) {
+      if (this._scheduledProgress != null) {
+        clearTimeout(this._scheduledProgress);
+      }
+      this._scheduledProgress = setTimeout(() => this._update(), 100);
       return;
+    }
+
+    this._progressing = true;
+    if (!this._initialized) {
+      this._initProgress();
+    } else if (!this.state.loadingProcesses) {
+      this._completeProgress();
     } else {
-      // Lock the component.
-      this.state.addState('updating');
+      this._updateProgress();
     }
+  },
 
-    /*
-     * Make a temporary working copy of the class' variables.
-     * Measurement are based on these variables, and they can change asynchronously.
-     */
-    const currentProcs = this.options.currentProcs;
-    // If we have more processes in the queue than during the previous execution.
-    if (this.options.maxProcs < currentProcs) {
-      this.options.maxProcs = currentProcs;
-    }
-    // The variation of processes compare to the latest execution of the function.
-    const diffProcs = currentProcs - this.options.previousProcs;
-
-    // As much as processes than during the previous execution. In asynchronous context it can happened.
-    if (!diffProcs) {
-      this.state.removeState('updating');
-    } else if (!currentProcs) {
-      // All processes have been completed. Even if the bar is not in "progressing" state, complete it.
-      this.state.addState('completing');
-      this.loading_complete(() => {
-        /*
-         * Broadcast an event on the app event bus to notify all other components about the
-         * the completion of the currents processes.
-         */
-        MadBus.trigger('passbolt_application_loading_completed', [this]);
-        // Mark the loading bar component as ready.
-        this.state.setState('ready');
+  /**
+   * Initialize the progress.
+   * @private
+   */
+  _initProgress: function() {
+    this._animateBar(15, 0)
+      .then(() => {
+        this._initialized = true;
+        this._progressing = false;
       });
-    } else {
-      /*
-       * Update the loading bar depending on the latest changes.
-       * If there was no other processus currently loading.
-       */
-      if (!this.state.is('progressing')) {
-        /*
-         * Broadcast an event on the app event bus to notify all other components that some
-         * processus are currently in action.
-         */
-        MadBus.trigger('passbolt_application_loading', [this]);
-        this.state.addState('progressing');
-      }
+  },
 
-      /*
-       * A new processus will fill the loading bar at 50%.
-       * The other 50% will be filled while the processes will be completed.
-       */
-      const procSpace = (100 / this.options.maxProcs) * 1 / 2;
-      const spaceLeft = (this.options.maxProcs - (this.options.maxProcs - this.options.currentProcs)) * procSpace;
+  /**
+   * Complete the progress.
+   * @private
+   */
+  _completeProgress: function() {
+    if (this._completing) {
+      return;
+    }
 
-      // The loading bar should only progress.
-      if (spaceLeft <= this.options.progressionLeft) {
-        this.options.progressionLeft = spaceLeft;
-      }
-
-      // Update the view.
-      this.view.update(100 - this.options.progressionLeft, true, () => {
-        this.state.removeState('updating');
+    this._completing = true;
+    this._animateBar(100, 100)
+      .then(() => {
+        $('.progress-bar span', this.element).width(0);
+        this._completing = false;
+        this._progressing = false;
+        this._initialized = false;
+        if (!this.state.loadingProcesses) {
+          this._maxProcesses = 0;
+        }
       });
+  },
+
+  /**
+   * Update the progress.
+   * @private
+   */
+  _updateProgress: function() {
+    this._maxProcesses = Math.max(this._maxProcesses, this.state.loadingProcesses);
+    const procSpace = (100 / this._maxProcesses) * 1 / 2;
+    const spaceLeft = (this._maxProcesses - (this._maxProcesses - this.state.loadingProcesses)) * procSpace;
+
+    // The loading bar should only progress.
+    if (spaceLeft <= this._progressedSpace) {
+      this._progressedSpace = spaceLeft;
     }
-
-    // The processus which are still active.
-    this.options.previousProcs = currentProcs;
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
-  /**
-   * Listen when a component is entering loading state.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} passbolt_component_loading_start': function(el, ev) {
-    const component = ev.data.component;
-    if (!component.options.silentLoading) {
-      this.options.currentProcs++;
-      this.update();
-    }
-  },
-
-  /**
-   * Listen when a component is leaving loading state.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} passbolt_component_loading_complete': function(el, ev) {
-    const component = ev.data.component;
-    if (!component.options.silentLoading) {
-      if (this.options.currentProcs) { this.options.currentProcs--; }
-      this.update();
-    }
-  },
-
-  /**
-   * Listen when an ajax request is starting from mad.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} mad_ajax_request_start': function(el, ev) {
-    const request = ev.data.request;
-    MadBus.trigger('passbolt_ajax_request_start', {request: request});
-  },
-
-  /**
-   * Listen when an ajax request is completed in mad.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} mad_ajax_request_complete': function(el, ev) {
-    const request = ev.data.request;
-    MadBus.trigger('passbolt_ajax_request_complete',  {request: request});
-  },
-
-  /**
-   * Listen when an ajax request is starting.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} passbolt_ajax_request_start': function(el, ev) {
-    const request = ev.data.request;
-    if (!request.silentLoading) {
-      this.options.currentProcs++;
-      this.update();
-    }
-  },
-
-  /**
-   * Listen when an ajax request is completed.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} passbolt_ajax_request_complete': function(el, ev) {
-    const request = ev.data.request;
-    if (!request.silentLoading) {
-      this.options.currentProcs--;
-      this.update();
-    }
-  },
-
-  /**
-   * Listen the event passbolt_loading and display a feedback to the user
-   */
-  '{mad.bus.element} passbolt_loading': function() {
-    this.options.currentProcs++;
-    this.update();
-  },
-
-  /**
-   * Listen the event passbolt_loading_completed and display a feedback to the user
-   */
-  '{mad.bus.element} passbolt_loading_complete': function() {
-    this.options.currentProcs--;
-    this.update();
+    this._animateBar(100 - this._progressedSpace, 100)
+      .then(() => this._progressing = false);
   }
 });
 

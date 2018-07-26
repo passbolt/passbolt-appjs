@@ -1,5 +1,5 @@
 <div class="accordion-header">
-    <h4><a role="button">{{ __('Group Members') }}</a></h4>
+    <h4><a class="accordion-trigger" role="button">{{ __('Group Members') }}</a></h4>
 </div>
 
 <div class="accordion-content">

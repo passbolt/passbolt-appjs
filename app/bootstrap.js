@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import 'app/config/routes.js';
+import Ajax from 'app/net/ajax';
 import cookies from 'browser-cookies/src/browser-cookies';
 import AccountSetting from 'app/model/map/accountSetting';
 import Bootstrap from 'passbolt-mad/bootstrap';
@@ -19,6 +20,8 @@ import Config from 'passbolt-mad/config/config';
 import AppComponent from 'app/component/app';
 import Role from 'app/model/map/role';
 import User from 'app/model/map/user';
+import notificationConfig from 'app/config/notification.json';
+import appConfig from 'app/config/config.json';
 
 const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 
@@ -30,8 +33,9 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
   init: function(options) {
     this._super(options);
     this._csrfToken();
-    Promise.all([this._loadUser(), this._loadRoles(), this._loadAccountSettings()])
-      .then(this._loadApp)
+    Promise.all([this._loadSettings(), this._loadUser(), this._loadRoles()])
+      .then(() => this._loadAccountSettings())
+      .then(() => this._loadApp())
       .then(null, e => { throw e; });
   },
 
@@ -41,6 +45,20 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
   _csrfToken: function() {
     const csrfToken = cookies.get('csrfToken');
     Config.write('app.csrfToken', csrfToken);
+  },
+
+  /**
+   * Load the application settings
+   */
+  _loadSettings: function() {
+    const url = 'settings.json?contain[header]=0';
+    const silentNotify = true;
+    return Ajax.request({url: url, silentNotify: silentNotify})
+      .then(data => {
+        Config.load({server: data});
+        Config.load(appConfig);
+        Config.load(notificationConfig);
+      });
   },
 
   /**

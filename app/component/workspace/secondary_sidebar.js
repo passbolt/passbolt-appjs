@@ -21,7 +21,6 @@ const SecondarySidebarComponent = Component.extend('passbolt.component.workspace
 
   defaults: {
     label: 'Sidebar Component',
-    // template uri.
     template: template
   }
 
@@ -47,8 +46,9 @@ const SecondarySidebarComponent = Component.extend('passbolt.component.workspace
    * Observe when the workspace sidebar setting change.
    */
   '{mad.bus.element} workspace_sidebar_state_change': function() {
-    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
-    this.setState(state);
+    if (!Config.read('ui.workspace.showSidebar')) {
+      this.destroyAndRemove();
+    }
   },
 
   /**

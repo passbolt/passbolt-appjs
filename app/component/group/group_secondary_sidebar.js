@@ -23,10 +23,19 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
   defaults: {
     label: 'Group Details Controller',
     template: template,
-    group: null
+    group: null,
+    Group: Group
   }
 
 }, /** @prototype */ {
+
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    this._super(el, options);
+    this._latestGroupModified = options.group.modified;
+  },
 
   /**
    * @inheritdoc
@@ -74,7 +83,7 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
    */
   _initInformationSection: function() {
     const group = this.options.group;
-    const component = new InformationSectionComponent('#js_group_details_information', {group});
+    const component = new InformationSectionComponent('#js_group_details_information', {group: group});
     component.start();
   },
 
@@ -85,15 +94,25 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
   _initGroupUsersSection: function() {
     const group = this.options.group;
     const cssClasses = ['closed'];
-    const component = new GroupUsersSectionComponent('#js_group_details_members', {group, cssClasses});
+    const component = new GroupUsersSectionComponent('#js_group_details_members', {group: group, cssClasses: cssClasses});
     component.start();
   },
 
   /**
-   * Observe when the group is updated.
+   * Observe when a group is updated.
+   * @param {Group.prototype} Constructor The constructor
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Group} group The created group
    */
-  '{group} updated': function() {
-    this.setTitle(this.options.selectedItem.name);
+  '{Group} updated': function(Constructor, ev, group) {
+    if (this.options.group.id != group.id) {
+      return;
+    }
+    const isGroupUpdated = this._latestGroupModified != group.modified;
+    if (isGroupUpdated) {
+      this._latestGroupModified = group.modified;
+      this.refresh();
+    }
   }
 
 });

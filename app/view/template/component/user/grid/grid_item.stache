@@ -1,0 +1,13 @@
+<tr id="{{id}}" class="{{#unless(mappedItem.active)}}inactive{{/unless}}">
+
+{{#each(columnModels, columnModel=value num=index)}}
+	<td class="js_grid_column_{{name}} cell_{{name}} {{css.join(' ')}}">
+		{{#if(columnModel.template)}}
+			{{>columnModel.template}}
+		{{#else}}
+			{{>../cellTemplate}}
+		{{/if}}
+	</td>
+{{/each}}
+
+</tr>

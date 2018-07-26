@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Comment from 'app/model/map/comment';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
@@ -24,12 +23,6 @@ const CreateForm = Form.extend('passbolt.form.comment.Create', /** @static */ {
   defaults: {
     foreignModel: null,
     foreignKey: null,
-    callbacks: {
-      submit: function(data) {
-        const comment = new Comment(data['Comment']);
-        comment.save();
-      }
-    },
     template: template,
     commentContentField: null
   }

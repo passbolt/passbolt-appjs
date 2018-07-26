@@ -23,6 +23,7 @@ import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
 import PrimaryMenuComponent from 'app/component/settings/workspace_primary_menu';
 import ProfileComponent from 'app/component/profile/profile';
+import route from 'can-route';
 import TabComponent from 'passbolt-mad/component/tab';
 import ThemeComponent from 'app/component/settings/theme';
 import User from 'app/model/map/user';
@@ -48,23 +49,32 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
   /**
    * @inheritdoc
    */
+  init: function(el, options) {
+    this._super(el, options);
+    this._initRouteListener();
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    route.data.on('action', () => {
+      if (route.data.controller == 'Settings') {
+        this._dispatchRoute();
+      }
+    });
+  },
+
+  /**
+   * @inheritdoc
+   */
   afterStart: function() {
     this._initPrimaryMenu();
     this._initPrimarySidebar();
     this._initBreadcrumb();
     this._initTabs();
-  },
-
-  /**
-   * Destroy the workspace.
-   */
-  destroy: function() {
-    // Be sure that the primary workspace menu controller will be destroyed also.
-    $('#js_wsp_primary_menu_wrapper').empty();
-    // Destroy the breadcrumb too.
-    $('#js_wsp_settings_breadcrumb').empty();
-
-    this._super();
+    this._dispatchRoute();
   },
 
   /**
@@ -74,12 +84,8 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
    * @see destroy()
    */
   _initPrimaryMenu: function() {
-    const menu = ComponentHelper.create(
-      $('#js_wsp_primary_menu_wrapper'),
-      'last',
-      PrimaryMenuComponent,
-      {}
-    );
+    const selector = $('#js_wsp_primary_menu_wrapper');
+    const menu = ComponentHelper.create(selector, 'last', PrimaryMenuComponent, {});
     menu.start();
   },
 
@@ -151,17 +157,17 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
       autoMenu: false // do not generate automatically the associated tab nav
     });
     tabs.start();
-    this.settingsTabsCtl = tabs;
+    this.tabs = tabs;
 
     // Profile tab
-    tabs.addComponent(ProfileComponent, {
+    tabs.addTab(ProfileComponent, {
       id: 'js_settings_wk_profile_controller',
       label: 'profile',
       user: User.getCurrent()
     });
 
     // Keys tab
-    tabs.addComponent(KeysComponent, {
+    tabs.addTab(KeysComponent, {
       id: 'js_settings_wk_profile_keys_controller',
       label: 'keys'
     });
@@ -169,11 +175,20 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
     // Theme tab
     const plugins = Config.read('server.passbolt.plugins');
     if (plugins && plugins.accountSettings) {
-      tabs.addComponent(ThemeComponent, {
+      tabs.addTab(ThemeComponent, {
         id: 'js_settings_wk_profile_theme_controller',
         label: 'theme'
       });
     }
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    const section = route.data.action;
+    MadBus.trigger('request_settings_section', {section: section});
   },
 
   /**
@@ -202,7 +217,6 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
 
   /**
    * Save the user.
-   *
    * @param {User} user The target user
    * @param {Form} form The form object
    * @param {Dialog} dialog The dialog object
@@ -275,22 +289,27 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
     const menu = this.options.primarySidebarMenu;
 
     switch (section) {
-      case 'keys' :
+      case 'keys': {
         tabId = 'js_settings_wk_profile_keys_controller';
         menuItem = this.options.primarySidebarKeysItem;
         break;
-      case 'profile' :
+      }
+      case 'profile': {
         tabId = 'js_settings_wk_profile_controller';
         menuItem = this.options.primarySidebarProfileItem;
         break;
-      case 'theme' :
+      }
+      case 'theme': {
         tabId = 'js_settings_wk_profile_theme_controller';
         menuItem = this.options.primarySidebarThemeItem;
         break;
+      }
     }
 
     // Enable the tab
-    this.settingsTabsCtl.enableTab(tabId);
+    this.tabs.enableTab(tabId);
+    // @todo remove .tab-content display none rules from the css
+    $('.tab-content', this.element).show();
 
     // Set class on top container.
     $('#container')
@@ -299,40 +318,6 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
 
     // Select corresponding section in the menu.
     menu.selectItem(menuItem);
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
-  /**
-   * The application is ready.
-   */
-  stateReady: function() {
-    const section = 'profile';
-    MadBus.trigger('request_settings_section', {section: section});
-  },
-
-  /**
-   * state disabled.
-   * @param go
-   */
-  stateDisabled: function(go) {
-    this._super(go);
-    // Remove container class.
-    $('#container')
-      .removeClass(this.options.sections.join(" "));
-  },
-
-  /**
-   * state hidden.
-   * @param go
-   */
-  stateHidden: function(go) {
-    this._super(go);
-    // Remove container class.
-    $('#container')
-      .removeClass(this.options.sections.join(" "));
   }
 });
 export default SettingsWorkspaceComponent;

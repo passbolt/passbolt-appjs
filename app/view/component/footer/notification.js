@@ -56,10 +56,10 @@ const NotificationView = View.extend('passbolt.view.component.Notification', /**
         .removeClass('fadeInUp')
         .addClass('fadeOutUp');
 
-      this.getController().state.addState('hiddening');
+      this.getController().state.hiddening = true;
       setTimeout(() => {
-        if (this.getController().state.is('hiddening')) {
-          this.getController().setState('hidden');
+        if (this.getController().state.hiddening) {
+          this.getController().state.hidden = true;
         }
       }, 500);
     }
@@ -98,7 +98,7 @@ const NotificationView = View.extend('passbolt.view.component.Notification', /**
    * Observe the mouse down event.
    * Put the notificator in pause.
    */
-  ' mousedown': function() {
+  '{element} mousedown': function() {
     this.options.pause = true;
     clearTimeout(this.options.timeoutProcess);
   },
@@ -108,7 +108,7 @@ const NotificationView = View.extend('passbolt.view.component.Notification', /**
    * Display the next notification if the user is not trying to select the notification text.
    * Otherwise keep the notificator in pause.
    */
-  ' mouseup': function() {
+  '{element} mouseup': function() {
     const selection = window.getSelection().toString();
     if (selection === '') {
       this.displayNext();

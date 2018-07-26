@@ -32,7 +32,6 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
   defaults: {
     label: 'Sidebar Section Tag Controller',
     template: template,
-    state: 'loading',
     resource: null
   }
 
@@ -43,6 +42,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    */
   beforeRender: function() {
     this._super();
+    this._editing = false;
     this.setViewData('resource', this.options.resource);
   },
 
@@ -53,7 +53,6 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     const tree = this._initTree();
     this.options.tree = tree;
     this._loadTags(this.options.resource.tags);
-    this.setState('ready');
   },
 
   /**
@@ -68,8 +67,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
       itemClass: Tag,
       itemTemplate: itemTemplate,
       prefixItemId: 'js_rs_details_tags_list_',
-      map: map,
-      state: 'loading'
+      map: map
     });
     tree.start();
 
@@ -138,10 +136,10 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * Destroy form
    */
   _destroyForm: function() {
-    this.state.removeState('editing');
+    this._editing = false;
     const tagEditorSelector = '#js_edit_tags_form';
     $(tagEditorSelector).remove();
-    this.options.tree.setState('ready');
+    this.options.tree.state.hidden = false;
   },
 
   /**
@@ -206,7 +204,6 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     if (tags.length) {
       this.options.tree.load(tags);
     }
-    this.options.tree.setState('ready');
   },
 
   /**
@@ -262,11 +259,11 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * Save the list of tags
    */
   '{element} #js_edit_tags_button click': function() {
-    if (this.state.is('editing')) {
+    if (this._editing) {
       return;
     }
-    this.state.addState('editing');
-    this.options.tree.setState('hidden');
+    this._editing = true;
+    this.options.tree.state.hidden = true;
     this._initForm();
   },
 

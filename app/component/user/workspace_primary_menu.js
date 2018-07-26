@@ -24,7 +24,6 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     label: 'User Workspace Menu Controller',
     tag: 'ul',
     template: template,
-    // the selected users, you can pass an existing list as parameter of the constructor to share the same list
     selectedUsers: new User.List()
   }
 
@@ -42,61 +41,63 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
    * @inheritdoc
    */
   afterStart: function() {
-    const role = User.getCurrent().role.name;
-
+    const isAdmin = User.getCurrent().isAdmin();
     // Only admin can edit/delete users
-    if (role == 'admin') {
+    if (isAdmin) {
       // Edit user
       const editButton = new ButtonComponent('#js_user_wk_menu_edition_button', {
-        state: 'disabled'
+        state: {
+          disabled: true
+        },
+        events: {
+          click: () => this._edit()
+        }
       });
       editButton.start();
-      this.options.editButton = editButton;
+      this.editButton = editButton;
 
       // Delete user
       const deleteButton = new ButtonComponent('#js_user_wk_menu_deletion_button', {
-        state: 'disabled'
+        state: {
+          disabled: true
+        },
+        events: {
+          click: () => this._delete()
+        }
       });
       deleteButton.start();
-      this.options.deleteButton = deleteButton;
+      this.deleteButton = deleteButton;
     }
 
     this.on();
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
   /**
-   * Observe when the user wants to edit an instance (Resource, User depending of the active workspace)
+   * Delete
    */
-  '{editButton.element} click': function() {
-    const user = this.options.selectedUsers[0];
-    MadBus.trigger('request_user_edition', {user: user});
-  },
-
-  /**
-   * Observe when the user wants to delete an instance (Resource, User depending of the active workspace)
-   */
-  '{deleteButton.element} click': function() {
+  _delete: function() {
     const user = this.options.selectedUsers[0];
     MadBus.trigger('request_user_deletion', {user: user});
   },
 
   /**
+   * Edit
+   */
+  _edit: function() {
+    const user = this.options.selectedUsers[0];
+    MadBus.trigger('request_user_edition', {user: user});
+  },
+
+
+  /**
    * Observe when a user is selected
    */
   '{selectedUsers} add': function() {
-    // if no user selected.
-    if (this.options.selectedUsers.length == 0) {
-      this.setState('ready');
-    } else if (this.options.selectedUsers.length == 1) {
-      // else if only 1 user is selected show the details
-      this.setState('selection');
+    const resourceSelected = this.options.selectedUsers.length == 1;
+    if (resourceSelected) {
+      this.userSelected();
     } else {
-      // else if more than one resource have been selected
-      this.setState('multiSelection');
+      this.reset();
     }
   },
 
@@ -104,85 +105,33 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
    * Observe when a user is unselected
    */
   '{selectedUsers} remove': function() {
-    // if more than one resource selected, or no resource selected
-    if (this.options.selectedUsers.length == 0) {
-      this.setState('ready');
-
-      // else if only 1 resource selected show the details
-    } else if (this.options.selectedUsers.length == 1) {
-      this.setState('selection');
-
-      // else if more than one resource have been selected
-    } else {
-      this.setState('multiSelection');
-    }
+    this.reset();
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
   /**
-   * Listen to the change relative to the state selected
-   * @param {boolean} go Enter or leave the state
+   * A user is selected, adapt the buttons states.
    */
-  stateSelection: function(go) {
-    // Is the current user an admin.
-    const isAdmin = User.getCurrent().role.name == 'admin';
-
-    // If user is an admin, we enable the controls.
+  userSelected: function() {
+    const currentUser = User.getCurrent();
+    const isAdmin = currentUser.role.name == 'admin';
     if (isAdmin) {
-      if (go) {
-        // Is the selected user same as the current user.
-        const isSelf = User.getCurrent().id == this.options.selectedUsers[0].id;
-
-        this.options.editButton
-          .setValue(this.options.selectedUsers[0])
-          .setState('ready');
-
-        // If the user has not selected himself.
-        if (!isSelf) {
-          // Activate the delete button.
-          this.options.deleteButton
-            .setValue(this.options.selectedUsers)
-            .setState('ready');
-        } else {
-          // If user has selected himself, delete is not available.
-          this.options.deleteButton
-            .setValue(null)
-            .setState('disabled');
-        }
-      } else {
-        this.options.editButton
-          .setValue(null)
-          .setState('disabled');
-        this.options.deleteButton
-          .setValue(null)
-          .setState('disabled');
+      const user = this.options.selectedUsers[0];
+      const isSelf = currentUser.id == user.id;
+      if (!isSelf) {
+        this.deleteButton.state.disabled = false;
       }
+      this.editButton.state.disabled = false;
     }
   },
 
   /**
-   * Listen to the change relative to the state multiSelection
-   * @param {boolean} go Enter or leave the state
+   * Reset the buttons states to their original.
    */
-  stateMultiSelection: function(go) {
-    if (User.getCurrent().role.name == 'admin') {
-      if (go) {
-        this.options.editButton
-          .setState('disabled');
-        this.options.deleteButton
-          .setValue(this.options.selectedUsers)
-          .setState('ready');
-      } else {
-        this.options.editButton
-          .setValue(null)
-          .setState('disabled');
-        this.options.deleteButton
-          .setValue(null)
-          .setState('disabled');
-      }
+  reset: function() {
+    const isAdmin = User.getCurrent().isAdmin();
+    if (isAdmin) {
+      this.deleteButton.state.disabled = true;
+      this.editButton.state.disabled = true;
     }
   }
 

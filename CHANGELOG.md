@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2896: Fix filter by tag from the password details sidebar
 - PASSBOLT-2906: Enable CSRF protection
 - PASSBOLT-2903: Fix logout link. It should target a full based url link
+- PASSBOLT-2933: Upgrade to canjs 4
+- PASSBOLT-2926: Fix session timeout check
 
 ## [2.1.0] - 2018-06-14
 ### Added

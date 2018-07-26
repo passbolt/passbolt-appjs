@@ -40,10 +40,7 @@ const ProfileComponent = Component.extend('passbolt.component.profile.Profile', 
    * Observe when the user is updated
    */
   '{user} updated': function() {
-    // The reference of the user does not change, refresh the component
-    if (!this.state.is('disabled') && !this.state.is(null)) {
-      this.refresh();
-    }
+    this.refresh();
   },
 
   /* ************************************************************** */

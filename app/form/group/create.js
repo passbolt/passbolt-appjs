@@ -35,17 +35,14 @@ const CreateForm = Form.extend('passbolt.form.group.Create', /** @static */ {
     // Add user first name field.
     this.addElement(
       new TextboxComponent('#js_field_name', {
-        modelReference: 'Group.name'
+        modelReference: 'Group.name',
+        state: {
+          disabled: !this.options.canUpdateName
+        }
       }).start(),
       new FeedbackComponent('#js_field_name_feedback', {}).start()
     );
 
-    // Disable name field if the user is not allowed to update it.
-    if (this.options.canUpdateName == false) {
-      $('#js_field_name').attr('disabled', 'disabled');
-    }
-
-    // Rebind controller events
     this.on();
   }
 

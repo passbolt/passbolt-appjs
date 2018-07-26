@@ -23,12 +23,6 @@
 	</a>
 </li>
 <li>
-	<a id="js_wk_menu_export_button" class="button hidden">
-		<i class="fa fa-fw fa-cloud-download"></i>
-		<span><%= __('export') %></span>
-	</a>
-</li>
-<li>
 	<div class="dropdown">
 		<a id="js_wk_menu_more_button" class="button">
 			<span>{{ __('more') }}</span>

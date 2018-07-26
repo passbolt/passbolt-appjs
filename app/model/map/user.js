@@ -24,6 +24,7 @@ import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import Profile from 'app/model/map/profile';
 import Role from 'app/model/map/role';
+import uuid from 'uuid/v4';
 
 const User = DefineMap.extend('passbolt.model.User', {
   id: 'string',
@@ -96,38 +97,41 @@ User.setCurrent = function(user) {
  * @param params {array} The file to save
  */
 User.prototype.saveAvatar = function(file) {
-  const request = {};
-  request._xhr = null;
-  request.params = new FormData();
-  request.params.id = this.id;
-  request.params.append('id', this.id);
-  request.params.append('profile[avatar][file]', file);
-
-  // @todo Cannot use Ajax.request, the can ajax layer cannot use the multipart/form-data content type.
-  Ajax._triggerAjaxStartEvent(request);
-  return $.ajax({
+  const request = {
+    _xhr: null,
+    id: uuid(),
     url: `users/${this.id}.json?api-version=v2`,
     method: 'POST',
     cache: false,
     contentType: false,
     processData: false,
-    data: request.params,
     headers: {'X-CSRF-Token': Config.read('app.csrfToken')},
     beforeSend: xhr => { request._xhr = xhr; }
-  }).then(data => Ajax.handleSuccess(request, data)
-    .then(data => {
-      this.profile.assign({avatar: data.profile.avatar});
-      this.dispatch('updated');
-      return Promise.resolve(this);
-    }), jqXHR => {
-    let jsonData = {};
-    if (jqXHR.responseText) {
-      try {
-        jsonData = $.parseJSON(jqXHR.responseText);
-      } catch (e) { }
-    }
-    return Ajax.handleError(request, jsonData);
-  });
+  };
+  request.params = new FormData();
+  request.params.id = this.id;
+  request.params.append('id', this.id);
+  request.params.append('profile[avatar][file]', file);
+  request.data = request.params;
+
+  // @todo Cannot use Ajax.request, the can ajax layer cannot use the multipart/form-data content type.
+  Ajax._registerRequest(request);
+  return $.ajax(request)
+    .then(data => Ajax.handleSuccess(request, data)
+      .then(data => {
+        this.profile.assign({avatar: data.profile.avatar});
+        this.dispatch('updated');
+        Ajax._unregisterRequest(request);
+        return Promise.resolve(this);
+      }), jqXHR => {
+      let jsonData = {};
+      if (jqXHR.responseText) {
+        try {
+          jsonData = $.parseJSON(jqXHR.responseText);
+        } catch (e) { }
+      }
+      return Ajax.handleError(request, jsonData);
+    });
 };
 
 User.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {

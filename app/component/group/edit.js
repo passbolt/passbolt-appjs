@@ -36,13 +36,11 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
     cssClasses: ['share-tab'],
     viewClass: EditView,
     template: template,
-    state: 'loading',
-    resource: null,
+    loadedOnStart: false,
     GroupUserChanges: [],
     data: {
       Group: {}
     },
-    // Component callbacks
     callbacks: {
       saved: null
     }
@@ -68,8 +66,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
       .then(() => this._initSaveButton())
       .then(() => {
         if (this.formState == 'create') {
-          this.options.state = 'ready';
-          this.setState('ready');
+          this.state.loaded = true;
         }
         this.showFeedback();
         this.on();
@@ -140,7 +137,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
 
   /**
    * Get the group users list map.
-   * @returns {mad.Map}
+   * @return {UtilMap}
    */
   _getGroupUsersListMap: function() {
     return new MadMap({
@@ -174,11 +171,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
    */
   _initSaveButton: function() {
     this.options.saveChangesButton = new ButtonComponent('#js_group_save', {
-      /*
-       * By default it is disabled, it will be enabled once the user has entered
-       * a name and added a group admin.
-       */
-      state: 'disabled'
+      state: {disabled: true}
     }).start();
   },
 
@@ -224,27 +217,16 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
   },
 
   /**
-   * Load a group to edit.
-   *
+   * Load a group to edit
    * @param group
    */
   loadGroup: function(group) {
-    const self = this;
-
-    // Update the form with the group data.
     this.formGroup.load({Group: group});
-
-    // Load groupUsers.
     group.groups_users.forEach(groupUser => {
-      self.addGroupUser(groupUser);
+      this.addGroupUser(groupUser);
     });
 
-    /*
-     * Mark the component as ready.
-     * If the component rendering is slower than the time the plugin makes to retrieve the group.
-     */
-    this.options.state = 'ready';
-    this.setState('ready');
+    this.state.loaded = true;
   },
 
   /**
@@ -333,7 +315,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
 
   /**
    * Check whether there are enough group managers, and lock the neccessary is_admin fields if necessary.
-   * @returns {boolean}
+   * @return {boolean}
    */
   checkManager: function() {
     const admins = this.groupUserList.options.items.filter(item => item.is_admin === true);
@@ -348,8 +330,8 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         const permDeleteButton = this._permissionDeleteButtons[admin.id];
 
         // Disable the permission type field and the permission delete button
-        permTypeDropdown.setState('ready');
-        permDeleteButton.setState('ready');
+        permTypeDropdown.state.disabled = false;
+        permDeleteButton.state.disabled = false;
       });
     } else if (admins.length == 1) {
       // If only one admin, the membership of the admin cannot be changed.
@@ -357,15 +339,15 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
       const permDeleteButton = this._permissionDeleteButtons[admins[0].id];
 
       // Disable the permission type field and the permission delete button
-      permTypeDropdown.setState('disabled');
-      permDeleteButton.setState('disabled');
+      permTypeDropdown.state.disabled = true;
+      permDeleteButton.state.disabled = true;
     }
 
     // If at least one admin is set, the form can be saved.
     if (admins.length) {
-      this.options.saveChangesButton.setState('ready');
+      this.options.saveChangesButton.state.disabled = false;
     } else {
-      this.options.saveChangesButton.setState('disabled');
+      this.options.saveChangesButton.state.disabled = true;
     }
 
     return admins.length >= 1;
@@ -402,7 +384,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
    * The user request the form to be saved.
    */
   '{saveChangesButton.element} click': function() {
-    if (this.state.is('ready')) {
+    if (this.state.loaded) {
       // Validate form.
       const validate = this.formGroup.validate();
 
@@ -414,14 +396,8 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         MadBus.trigger('passbolt_loading');
         Plugin.groupEditIframeSave(groupJson);
 
-        /*
-         * Switch the component in loading state.
-         * The ready state will be restored once the component will be refreshed.
-         */
-        this.setState('loading');
-
-        // Button goes in processing state.
-        this.options.saveChangesButton.setState('processing');
+        this.state.loaded = false;
+        this.options.saveChangesButton.loaded = false;
       }
     }
   },
@@ -465,7 +441,6 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
     $.extend(data.user, data.user.User);
     delete data.user.User;
     delete data.user.GroupUser;
-
     const groupUser = new GroupUser(data);
     this.addGroupUser(groupUser);
   },
@@ -513,10 +488,10 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         if (this.formState == 'create') {
           Group.dispatch('created', [group]);
         } else {
-          MadBus.trigger('group_replaced', {group: group});
+          Group.dispatch('updated', [group]);
         }
 
-        this.setState('ready');
+        this.state.loaded = true;
         MadBus.trigger('passbolt_loading_complete');
         MadBus.trigger('passbolt_notify', {
           status: 'success',
@@ -561,11 +536,8 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
       data: errorResponse
     });
 
-    // The ready state is restored.
-    this.setState('ready');
-
-    // Button goes back in processing state.
-    this.options.saveChangesButton.setState('ready');
+    this.state.loaded = true;
+    this.options.saveChangesButton.loaded = true;
   },
 
   /* ************************************************************** */

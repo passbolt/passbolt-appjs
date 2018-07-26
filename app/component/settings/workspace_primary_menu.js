@@ -30,17 +30,23 @@ const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Work
    */
   afterStart: function() {
     // Edit user
-    const editButton = new ButtonComponent('#js_settings_wk_menu_edition_button', {});
+    const editButton = new ButtonComponent('#js_settings_wk_menu_edition_button', {
+      state: {hidden: true}
+    });
     editButton.start();
     this.options.editButton = editButton;
 
     // Download public key
-    const publicKeyButton = new ButtonComponent('#js_settings_wk_menu_download_public_key', {});
+    const publicKeyButton = new ButtonComponent('#js_settings_wk_menu_download_public_key', {
+      state: {hidden: true}
+    });
     publicKeyButton.start();
     this.options.publicKeyButton = publicKeyButton;
 
     // Download private key
-    const privateKeyButton = new ButtonComponent('#js_settings_wk_menu_download_private_key', {});
+    const privateKeyButton = new ButtonComponent('#js_settings_wk_menu_download_private_key', {
+      state: {hidden: true}
+    });
     privateKeyButton.start();
     this.options.privateKeyButton = privateKeyButton;
 
@@ -84,13 +90,13 @@ const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Work
   '{mad.bus.element} request_settings_section': function(el, ev) {
     const section = ev.data.section;
     if (section == 'profile') {
-      this.options.editButton.setState('ready');
-      this.options.publicKeyButton.setState('hidden');
-      this.options.privateKeyButton.setState('hidden');
+      this.options.editButton.state.hidden = false;
+      this.options.publicKeyButton.state.hidden = true;
+      this.options.privateKeyButton.state.hidden = true;
     } else if (section == 'keys') {
-      this.options.editButton.setState('hidden');
-      this.options.publicKeyButton.setState('ready');
-      this.options.privateKeyButton.setState('ready');
+      this.options.editButton.state.hidden = true;
+      this.options.publicKeyButton.state.hidden = false;
+      this.options.privateKeyButton.state.hidden = false;
     }
   }
 });

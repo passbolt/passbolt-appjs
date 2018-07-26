@@ -43,7 +43,6 @@ const UserGridView = GridView.extend('passbolt.view.component.user.Grid', /** @s
   '{element} tbody tr mousedown': function(el, ev) {
     ev.stopPropagation();
     ev.preventDefault();
-
     if (ev.which == 3) {
       const itemClass = this.getController().getItemClass();
       const item = DomData.get(el, itemClass.shortName);

@@ -3,7 +3,7 @@
         <div class="row title">
             <div class="main-cell-wrapper">
                 <div class="main-cell">
-                    <h3>{{ __('All groups') }}</h3>
+                    <h3><a class="accordion-trigger">{{ __('All groups') }}</a></h3>
                 </div>
             </div>
         </div>

@@ -15,6 +15,7 @@ import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import domEvents from 'can-dom-events';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
+import isEmptyObject from "can-util/js/is-empty-object/is-empty-object";
 import MadMap from 'passbolt-mad/util/map/map';
 import Permission from 'app/model/map/permission';
 import PermissionType from 'app/model/map/permission_type';
@@ -37,11 +38,12 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     // The resource instance to bind the component on.
     acoInstance: null,
     // The list of changes.
-    changes: [],
+    changes: {},
     // The template used to render the permissions component.
     template: template,
     // Override the silentLoading parameter.
     silentLoading: false,
+    loadedOnStart: false,
     // The initial state the component will be initialized on (after start).
     state: 'loading',
     // Component callbacks
@@ -70,6 +72,22 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
   _isAdmin: function() {
     const permission = this.options.acoInstance.permission;
     return permission.isAllowedTo(PermissionType.ADMIN);
+  },
+
+  /**
+   * @inheritdoc
+   */
+  onLoadedChange: function(loaded) {
+    const saveButton = this.options.saveChangesButton;
+    const isDirty = !isEmptyObject(this.options.changes);
+    if (loaded) {
+      if (isDirty) {
+        saveButton.state.disabled = false;
+      }
+    } else {
+      saveButton.state.disabled = true;
+    }
+    this._super(loaded);
   },
 
   /**
@@ -150,7 +168,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     // Add a button to control the final save action
     this.options.saveChangesButton = new ButtonComponent('#js_rs_share_save', {
       // By default it is disabled, it will be enabled once the user has changed something.
-      state: 'disabled'
+      state: {disabled: true}
     }).start();
 
     this.on();
@@ -182,7 +200,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
       modelReference: 'passbolt.model.Permission.type',
       availableValues: availablePermissionTypes,
       // If the current user has no admin right, disable this action.
-      state: this._isAdmin() ? 'ready' : 'disabled'
+      state: {disabled: !this._isAdmin()}
     })
       .start()
       .setValue(permission.type);
@@ -191,7 +209,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     this._permissionDeleteButtons[permission.id] = new ButtonComponent(`${actionSelector} .js_perm_delete`, {
       id: `js_share_perm_delete_${permission.id}`,
       // If the current user has no admin right, disable this action.
-      state: this._isAdmin() ? 'ready' : 'disabled'
+      state: {disabled: !this._isAdmin()}
     }).start();
 
     // If the permission is temporary and requires a final save action to be applied.
@@ -213,7 +231,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     this.options.changes = {};
 
     // change the state of the component to loading.
-    this.setState('loading');
+    this.state.loaded = false;
 
     // get permissions for the given resource
     return Permission.findAll({
@@ -233,8 +251,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
         self.checkOwner();
       }
 
-      // change the state of the component to loading
-      self.setState('ready');
+      this.state.loaded = true;
     }, function() {
       console.log('an error occured');
       console.log(arguments);
@@ -245,8 +262,6 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
    * Refresh
    */
   refresh: function() {
-    const self = this;
-
     // hide the user feedback.
     $('#js_permissions_changes').addClass('hidden');
 
@@ -262,7 +277,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     this.load(this.options.acoInstance)
       .done(() => {
       // Switch the component in ready state.
-        self.setState('ready');
+        this.state.loaded = true;
       });
   },
 
@@ -274,8 +289,8 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     $permissionChanges.removeClass('hidden');
 
     // Enable the save change button
-    if (this.options.saveChangesButton.state.is('disabled')) {
-      this.options.saveChangesButton.setState('ready');
+    if (this.options.saveChangesButton.state.disabled) {
+      this.options.saveChangesButton.state.disabled = false;
     }
   },
 
@@ -287,8 +302,8 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
     $permissionChanges.addClass('hidden');
 
     // Disable the save change button
-    if (this.options.saveChangesButton.state.is('ready')) {
-      this.options.saveChangesButton.setState('disabled');
+    if (!this.options.saveChangesButton.state.disabled) {
+      this.options.saveChangesButton.state.disabled = true;
     }
   },
 
@@ -329,8 +344,8 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
       const permDeleteButton = this._permissionDeleteButtons[ownerPermissions[0].id];
 
       // Disable the permission type field and the permission delete button
-      permTypeDropdown.setState('disabled');
-      permDeleteButton.setState('disabled');
+      permTypeDropdown.state.disabled = true;
+      permDeleteButton.state.disabled = true;
     } else if (ownerPermissions.length > 1) {
       // If several owners, make the permission type dropdown and permission delete button enabled
       for (const i in ownerPermissions) {
@@ -338,8 +353,8 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
         const permDeleteButton = this._permissionDeleteButtons[ownerPermissions[i].id];
 
         // Disable the permission type field and the permission delete button
-        permTypeDropdown.setState('ready');
-        permDeleteButton.setState('ready');
+        permTypeDropdown.state.disabled = false;
+        permDeleteButton.state.disabled = false;
       }
     }
   },
@@ -517,7 +532,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
    * The encryption has been canceled.
    */
   '{mad.bus.element} passbolt.plugin.share.canceled': function() {
-    this.setState('ready');
+    this.state.loaded = true;
   },
 
   /**
@@ -600,7 +615,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
      * Switch the component in loading state.
      * The ready state will be restored once the component will be refreshed.
      */
-    this.setState('loading');
+    this.state.loaded = false;
 
     /*
      * Extract the users the secret should be encrypted for by extracting the information from the changes.
@@ -621,31 +636,6 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
      * Once the plugin has encrypted the secret, it sends back an event resource_share_encrypted.
      */
     Plugin.shareIframeEncrypt();
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO ANY STATES CHANGES */
-  /* ************************************************************** */
-
-  /**
-   * Listen to any changes relative to the state Loading
-   * Override this function if you want add a specific behavior.
-   *
-   * @param {boolean} go Entering or leaving the state
-   */
-  stateLoading: function(go) {
-    const saveButton = this.options.saveChangesButton;
-    if (go) {
-      if (saveButton) {
-        saveButton.setState('disabled');
-      }
-    } else {
-      if (this.options.changes.length) {
-        saveButton.setState('ready');
-      }
-    }
-
-    this._super(go);
   }
 
 });

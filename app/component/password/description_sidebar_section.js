@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import DescriptionView from 'app/view/component/password/description_sidebar_section';
+import ComponentHelper from 'passbolt-mad/helper/component';
 import PermissionType from 'app/model/map/permission_type';
 import ResourceEditDescriptionForm from 'app/form/resource/edit_description';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
@@ -22,10 +22,8 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
   defaults: {
     label: 'Sidebar Section Description Controller',
-    viewClass: DescriptionView,
     template: template,
-    resource: null,
-    editDescriptionFormCtrl: null
+    resource: null
   }
 
 }, /** @prototype */ {
@@ -33,40 +31,90 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
   /**
    * @inheritdoc
    */
+  init: function(el, options) {
+    this._super(el, options);
+    this.editing = false;
+  },
+
+  /**
+   * @inheritdoc
+   */
   beforeRender: function() {
     this._super();
-    // pass the new resource to the view
     const resource = this.options.resource;
     this.setViewData('resource', resource);
     this.setViewData('editable', resource.permission.isAllowedTo(PermissionType.UPDATE));
   },
 
   /**
-   * @inheritdoc
+   * Observe when the user want to edit the instance's resource description
    */
-  afterStart: function() {
-    const self = this;
-
-    // create a form to edit the description
+  '{element} a#js_edit_description_button, p.description_content click': function() {
     const resource = this.options.resource;
-    const form = new ResourceEditDescriptionForm('#js_rs_details_edit_description', {
+    const canUpdate = resource.permission.isAllowedTo(PermissionType.UPDATE);
+    if (!canUpdate) {
+      return;
+    }
+    if (!this.editing) {
+      this.enableEditMode();
+    } else {
+      this.disableEditMode();
+    }
+  },
+
+  /**
+   * If a click is done while editing and this click is not on the component, cancel the edit.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{window} click': function(el, ev) {
+    if (!this.editing) {
+      return;
+    }
+
+    const componentIsSrc = this.element.id == ev.target.id;
+    const componentIsParent = $(ev.target).parents(`#${this.getId()}`).length;
+    if (!componentIsSrc && !componentIsParent) {
+      this.disableEditMode();
+    }
+  },
+
+  /**
+   * Enable the description edit mode.
+   */
+  enableEditMode: function() {
+    this.editing = true;
+    const resource = this.options.resource;
+    const formOptions = {
+      id: 'js_rs_details_edit_description',
       resource: resource,
-      state: 'hidden',
       data: {
         Resource: resource
       },
       callbacks: {
-        submit: function(formData) {
-          self._saveResource(resource, formData);
+        submit: formData => {
+          this._saveResource(resource, formData);
         }
       }
-    }).start();
-    this.options.editDescriptionFormCtrl = form;
+    };
+    $('.description_content', $(this.element)).addClass('hidden');
+    const selector = $('.accordion-content', this.element);
+    const form = ComponentHelper.create(selector, 'last', ResourceEditDescriptionForm, formOptions);
+    form.start();
+    this.form = form;
+  },
+
+  /**
+   * Enable the description edit mode.
+   */
+  disableEditMode: function() {
+    this.editing = false;
+    this.form.destroyAndRemove();
+    $('.description_content', $(this.element)).removeClass('hidden');
   },
 
   /**
    * Save a resource after the description is edited.
-   *
    * @param {Resource} resource The target resource
    * @param {Form} form The form data object
    */
@@ -74,17 +122,7 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     resource.description = formData['Resource']['description'];
     resource.__FILTER_CASE__ = 'edit_description';
     resource.save();
-  },
-
-  /**
-   * Observe when the user want to edit the instance's resource description
-   */
-  '{element} request_resource_description_edit': function() {
-    if (!this.state.is('edit')) {
-      this.setState('edit');
-    } else {
-      this.setState('ready');
-    }
+    this.disableEditMode();
   },
 
   /**
@@ -92,25 +130,6 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    */
   '{resource} updated': function() {
     this.refresh();
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
-  /**
-   * Switch to edit mode
-   * @param {boolean} go Go or leave the state
-   */
-  'stateEdit': function(go) {
-    if (go) {
-      this.options.editDescriptionFormCtrl.setState('ready');
-      this.view.showDescription(false);
-    } else {
-      this.options.editDescriptionFormCtrl.setState('hidden');
-      this.options.editDescriptionFormCtrl.reset();
-      this.view.showDescription(true);
-    }
   }
 });
 

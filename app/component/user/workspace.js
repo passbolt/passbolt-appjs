@@ -56,6 +56,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     filter: null,
     // Override the silentLoading parameter.
     silentLoading: false,
+    loadedOnStart: false,
     // State strategy
     state: 'ready',
     // Filter the workspace with this filter settings.
@@ -209,12 +210,21 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @inheritdoc
    */
   afterStart: function() {
-    this._initPrimaryMenu();
-    this._initSecondaryMenu();
-    this._initMainActionButton();
-    this._initBreadcrumb();
-    this._initPrimarySidebar();
-    this._initGrid();
+    const primaryMenu = this._initPrimaryMenu();
+    const secondaryMenu = this._initSecondaryMenu();
+    const mainActionButton = this._initMainActionButton();
+    const breadcrumb = this._initBreadcrumb();
+    const primarySidebar = this._initPrimarySidebar();
+    const grid = this._initGrid();
+
+    primaryMenu.start();
+    secondaryMenu.start();
+    if (mainActionButton) {
+      mainActionButton.start();
+    }
+    breadcrumb.start();
+    primarySidebar.start();
+    grid.start();
 
     // Apply a filter to the workspace
     let filter = null;
@@ -232,29 +242,14 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   },
 
   /**
-   * Destroy the workspace.
-   */
-  destroy: function() {
-    // Be sure that the primary & secondary workspace menus controllers will be destroyed also.
-    $('#js_wsp_primary_menu_wrapper').empty();
-    $('#js_wsp_secondary_menu_wrapper').empty();
-    $('.main-action-wrapper').empty();
-
-    // Destroy Selected users.
-    this.options.selectedUsers.splice(0, this.options.selectedUsers.length);
-
-    // Call parent.
-    this._super();
-  },
-
-  /**
    * Init the primary workspace menu.
    * The menu is not instantiated as a child of this component DOM Element, remove it manually from the DOM when
    * this component is destroyed.
    * @see destroy()
+   * @return {Component}
    */
   _initPrimaryMenu: function() {
-    const menu = ComponentHelper.create(
+    const component = ComponentHelper.create(
       $('#js_wsp_primary_menu_wrapper'),
       'last',
       PrimaryMenuComponent, {
@@ -262,7 +257,8 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         selectedGroups: this.options.selectedGroups
       }
     );
-    menu.start();
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
@@ -270,26 +266,50 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * The menu is not instantiated as a child of this component DOM Element, remove it manually from the DOM when
    * this component is destroyed.
    * @see destroy()
+   * @return {Component}
    */
   _initSecondaryMenu: function() {
-    const menu = ComponentHelper.create(
+    const component = ComponentHelper.create(
       $('#js_wsp_secondary_menu_wrapper'),
       'last',
       SecondaryMenuComponent, {
         selectedItems: this.options.selectedUsers
       }
     );
-    menu.start();
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the workspace main action button.
+   * @return {Component}
    */
   _initMainActionButton: function() {
     const role = User.getCurrent().role.name;
 
     // Create user / group capability is only available to admin user.
     if (role == 'admin') {
+      const items = [
+        new Action({
+          id: uuid(),
+          label: __('New user'),
+          cssClasses: ['create-user'],
+          action: function() {
+            button.view.close();
+            MadBus.trigger('request_user_creation');
+          }
+        }),
+        new Action({
+          id: uuid(),
+          label: __('New group'),
+          cssClasses: ['create-group'],
+          action: function() {
+            button.view.close();
+            MadBus.trigger('request_group_creation');
+          }
+        })
+      ];
+
       const button = ComponentHelper.create(
         $('.main-action-wrapper'),
         'last',
@@ -298,53 +318,34 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
           template: createButtonTemplate,
           tag: 'a',
           cssClasses: ['button', 'primary'],
-          silentLoading: false
+          silentLoading: false,
+          items: items
         }
       );
-      button.start();
-
-      // New user item
-      const userItem = new Action({
-        id: uuid(),
-        label: __('New user'),
-        cssClasses: ['create-user'],
-        action: function() {
-          button.view.close();
-          MadBus.trigger('request_user_creation');
-        }
-      });
-      button.options.menu.insertItem(userItem);
-
-      // New group item
-      const groupItem = new Action({
-        id: uuid(),
-        label: __('New group'),
-        cssClasses: ['create-group'],
-        action: function() {
-          button.view.close();
-          MadBus.trigger('request_group_creation');
-        }
-      });
-      button.options.menu.insertItem(groupItem);
 
       this.options.mainButton = button;
+      this.addLoadedDependency(button);
+      return button;
     }
   },
 
   /**
    * Initialize the workspace breadcrumb
+   * @return {Component}
    */
   _initBreadcrumb: function() {
     const component = new BreadcrumbComponent('#js_wsp_users_breadcrumb', {
       rootFilter: UserWorkspaceComponent.getDefaultFilterSettings(),
       silentLoading: false
     });
-    component.start();
     this.breadcrumCtl = component;
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the primary sidebar component
+   * @return {Component}
    */
   _initPrimarySidebar: function() {
     const component = new PrimarySidebarComponent('#js_user_workspace_primary_sidebar', {
@@ -353,25 +354,27 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       selectedGroups: this.options.selectedGroups,
       silentLoading: false
     });
-    component.start();
     this.options.primarySidebar = component;
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Initialize the grid component
+   * @return {Component}
    */
   _initGrid: function() {
     const component = new GridComponent('#js_wsp_users_browser', {
       selectedUsers: this.options.selectedUsers,
       silentLoading: false
     });
-    component.start();
     this.options.grid = component;
+    this.addLoadedDependency(component);
+    return component;
   },
 
   /**
    * Open the group edit dialog.
-   *
    * @param {Group} group The target group entity.
    */
   openEditGroupDialog: function(group) {
@@ -396,7 +399,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Open the user create dialog.
-   *
    * @param {User} user The target user entity.
    */
   openCreateUserDialog: function(user) {
@@ -421,7 +423,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Open the user edit dialog.
-   *
    * @param {User} user The target user entity.
    */
   openEditUserDialog: function(user) {
@@ -446,7 +447,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Save a user after creating/editing it with the create/edit forms.
-   *
    * @param {User} user The target user
    * @param {Form} form The form object
    * @param {Dialog} dialog The dialog object
@@ -528,11 +528,9 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Delete a user.
-   *
    * Request a dry-run delete on the API.
    * - If the dry-run is a success, ask the user to confirm the deletion;
    * - If the dry-run failed, notify the user about the reasons.
-   *
    * @param {User} user The user to delete.
    */
   deleteUser: function(user) {
@@ -574,7 +572,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Notify the user regarding the delete failure.
-   *
    * @param {User} user The user to delete.
    * @param {array} data An object containing the error target
    */
@@ -603,9 +600,105 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     MadBus.trigger('filter_workspace', {filter: filter});
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE MODEL EVENTS */
-  /* ************************************************************** */
+  /**
+   * Init the user secondary sidebar.
+   * @private
+   */
+  _initUserSecondarySidebar: function() {
+    const showSidebar = Config.read('ui.workspace.showSidebar');
+    if (!showSidebar) {
+      return;
+    }
+    this._destroyUserSecondarySidebar();
+    this._destroyGroupSecondarySidebar();
+    const user = this.options.selectedUsers[0];
+    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
+    const options = {
+      id: 'js_user_details',
+      user: user,
+      silentLoading: false,
+      cssClasses: ['panel', 'aside', 'js_wsp_users_sidebar_second'],
+      state: state
+    };
+    const component = ComponentHelper.create(this.element, 'last', UserSecondarySidebarComponent, options);
+    component.start();
+    this.options.userSecondarySidebar = component;
+  },
+
+  /**
+   * Init the group secondary sidebar.
+   * @private
+   */
+  _initGroupSecondarySidebar: function() {
+    const showSidebar = Config.read('ui.workspace.showSidebar');
+    if (!showSidebar) {
+      return;
+    }
+    this._destroyUserSecondarySidebar();
+    this._destroyGroupSecondarySidebar();
+    const group = this.options.selectedGroups[0];
+    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
+    const options = {
+      id: 'js_group_details',
+      group: group,
+      silentLoading: false,
+      cssClasses: ['panel', 'aside', 'js_wsp_groups_sidebar_second'],
+      state: state
+    };
+    const component = ComponentHelper.create(this.element, 'last', GroupSecondarySidebarComponent, options);
+    component.start();
+    this.options.groupSecondarySidebar = component;
+  },
+
+  /**
+   * Destroy the user secondary sidebar
+   * @private
+   */
+  _destroyUserSecondarySidebar: function() {
+    if (this.options.userSecondarySidebar) {
+      this.options.userSecondarySidebar.destroyAndRemove();
+      this.options.userSecondarySidebar = null;
+    }
+  },
+
+  /**
+   * Destroy the group secondary sidebar
+   * @private
+   */
+  _destroyGroupSecondarySidebar: function() {
+    if (this.options.groupSecondarySidebar) {
+      this.options.groupSecondarySidebar.destroyAndRemove();
+      this.options.groupSecondarySidebar = null;
+    }
+  },
+
+  /**
+   * Observe when users are selected
+   */
+  '{selectedUsers} add': function() {
+    this._initUserSecondarySidebar();
+  },
+
+  /**
+   * Observe when users are selected
+   */
+  '{selectedUsers} remove': function() {
+    this._destroyUserSecondarySidebar();
+  },
+
+  /**
+   * Observe when groups are selected
+   */
+  '{selectedGroups} add': function() {
+    this._initGroupSecondarySidebar();
+  },
+
+  /**
+   * Observe when users are selected
+   */
+  '{selectedGroups} remove': function() {
+    this._destroyGroupSecondarySidebar();
+  },
 
   /**
    * Observe when a user is destroyed.
@@ -628,78 +721,9 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    */
   '{Group} destroyed': function(el, ev, group) {
     const selectedGroups = this.options.selectedGroups;
-    if (selectedGroups.indexOf({id:group.id}) != -1) {
+    if (selectedGroups.indexOf({id: group.id}) != -1) {
       selectedGroups.remove(group);
       this._resetFilter();
-    }
-  },
-
-  /**
-   * Observe when groups are selected
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {array<Group>} items The selected items change
-   */
-  '{selectedGroups} add': function(el, ev, items) {
-    if (this.options.groupSecondarySidebar) {
-      this.options.groupSecondarySidebar.remove();
-    }
-    const group = items[0];
-    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
-    const options = {
-      id: 'js_group_details',
-      group: group,
-      silentLoading: false,
-      cssClasses: ['panel', 'aside', 'js_wsp_groups_sidebar_second'],
-      state: state
-    };
-    const component = ComponentHelper.create(this.element, 'last', GroupSecondarySidebarComponent, options);
-    component.start();
-    this.options.groupSecondarySidebar = component;
-  },
-
-  /**
-   * Observe when users are selected
-   */
-  '{selectedGroups} remove': function() {
-    if (this.options.groupSecondarySidebar) {
-      this.options.groupSecondarySidebar.remove();
-    }
-  },
-
-  /**
-   * Observe when users are selected
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {array<User>} items The selected items change
-   */
-  '{selectedUsers} add': function(el, ev, items) {
-    if (this.options.groupSecondarySidebar) {
-      this.options.groupSecondarySidebar.remove();
-    }
-    if (this.options.userSecondarySidebar) {
-      this.options.userSecondarySidebar.remove();
-    }
-    const user = items[0];
-    const state = Config.read('ui.workspace.showSidebar') ? 'ready' : 'hidden';
-    const options = {
-      id: 'js_user_details',
-      user: user,
-      silentLoading: false,
-      cssClasses: ['panel', 'aside', 'js_wsp_users_sidebar_second'],
-      state: state
-    };
-    const component = ComponentHelper.create(this.element, 'last', UserSecondarySidebarComponent, options);
-    component.start();
-    this.options.userSecondarySidebar = component;
-  },
-
-  /**
-   * Observe when users are selected
-   */
-  '{selectedUsers} remove': function() {
-    if (this.options.userSecondarySidebar) {
-      this.options.userSecondarySidebar.remove();
     }
   },
 
@@ -707,21 +731,20 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /* LISTEN TO THE APP EVENTS */
   /* ************************************************************** */
 
-  ///**
-  // * When a new filter is applied to the workspace.
-  // *
-  // * @param {HTMLElement} el The element the event occurred on
-  // * @param {HTMLEvent} ev The event which occurred
-  // */
-  //'{mad.bus.element} filter_workspace': function(el, ev) {
-  //  const filter = ev.data.filter;
-  //  // Unselect all group if the filter does not target a group (dirty).
-  //  if (!filter.rules['has-groups']) {
-  //    this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
-  //  }
-  //  this.options.selectedUsers.splice(0, this.options.selectedUsers.length);
-  //  this.breadcrumCtl.load(filter);
-  //},
+  /**
+   * When a new filter is applied to the workspace.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} filter_workspace': function(el, ev) {
+    const filter = ev.data.filter;
+    // Unselect all group if the filter does not target a group (dirty).
+    if (!filter.rules['has-groups']) {
+      this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
+    }
+    this.options.selectedUsers.splice(0, this.options.selectedUsers.length);
+    this.breadcrumCtl.load(filter);
+  },
 
   /**
    * Observe when the user requests a group creation
@@ -733,7 +756,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Observe when the user requests a group edition
-   *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
@@ -744,7 +766,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Observe when the user requests a group deletion
-   *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
@@ -763,7 +784,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Observe when the user requests a user edition
-   *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
@@ -774,7 +794,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   /**
    * Observe when the user requests a user deletion
-   *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
@@ -783,19 +802,19 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     this.deleteUser(user);
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE STATE CHANGES */
-  /* ************************************************************** */
-
   /**
-   * The application is ready.
-   * @param {boolean} go Enter or leave the state
+   * Observe when the workspace sidebar setting change.
    */
-  stateReady: function(go) {
-    if (go) {
-      this._dispatchRoute();
+  '{mad.bus.element} workspace_sidebar_state_change': function() {
+    const user = this.options.selectedUsers[0];
+    const group = this.options.selectedGroups[0];
+    if (user) {
+      this._initUserSecondarySidebar();
+    } else if (group) {
+      this._initGroupSecondarySidebar();
     }
   }
+
 });
 
 export default UserWorkspaceComponent;

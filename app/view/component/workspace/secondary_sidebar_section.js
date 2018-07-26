@@ -36,7 +36,7 @@ const SecondarySidebarSectionView = View.extend('passbolt.view.component.Seconda
   /**
    * Observe when accordion-header is clicked.
    */
-  ' .accordion-header click': function() {
+  '{element} a.accordion-trigger click': function() {
     if ($(this.element).hasClass('closed')) {
       this.open();
     } else {

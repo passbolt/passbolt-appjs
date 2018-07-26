@@ -41,8 +41,8 @@ const ActionsTabComponent = TabComponent.extend('passbolt.component.password.Act
   afterStart: function() {
     this._super();
 
-    // Add the edit form to the tab
-    this.addComponent(ResourceCreateForm, {
+    // Edit
+    this.addTab(ResourceCreateForm, {
       id: 'js_rs_edit',
       label: __('Edit'),
       action: 'edit',
@@ -52,8 +52,8 @@ const ActionsTabComponent = TabComponent.extend('passbolt.component.password.Act
       }
     });
 
-    // Add the permission component to the tab
-    this.addComponent(PermissionsComponent, {
+    // Permission
+    this.addTab(PermissionsComponent, {
       id: 'js_rs_permission',
       label: 'Share',
       resource: this.options.resources,
@@ -95,26 +95,19 @@ const ActionsTabComponent = TabComponent.extend('passbolt.component.password.Act
    */
   enableTab: function(tabId, force) {
     force = force || false;
-
-    // If the request tab is the same than the active one.
-    if (this.enabledTabId == tabId) {
+    if (this._activeTab && this._activeTab.getId() == tabId) {
       return;
     }
-
-    // If a change occurred on the current tab, and a confirmation is required.
     if (this._hasChanged && force === false) {
       return this._confirmChangeTab(tabId);
     }
 
-    // The tab to enable.
-    const targetTabCtl = this.getComponent(tabId);
-
-    // The dialog should have a relevant title.
-    this.options.dialog.setTitle(targetTabCtl.options.label);
-    this.options.dialog.setSubtitle(this.options.resource.name);
-
     this._hasChanged = false;
     this._super(tabId);
+    // @todo remove .tab-content display none rules from the css
+    $('.tab-content', this.element).show();
+    this.options.dialog.setTitle(this._activeTab.options.label);
+    this.options.dialog.setSubtitle(this.options.resource.name);
   },
 
   /**

@@ -112,32 +112,20 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
     return menu;
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE VIEW EVENTS */
-  /* ************************************************************** */
-
   /**
    * An item has been selected
-   * @parent mad.component.Menu.view_events
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
   '{element} item_selected': function(el, ev) {
     const item = ev.data.item;
-    // If this item is not disabled, try to execute the item action.
-    if (!item.state.is('disabled')) {
-      MadBus.trigger('filter_workspace', {filter: item.filter});
-    }
+    MadBus.trigger('filter_workspace', {filter: item.filter});
   },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
 
   /**
    * Listen to the workspace is filtered
-   * @param {jQuery} element The source element
-   * @param {Event} event The jQuery event
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
     const filter = ev.data.filter;

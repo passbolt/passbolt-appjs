@@ -12,20 +12,16 @@
  * @since         2.0.0
  */
 import domEvents from 'can-dom-events';
-import FeedbackComponent from 'passbolt-mad/form/feedback';
+import Feedback from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
-import TextboxComponent from 'passbolt-mad/form/element/textbox';
+import Textbox from 'passbolt-mad/form/element/textbox';
 
 import template from 'app/view/template/form/resource/edit_description.stache!';
 
 const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription', /** @static */ {
 
   defaults: {
-    template: template,
-    // The current resource
-    resource: null,
-    // Description field.
-    descriptionField: null
+    template: template
   }
 
 }, /** @prototype */ {
@@ -34,24 +30,24 @@ const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription'
    * @inheritdoc
    */
   afterStart: function() {
-    /*
-     * id hidden field
-     *@todo ID_ERROR
-     */
-    this.addElement(new TextboxComponent(`#${this.element.id} .js_resource_id`, {
-      modelReference: 'Resource.id'
-    }).start().setValue(this.options.resource.id));
+    // Resource id
+    const idSelector = `#${this.element.id} .js_resource_id`;
+    const idOptions = {
+      modelReference: 'Resource.id',
+      value: this.options.data.Resource.id
+    };
+    const idTextbox = new Textbox(idSelector, idOptions);
+    this.addElement(idTextbox).start();
 
-    // Init the description field.
-    this.options.descriptionField = this.addElement(
-      new TextboxComponent(`#${this.element.id} .js_resource_description`, {
-        modelReference: 'Resource.description'
-      }).start(),
-      new FeedbackComponent(`#${this.element.id} .js_resource_description_feedback`, {}).start()
-    );
-
-    // Update the resource description with current value
-    this.options.descriptionField.setValue(this.options.resource.description);
+    // Description
+    const descriptionSelector = `#${this.element.id} .js_resource_description`;
+    const descriptionOptions = {
+      modelReference: 'Resource.description',
+      value: this.options.data.Resource.description
+    };
+    const descriptionTextbox = new Textbox(descriptionSelector, descriptionOptions).start();
+    const descriptionFeedback = new Feedback(`#${this.element.id} .js_resource_description_feedback`).start();
+    this.addElement(descriptionTextbox, descriptionFeedback);
 
     /*
      * Force event submit event (not thrown by default)
@@ -60,18 +56,6 @@ const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription'
     $('.button.resource-submit').click(() => {
       domEvents.dispatch(this.element, {type: 'submit'});
     });
-  },
-
-  /**
-   * Reset description in description field.
-   * @param description
-   */
-  reset: function(description) {
-    this._super();
-    if (description == undefined) {
-      description = this.options.resource.description;
-    }
-    this.options.descriptionField.setValue(description);
   }
 });
 

@@ -25,7 +25,7 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
   defaults: {
     label: 'Notification Component',
     viewClass: NotificationView,
-    status: 'hidden',
+    state: {hidden: true},
     notifications: [],
     template: template
   }
@@ -38,7 +38,7 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
    * If no settings are provided, but the notification is an error,
    * then return error settings. Otherwise return null.
    *
-   * @param notification
+   * @param {object} notification
    * @returns {*}
    * @private
    */
@@ -62,7 +62,7 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
 
   /**
    * Get settings for a given notification.
-   * @param notification
+   * @param {object} notification
    * @returns {*}
    * @private
    */
@@ -93,8 +93,8 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
 
   /**
    * Build the message string for a given notification, and given settings.
-   * @param notification
-   * @param settings
+   * @param {object} notification
+   * @param {object} settings
    * @returns {*|Object}
    * @private
    */
@@ -115,8 +115,8 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
 
   /**
    * Populate a notification object from given settings.
-   * @param notification
-   * @param settings
+   * @param {object} notification
+   * @param {object} settings
    * @returns {*}
    * @private
    */
@@ -192,18 +192,16 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
     this.options.notifications.push(_notification);
 
     // The component is not already started, start it
-    if (this.view == null) {
+    if (!this.state.started) {
       this.start();
-    } else if (this.state.is('hidden') || this.state.is('hiddening')) {
+      this.state.hidden = false;
+    } else if (this.state.hidden || this.state.hiddening) {
       // If the component is not ready restart it, otherwise the view will take care of the notifications queue.
       this.refresh();
-      this.setState('ready');
+      this.state.hidden = false;
+      this.state.hiddening = false;
     }
   },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
 
   /**
    * Listen the event passbolt_notify and display load the corresponding notification.

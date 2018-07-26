@@ -8,16 +8,18 @@
 						<span class="author username">{{ mappedItem.creatorName }}</span>
 						<span class="modified">{{ getTimeAgo(mappedItem.modified) }}</span>
 					</div>
+					{{#if(mappedItem.isOwner)}}
 					<div class="actions">
 						<ul>
 							<li>
-								<a class="js_delete_comment hidden">
+								<a class="js_delete_comment">
 									<i class="fa fa-fw fa-trash"></i>
 									<span class="visuallyhidden">delete</span>
 								</a>
 							</li>
 						</ul>
 					</div>
+					{{/if}}
 				</div>
 			</div>
 		</div>

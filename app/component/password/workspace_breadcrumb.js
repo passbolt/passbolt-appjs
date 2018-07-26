@@ -24,8 +24,6 @@ const WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadc
 
   defaults: {
     template: template,
-    status: 'hidden',
-    // Root crumb filter
     rootFilter: null
   }
 
@@ -85,7 +83,7 @@ const WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadc
 
   /**
    * An item has been selected
-   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occured
    */
   '{element} item_selected': function(el, ev) {
@@ -101,7 +99,7 @@ const WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadc
 
   /**
    * Listen to the browser filter
-   * @param {HTMLElement} el The element the event occured on
+   * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occured
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {

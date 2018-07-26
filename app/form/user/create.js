@@ -107,7 +107,10 @@ const CreateForm = Form.extend('passbolt.form.user.Create', /** @static */ {
     // Add resource username field
     this.addElement(
       new TextboxComponent('#js_field_username', {
-        modelReference: 'User.username'
+        modelReference: 'User.username',
+        state: {
+          disabled: this.options.action == 'edit'
+        }
       }).start(),
       new FeedbackComponent('#js_field_username_feedback', {}).start()
     );

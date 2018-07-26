@@ -30,77 +30,72 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    * @inheritdoc
    */
   afterStart: function() {
+    const items = [];
     const resource = this.options.resource;
-
-    // Get the permission on the resource.
-    const canRead = resource.permission.isAllowedTo(PermissionType.READ);
     const canUpdate = resource.permission.isAllowedTo(PermissionType.UPDATE);
-    const  canAdmin = resource.permission.isAllowedTo(PermissionType.ADMIN);
+    const canAdmin = resource.permission.isAllowedTo(PermissionType.ADMIN);
 
     // Add Copy username action.
     const copyUsernameItem = new Action({
       id: 'js_password_browser_menu_copy_username',
       label: __('Copy username'),
-      initial_state: !canRead ? 'disabled' : 'ready',
       action: () => this._copyLogin()
     });
-    this.insertItem(copyUsernameItem);
+    items.push(copyUsernameItem);
 
     // Add Copy password action.
     const copyPasswordItem = new Action({
       id: 'js_password_browser_menu_copy_password',
       label: __('Copy password'),
-      initial_state: !canRead ? 'disabled' : 'ready',
       action: () => this._copySecret()
     });
-    this.insertItem(copyPasswordItem);
+    items.push(copyPasswordItem);
 
     // Add Copy URI action.
     const copyUriItem = new Action({
       id: 'js_password_browser_menu_copy_uri',
       label: __('Copy URI'),
-      initial_state: !canRead ? 'disabled' : 'ready',
       action: () => this._copyUri()
     });
-    this.insertItem(copyUriItem);
+    items.push(copyUriItem);
 
     // Add Open URI in a new tab action.
     const openUriItem = new Action({
       id: 'js_password_browser_menu_open_uri',
       label: __('Open URI in a new tab'),
-      initial_state: !canRead ? 'disabled' : 'ready',
       cssClasses: ['separator-after'],
       action: () => this._openUri()
     });
-    this.insertItem(openUriItem);
+    items.push(openUriItem);
 
     // Add Edit action.
     const editItem = new Action({
       id: 'js_password_browser_menu_edit',
       label: __('Edit'),
-      initial_state: !canUpdate ? 'disabled' : 'ready',
+      enabled: canUpdate,
       action: () => this._edit()
     });
-    this.insertItem(editItem);
+    items.push(editItem);
 
     // Add Share action.
     const shareItem = new Action({
       id: 'js_password_browser_menu_share',
       label: __('Share'),
-      initial_state: !canAdmin ? 'disabled' : 'ready',
+      enabled: canAdmin,
       action: () => this._share()
     });
-    this.insertItem(shareItem);
+    items.push(shareItem);
 
     // Add Delete action.
     const deleteItem = new Action({
       id: 'js_password_browser_menu_delete',
       label: __('Delete'),
-      initial_state: !canUpdate ? 'disabled' : 'ready',
+      enabled: canUpdate,
       action: () => this._delete()
     });
-    this.insertItem(deleteItem);
+    items.push(deleteItem);
 
+    this.load(items);
     this._super();
   },
 

@@ -1,9 +1,9 @@
 <div class="accordion-header">
-	<h4><a role="button">{{ __('Shared with') }}</a></h4>
+	<h4><a class="accordion-trigger" role="button">{{ __('Shared with') }}</a></h4>
 </div>
 
 <div class="accordion-content">
-	{{#if(administrable)}}
+	{{#if(canAdmin)}}
 	<a class="edit_permissions_button section-action" id="js_edit_permissions_button">
 		<i class="fa fa-fw fa-edit"></i>
 		<span class="visuallyhidden">{{ __('edit') }}</span>

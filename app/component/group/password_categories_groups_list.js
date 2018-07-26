@@ -27,7 +27,6 @@ const PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.compon
     prefixItemId: 'group_',
     selectedGroups: new Group.List(),
     selectedFilter: null,
-    // the view class to use. Overridden so we can put our own logic.
     viewClass: GroupsListView
   }
 

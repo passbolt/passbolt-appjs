@@ -14,8 +14,6 @@
 import Action from 'passbolt-mad/model/map/action';
 import ButtonDropdown from 'passbolt-mad/component/button_dropdown';
 import Config from 'passbolt-mad/config/config';
-import MadBus from 'passbolt-mad/control/bus';
-import User from 'app/model/map/user';
 import uuid from 'uuid/v4';
 
 import template from 'app/view/template/component/profile/header_dropdown.stache!';
@@ -35,16 +33,15 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
   /**
    * @inheritdoc
    */
-  beforeStart: function() {
-    this.options.user = User.getCurrent();
+  afterStart: function() {
     this._super();
+    this._initMenu();
   },
 
   /**
-   * @inheritdoc
+   * Init the menu
    */
-  afterStart: function() {
-    this._super();
+  _initMenu: function() {
     const menu = this.options.menu;
 
     // profile
@@ -79,10 +76,7 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
    * Go to the user profile
    */
   _goToUserProfile: function() {
-    const workspace = 'settings';
-    const section = 'profile';
-    MadBus.trigger('request_workspace', {workspace: workspace});
-    MadBus.trigger('request_settings_section', {section: section});
+    location.hash = '/settings/profile';
     this.view.close();
   },
 
@@ -90,10 +84,7 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
    * Go to the manage your keys screen
    */
   _goToTheme: function() {
-    const workspace = 'settings';
-    const section = 'theme';
-    MadBus.trigger('request_workspace', {workspace: workspace});
-    MadBus.trigger('request_settings_section', {section: section});
+    location.hash = '/settings/theme';
     this.view.close();
   },
 
@@ -120,10 +111,7 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
    * Observe when the user is updated
    */
   '{user} updated': function() {
-    // If the component is active, refresh it.
-    if (!this.state.is('disabled') && !this.state.is(null)) {
-      this.refresh();
-    }
+    this.refresh();
   }
 
 });

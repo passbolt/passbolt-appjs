@@ -35,8 +35,8 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    * @inheritdoc
    */
   beforeRender: function() {
-    this.setViewData('resource', this.options.resource);
     this._super();
+    this.setViewData('resource', this.options.resource);
   },
 
   /**
@@ -112,10 +112,10 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
 
   /**
    * Observe when the item is updated
-   * @param {passbolt.model} item The updated item
+   * @param {Resource} resource The updated item
    */
-  '{selectedItem} updated': function(item) {
-    this.setTitle(item.name);
+  '{resource} updated': function(resource) {
+    this.setTitle(resource.name);
   }
 });
 

@@ -78,9 +78,6 @@ const PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.
       });
       contextualMenu.insertItem(deleteItem);
     }
-
-    // Display the menu.
-    contextualMenu.setState('ready');
   },
 
   /* ************************************************************** */

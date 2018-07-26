@@ -1,5 +1,5 @@
 <div class="accordion-header">
-    <h4><a role="button">{{ __('Comments') }}</a></h4>
+    <h4><a class="accordion-trigger" role="button">{{ __('Comments') }}</a></h4>
 </div>
 
 <div class="accordion-content">
@@ -7,6 +7,5 @@
         <i class="fa fa-fw fa-plus-circle"></i>
         <span class="visuallyhidden">{{ __('create') }}</span>
     </a>
-    <div id="js_rs_details_comments_add_form"></div>
     <ul id="js_rs_details_comments_list"></ul>
 </div>

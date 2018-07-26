@@ -46,6 +46,9 @@ const CreateForm = Form.extend('passbolt.form.secret.Create', /** @static */ {
     // Add secret data hidden field.
     this.addElement(
       new TextboxComponent(`#js_field_secret_data_${this.options.secret_i}`, {
+        state: {
+          hidden: true
+        },
         modelReference: 'Secret.data',
         validate: false
       }).start()

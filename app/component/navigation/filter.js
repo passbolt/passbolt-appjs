@@ -122,7 +122,7 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
    * Listen when the user is updating the filter
    */
   '{keywordsTextbox.element} changed': function() {
-    const formData =  this.options.filterForm.getData();
+    const formData = this.options.filterForm.getData();
     const keywords = getObject(formData, 'passbolt.model.Filter.keywords');
     this._updateFilter(keywords);
   },
