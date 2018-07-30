@@ -45,16 +45,11 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   defaults: {
     name: 'password_workspace',
     template: template,
-    // The current selected resources
-    selectedResources: new Resource.List(),
-    //// The current selected groups
-    selectedGroups: new Group.List(),
-    // The current filter
-    filter: null,
-    // Override the silentLoading parameter.
     silentLoading: false,
     loadedOnStart: false,
-    // Models to listen to
+    selectedResources: new Resource.List(),
+    selectedGroups: new Group.List(),
+    filter: null,
     Resource: Resource
   },
 
@@ -78,19 +73,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   init: function(el, options) {
     this._super(el, options);
-    this._initRouteListener();
-  },
-
-  /**
-   * Initialize the route listener
-   * @private
-   */
-  _initRouteListener: function() {
-    route.data.on('action', () => {
-      if (route.data.controller == 'Password') {
-        this._dispatchRoute();
-      }
-    });
+    this._firstLoad = true;
   },
 
   /**
@@ -98,7 +81,9 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @private
    */
   _dispatchRoute: function() {
-    switch (route.data.action) {
+    const action = route.data.action;
+    switch (action) {
+      case 'commentsView':
       case 'view': {
         const id = route.data.id;
         const resource = Resource.connection.instanceStore.get(id);
@@ -126,6 +111,20 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
         break;
       }
     }
+  },
+
+  /**
+   * Observer when the component is loaded / loading
+   * @param {boolean} loaded True if loaded, false otherwise
+   */
+  onLoadedChange: function(loaded) {
+    if (loaded) {
+      if (this._firstLoad) {
+        this._firstLoad = false;
+        this._dispatchRoute();
+      }
+    }
+    this._super(loaded);
   },
 
   /**

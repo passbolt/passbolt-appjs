@@ -90,14 +90,18 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
    * @private
    */
   _goToPasswordWorkspace: function() {
-    location.hash = '/passwords';
+    const controller = 'Password';
+    const action = 'index';
+    route.data.update({controller: controller, action: action});
   },
 
   /**
    * Go to the user workspace
    */
   _goToUserWorkspace: function() {
-    location.hash = '/users';
+    const controller = 'User';
+    const action = 'index';
+    route.data.update({controller: controller, action: action});
   },
 
   /**
@@ -105,7 +109,11 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
    * @private
    */
   _dispatchRoute: function() {
-    const workspace = String.underscore(route.data.controller);
+    const controller = route.data.controller;
+    let workspace = String.underscore(controller);
+    if (workspace == 'settings') {
+      workspace = 'user';
+    }
     if (this.options.selected != workspace) {
       const li = $(`li.${workspace}`);
       const itemClass = this.getItemClass();

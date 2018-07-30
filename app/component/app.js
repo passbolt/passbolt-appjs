@@ -62,7 +62,8 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * @private
    */
   _dispatchRoute: function() {
-    const workspaceName = String.underscore(route.data.controller);
+    const controller = route.data.controller;
+    const workspaceName = String.underscore(controller);
     this._enableWorkspace(workspaceName);
   },
 
@@ -78,6 +79,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * @inheritdoc
    */
   afterStart: function() {
+    this._firstLoad = true;
     this._initHeader();
     this._initFooter();
     SessionCheck.instantiate();
@@ -91,7 +93,11 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   onLoadedChange: function(loaded) {
     if (loaded) {
-      $('html').removeClass('loading launching').addClass('loaded');
+      if (this._firstLoad) {
+        this._firstLoad = false;
+        $('html').removeClass('launching');
+      }
+      $('html').removeClass('loading').addClass('loaded');
     } else {
       $('html').removeClass('loaded').addClass('loading');
     }

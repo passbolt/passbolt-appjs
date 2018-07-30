@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2903: Fix logout link. It should target a full based url link
 - PASSBOLT-2933: Upgrade to canjs 4
 - PASSBOLT-2926: Fix session timeout check
+- PASSBOLT-2940: Implement routes
 
 ## [2.1.0] - 2018-06-14
 ### Added

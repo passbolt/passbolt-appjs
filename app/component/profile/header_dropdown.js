@@ -14,6 +14,7 @@
 import Action from 'passbolt-mad/model/map/action';
 import ButtonDropdown from 'passbolt-mad/component/button_dropdown';
 import Config from 'passbolt-mad/config/config';
+import route from 'can-route';
 import uuid from 'uuid/v4';
 
 import template from 'app/view/template/component/profile/header_dropdown.stache!';
@@ -76,7 +77,9 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
    * Go to the user profile
    */
   _goToUserProfile: function() {
-    location.hash = '/settings/profile';
+    const controller = 'Settings';
+    const action = 'profile';
+    route.data.update({controller: controller, action: action});
     this.view.close();
   },
 
@@ -84,7 +87,9 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
    * Go to the manage your keys screen
    */
   _goToTheme: function() {
-    location.hash = '/settings/theme';
+    const controller = 'Settings';
+    const action = 'theme';
+    route.data.update({controller: controller, action: action});
     this.view.close();
   },
 

@@ -20,7 +20,6 @@ import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import Filter from 'app/model/filter';
-import getObject from 'can-util/js/get/get';
 import GridComponent from 'app/component/user/grid';
 import Group from 'app/model/map/group';
 import GroupEditComponent from 'app/component/group/edit';
@@ -84,20 +83,8 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @inheritdoc
    */
   init: function(el, options) {
-    this._initRouteListener();
-    return this._super(el, options);
-  },
-
-  /**
-   * Initialize the route listener
-   * @private
-   */
-  _initRouteListener: function() {
-    route.data.on('action', () => {
-      if (route.data.controller == 'User') {
-        this._dispatchRoute();
-      }
-    });
+    this._super(el, options);
+    this._firstLoad = true;
   },
 
   /**
@@ -105,7 +92,21 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @private
    */
   _dispatchRoute: function() {
-    switch (route.data.action) {
+    const action = route.data.action;
+    switch (action) {
+      case 'index': {
+        // Apply a filter to the workspace
+        let filter = null;
+        if (this.options.filterSettings == undefined) {
+          filter = this.constructor.getDefaultFilterSettings();
+        } else {
+          filter = this.options.filterSettings;
+        }
+
+        // Filter the workspace
+        MadBus.trigger('filter_workspace', {filter: filter});
+        break;
+      }
       case 'view': {
         const id = route.data.id;
         const user = User.connection.instanceStore.get(id);
@@ -150,6 +151,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
           });
         break;
       }
+      case 'groupViewMembership':
       case 'groupView': {
         const id = route.data.id;
         // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
@@ -159,21 +161,15 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
           });
         break;
       }
-      case 'groupViewGroupsUsers': {
-        const id = route.data.id;
-        // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
-        Group.findOne({id: id})
-          .then(group => {
-            this.options.selectedGroups.splice(0, this.options.selectedGroups.length, group);
-          });
-        break;
-      }
       case 'add': {
+        const username = route.data.username;
+        const firstName = route.data.first_name;
+        const lastName = route.data.last_name;
         const data = {
-          username: getObject(route.data, 'username'),
+          username: username,
           profile: {
-            first_name: getObject(route.data, 'first_name'),
-            last_name: getObject(route.data, 'last_name')
+            first_name: firstName,
+            last_name: lastName
           }
         };
         const user = new User(data);
@@ -185,8 +181,8 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         const user = this.options.grid.options.items.filter({id: id}).pop();
         if (user) {
           const data = {};
-          const firstName = getObject(route.data, 'first_name');
-          const lastName = getObject(route.data, 'last_name');
+          const firstName = route.data.first_name;
+          const lastName = route.data.last_name;
           if (firstName) {
             setObject(data, 'profile.first_name', firstName);
           }
@@ -239,6 +235,20 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
     this.on();
     this._super();
+  },
+
+  /**
+   * Observer when the component is loaded / loading
+   * @param {boolean} loaded True if loaded, false otherwise
+   */
+  onLoadedChange: function(loaded) {
+    if (loaded) {
+      if (this._firstLoad) {
+        this._firstLoad = false;
+        this._dispatchRoute();
+      }
+    }
+    this._super(loaded);
   },
 
   /**

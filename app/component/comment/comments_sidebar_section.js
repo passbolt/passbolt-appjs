@@ -16,6 +16,7 @@ import CommentCreateForm from 'app/form/comment/create';
 import CommentsListComponent from 'app/component/comment/comments_list';
 import CommentsSidebarSectionView from 'app/view/component/comment/comments_sidebar_section';
 import ComponentHelper from 'passbolt-mad/helper/component';
+import route from 'can-route';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 
 import template from 'app/view/template/component/comment/comments_sidebar_section.stache!';
@@ -31,7 +32,10 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
     foreignKey: null,
     template: template,
     Comment: Comment
-  }
+  },
+
+  // Consume the route only once
+  _routeConsumed: false
 
 }, /** @prototype */ {
 
@@ -50,6 +54,19 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
     this._findComments()
       .then(comments => this._loadComments(comments));
     this._super();
+    this._dispatchRoute();
+  },
+
+  /**
+   * Dispatch the route
+   */
+  _dispatchRoute: function() {
+    if (route.data.controller == 'Password' && route.data.action == 'commentsView') {
+      if (!CommentsSidebarSectionComponent._routeConsumed) {
+        this.view.open();
+        CommentsSidebarSectionComponent._routeConsumed = true;
+      }
+    }
   },
 
   /**

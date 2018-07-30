@@ -11,10 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import domEvents from 'can-dom-events';
 import Group from 'app/model/map/group';
 import GroupUser from 'app/model/map/group_user';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
+import route from 'can-route';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 import TreeComponent from 'passbolt-mad/component/tree';
 import User from 'app/model/map/user';
@@ -29,9 +31,34 @@ const GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.exten
     template: template,
     group: null,
     tree: null
-  }
+  },
+
+  // Consume the route only once
+  _routeConsumed: false
 
 }, /** @prototype */ {
+
+  /**
+   * @inheritdoc
+   */
+  afterStart: function() {
+    this._super();
+    this._dispatchRoute();
+  },
+
+  /**
+   * Dispatch the route
+   */
+  _dispatchRoute: function() {
+    if (route.data.controller == 'User' && route.data.action == 'groupViewMembership') {
+      if (!GroupUsersSidebarSectionComponent._routeConsumed) {
+        // dirty af
+        const accordionHeaderElement = $('.accordion-trigger', this.element)[0];
+        domEvents.dispatch(accordionHeaderElement, {type: 'click'});
+        GroupUsersSidebarSectionComponent._routeConsumed = true;
+      }
+    }
+  },
 
   /**
    * @inheritdoc

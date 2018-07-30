@@ -19,7 +19,6 @@ import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import KeysComponent from 'app/component/gpgkey/keys';
-import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
 import PrimaryMenuComponent from 'app/component/settings/workspace_primary_menu';
 import ProfileComponent from 'app/component/profile/profile';
@@ -59,11 +58,21 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
    * @private
    */
   _initRouteListener: function() {
-    route.data.on('action', () => {
-      if (route.data.controller == 'Settings') {
-        this._dispatchRoute();
-      }
-    });
+    // We have to proceed like following to execute the dispatch route in the scope of the instance, and be able to remove the listener when the component is destroyed.
+    const executeFunc = () => this._dispatchRoute();
+    route.data.on('action', executeFunc);
+    this.state.on('destroyed', () => route.data.off('action', executeFunc));
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    if (route.data.controller == 'Settings') {
+      const section = route.data.action;
+      this._enableSection(section);
+    }
   },
 
   /**
@@ -111,13 +120,9 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
       id: uuid(),
       name: 'profile',
       label: __('Profile'),
-      action: function() {
-        const section = 'profile';
-        MadBus.trigger('request_settings_section', {section: section});
-      }
+      action: () => this._goToSection('profile')
     });
     menu.insertItem(profileItem);
-    this.options.primarySidebarProfileItem = profileItem;
 
     // Theme
     const plugins = Config.read('server.passbolt.plugins');
@@ -126,13 +131,9 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
         id: uuid(),
         name: 'keys',
         label: __('Theme'),
-        action: function() {
-          const section = 'theme';
-          MadBus.trigger('request_settings_section', {section: section});
-        }
+        action: () => this._goToSection('theme')
       });
       menu.insertItem(themeItem);
-      this.options.primarySidebarThemeItem = themeItem;
     }
 
     // Keys
@@ -140,13 +141,9 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
       id: uuid(),
       name: 'keys',
       label: __('Keys inspector'),
-      action: function() {
-        const section = 'keys';
-        MadBus.trigger('request_settings_section', {section: section});
-      }
+      action: () => this._goToSection('keys')
     });
     menu.insertItem(keysItem);
-    this.options.primarySidebarKeysItem = keysItem;
   },
 
   /**
@@ -161,14 +158,14 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
 
     // Profile tab
     tabs.addTab(ProfileComponent, {
-      id: 'js_settings_wk_profile_controller',
+      id: 'js_settings_profile_tab',
       label: 'profile',
       user: User.getCurrent()
     });
 
     // Keys tab
     tabs.addTab(KeysComponent, {
-      id: 'js_settings_wk_profile_keys_controller',
+      id: 'js_settings_keys_tab',
       label: 'keys'
     });
 
@@ -176,19 +173,43 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
     const plugins = Config.read('server.passbolt.plugins');
     if (plugins && plugins.accountSettings) {
       tabs.addTab(ThemeComponent, {
-        id: 'js_settings_wk_profile_theme_controller',
+        id: 'js_settings_theme_tab',
         label: 'theme'
       });
     }
   },
 
   /**
-   * Dispatch route
+   * Go to a settings section
    * @private
    */
-  _dispatchRoute: function() {
-    const section = route.data.action;
-    MadBus.trigger('request_settings_section', {section: section});
+  _goToSection: function(section) {
+    const controller = 'Settings';
+    const action = section;
+    route.data.update({controller: controller, action: action});
+  },
+
+  /**
+   * Go to a settings section
+   * @private
+   */
+  _enableSection: function(section) {
+    const tabId = `js_settings_${section}_tab`;
+    const menu = this.options.primarySidebarMenu;
+    const menuItem = menu.options.items.filter({name: section}).pop();
+
+    // Enable the tab
+    this.tabs.enableTab(tabId);
+    // @todo remove .tab-content display none rules from the css
+    $('.tab-content', this.element).show();
+
+    // Set class on top container.
+    $('#container')
+      .removeClass(this.options.sections.join(" "))
+      .addClass(section);
+
+    // Select corresponding section in the menu.
+    menu.selectItem(menuItem);
   },
 
   /**
@@ -275,49 +296,7 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
    */
   '{mad.bus.element} request_profile_avatar_edition': function() {
     this.openEditAvatarDialog();
-  },
-
-  /**
-   * Observe when the user requests a section.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_settings_section': function(el, ev) {
-    const section = ev.data.section;
-    let tabId = null;
-    let menuItem = null;
-    const menu = this.options.primarySidebarMenu;
-
-    switch (section) {
-      case 'keys': {
-        tabId = 'js_settings_wk_profile_keys_controller';
-        menuItem = this.options.primarySidebarKeysItem;
-        break;
-      }
-      case 'profile': {
-        tabId = 'js_settings_wk_profile_controller';
-        menuItem = this.options.primarySidebarProfileItem;
-        break;
-      }
-      case 'theme': {
-        tabId = 'js_settings_wk_profile_theme_controller';
-        menuItem = this.options.primarySidebarThemeItem;
-        break;
-      }
-    }
-
-    // Enable the tab
-    this.tabs.enableTab(tabId);
-    // @todo remove .tab-content display none rules from the css
-    $('.tab-content', this.element).show();
-
-    // Set class on top container.
-    $('#container')
-      .removeClass(this.options.sections.join(" "))
-      .addClass(section);
-
-    // Select corresponding section in the menu.
-    menu.selectItem(menuItem);
   }
+
 });
 export default SettingsWorkspaceComponent;
