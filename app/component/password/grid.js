@@ -17,7 +17,7 @@ import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import FavoriteComponent from 'app/component/favorite/favorite';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
-import GridColumn from 'passbolt-mad/model/grid_column';
+import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/password/grid_contextual_menu';
 import MadMap from 'passbolt-mad/util/map/map';
@@ -42,7 +42,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     prefixItemId: 'resource_',
     silentLoading: false,
     loadedOnStart: false,
-    Resource: Resource
+    Resource: Resource,
+    paginate: true
   }
 
 }, /** @prototype */ {
@@ -308,85 +309,152 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   /**
    * Filter the browser using a filter settings object
    * @param {Filter} filter The filter to
-   * @return {Jquery.Deferred}
+   * @return {Promise}
    */
   filterBySettings: function(filter) {
-    let def = null;
+    this.state.loaded = false;
+    this.view.reset();
+    return this._findResources(filter)
+      .then(resources => this._handleApiResources(resources, filter))
+      .then(() => this._markSortedBySettings(filter))
+      .then(() => this._filterByKeywordsBySettings(filter))
+      .then(() => this._selectResourceBySettings(filter))
+      .then(() => {
+        this._showHideEmptyFeeback();
+        this.state.loaded = true;
+      });
+  },
 
-    // If new filter or the filter changed, request the API.
-    if (!this.filterSettings || this.filterSettings.id !== filter.id) {
-      this.state.loaded = false;
-      const findOptions = {
-        contain: {creator: 1, favorite: 1, modifier: 1, secret: 1, permission: 1, tag: 1},
-        // All rules except keywords that is filtered on the browser.
-        filter: filter.getRules(['keywords']),
-        order: filter.getOrders()
-      };
-
-      this.reset();
-      def = Resource.findAll(findOptions)
-        .then(resources => {
-          if (this.state.destroyed) {
-            return;
-          }
-          if (!resources.length) {
-            this.state.empty = true;
-          }
-          this.filtered = false;
-          this.load(resources);
-        });
-    } else {
-      def = Promise.resolve();
+  /**
+   * Find resources if the given filter needs it
+   * @param {Filter} filter
+   * @return {Promise}
+   * @private
+   */
+  _findResources: function(filter) {
+    const requestApi = !this.filterSettings || (this.filterSettings.id !== filter.id);
+    if (!requestApi) {
+      return Promise.resolve();
     }
 
-    // When the resources have been retrieved.
-    def.then(() => {
-      if (this.state.destroyed) {
-        return;
-      }
-      this.oldFilterSettings = this.filterSettings;
-      this.filterSettings = filter;
-      this._showHideEmptyFeeback();
+    const findOptions = {
+      contain: {creator: 1, favorite: 1, modifier: 1, secret: 1, permission: 1, tag: 1},
+      filter: filter.getRules(['keywords']),
+      order: filter.getOrders(),
+      silentLoading: false
+    };
+    return Resource.findAll(findOptions);
+  },
 
-      // Mark the ordered column if any.
-      const orders = filter.getOrders();
-      if (orders && orders[0]) {
-        const matches = /((\w*)\.)?(\w*)\s*(asc|desc|ASC|DESC)?/i.exec(orders[0]);
-        const fieldName = matches[3];
-        const sortWay = matches[4] ? matches[4].toLowerCase() : 'asc';
+  /**
+   * Handle the find request API response
+   * @param {Resources.List} resources The resources list from the API. If undefined, the grid doesn't need to be reloaded.
+   * @param {Filter} filter The filter to apply
+   * @return {Promise}
+   * @private
+   */
+  _handleApiResources: function(resources, filter) {
+    if (!resources) {
+      return Promise.resolve();
+    }
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
+    this.view.reset();
+    if (!resources.length) {
+      this.state.empty = true;
+    }
+    const loadOptions = {};
+    const keywords = filter.getRule('keywords');
+    if (keywords && keywords != '') {
+      filter.filterByKeywordsApplied = true;
+      loadOptions.filter = {
+        keywords: keywords,
+        fields: this._getFilterFields()
+      };
+    }
 
-        if (fieldName) {
-          const sortedColumnModel = this.getColumnModel(fieldName);
-          if (sortedColumnModel) {
-            this.view.markColumnAsSorted(sortedColumnModel, sortWay === 'asc');
-          }
+    return this.load(resources, loadOptions);
+  },
+
+  /**
+   * Mark the grid as sorted following the filter settings.
+   * It happens when the API result is already sorted.
+   * @param {Filter}filter
+   * @private
+   */
+  _markSortedBySettings: function(filter) {
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
+    this.oldFilterSettings = this.filterSettings;
+    this.filterSettings = filter;
+
+    const orders = filter.getOrders();
+    if (orders && orders[0]) {
+      const matches = /((\w*)\.)?(\w*)\s*(asc|desc|ASC|DESC)?/i.exec(orders[0]);
+      const fieldName = matches[3];
+      const sortWay = matches[4] ? matches[4].toLowerCase() : 'asc';
+
+      if (fieldName) {
+        const sortedColumnModel = this.getColumnModel(fieldName);
+        if (sortedColumnModel) {
+          this.view.markColumnAsSorted(sortedColumnModel, sortWay === 'asc');
         }
       }
+    }
+  },
 
-      // Filter by keywords.
-      const keywords = filter.getRule('keywords');
-      if (keywords && keywords != '') {
-        const searchInFields = ['username', 'name', 'uri', 'description'];
-        const plugins = Config.read('server.passbolt.plugins');
-        if (plugins && plugins.tags) {
-          searchInFields.push('tags[].slug');
-        }
-        this.filterByKeywords(keywords, {
-          searchInFields: searchInFields
-        });
-      } else if (this.isFiltered()) {
-        this.resetFilter();
-      }
+  /**
+   * Filter the grid by keywords following the filter settings
+   * @param {Filter} filter
+   * @returns {Promise}
+   * @private
+   */
+  _filterByKeywordsBySettings: function(filter) {
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
+    if (filter.filterByKeywordsApplied) {
+      return;
+    }
+    const keywords = filter.getRule('keywords');
+    if (keywords && keywords != '') {
+      const filterFields = this._getFilterFields();
+      return this.filterByKeywords(keywords, filterFields);
+    } else if (this.isFiltered()) {
+      this.resetFilter();
+    }
+  },
 
-      // If resource to select given
-      if (filter.resource) {
-        this.select(filter.resource);
-      }
+  /**
+   * Select a resource following the filter settings
+   * @param {Filter} filter
+   * @returns {Promise}
+   * @private
+   */
+  _selectResourceBySettings: function(filter) {
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
 
-      this.state.loaded = true;
-    });
+    if (filter.resource) {
+      this.select(filter.resource);
+    }
+  },
 
-    return def;
+  /**
+   * Get the fields the grid can be filter on by keywords.
+   * @returns {string[]}
+   * @private
+   */
+  _getFilterFields: function() {
+    const filterFields = ['username', 'name', 'uri', 'description'];
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins && plugins.tags) {
+      filterFields.push('tags[].slug');
+    }
+    return filterFields;
   },
 
   /**
@@ -394,9 +462,12 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @private
    */
   _showHideEmptyFeeback: function() {
+    if (this.state.destroyed) {
+      return;
+    }
     const isEmpty = this.options.items.length == 0;
     const isAllItemsFilter = this.filterSettings.id == 'default';
-    if (isEmpty && isAllItemsFilter) {
+    if (isEmpty && isAllItemsFilter && !this.isFiltered()) {
       $(this.element).addClass('empty all_items');
       const empty_html = View.render(gridEmptyTemplate);
       $('.tableview-content', this.element).prepend(empty_html);

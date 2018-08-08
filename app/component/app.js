@@ -80,8 +80,8 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   afterStart: function() {
     this._firstLoad = true;
-    this._initHeader();
     this._initFooter();
+    this._initHeader();
     SessionCheck.instantiate();
     this._dispatchRoute();
     this._super();
@@ -124,9 +124,9 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * Init footer
    */
   _initFooter: function() {
-    new NotificationComponent('#js_app_notificator');
     const loadingBarComponent = new LoadingBarComponent('#js_app_loading_bar');
     loadingBarComponent.start();
+    new NotificationComponent('#js_app_notificator');
   },
 
   /**

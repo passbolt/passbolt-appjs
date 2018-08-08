@@ -32,7 +32,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
     this._initialized = false;
     this._progressing = false;
     this._completing = false;
-    this._progressedSpace = 0;
+    this._progressedSpace = 100;
     this._scheduledProgress = null;
     this._initListeners();
   },
@@ -203,6 +203,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
         this._completing = false;
         this._progressing = false;
         this._initialized = false;
+        this._progressedSpace = 100;
         if (!this.state.loadingProcesses) {
           this._maxProcesses = 0;
         }

@@ -14,7 +14,7 @@
 import CheckboxComponent from 'passbolt-mad/form/element/checkbox';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
-import GridColumn from 'passbolt-mad/model/grid_column';
+import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/user/grid_contextual_menu';
 import Group from 'app/model/map/group';
@@ -40,7 +40,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     itemTemplate: itemTemplate,
     Group: Group,
     GroupUser: GroupUser,
-    User: User
+    User: User,
+    paginate: true
   }
 
 }, /** @prototype */ {
@@ -238,8 +239,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
   },
 
   /**
-   * Is the item selected
-   * @param {User}
+   * Check if a user is selected
+   * @param {User} item The target user
    * @return {bool}
    */
   isSelected: function(item) {
@@ -278,68 +279,128 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @param {Filter} filter The filter to
    */
   filterBySettings: function(filter) {
-    // The deferred used for the users find all request.
-    let def = null;
-
-    // If new filter or the filter changed, request the API.
-    if (!this.filterSettings || this.filterSettings.id !== filter.id) {
-      this.state.loaded = false;
-      const findOptions = {
-        silentLoading: false,
-        filter: filter.getRules(['keywords']), // All rules except keywords that is filtered on the browser.
-        order: filter.getOrders(),
-        contain: {
-          LastLoggedIn: 1
-        }
-      };
-
-      this.reset();
-      def = User.findAll(findOptions).then(users => {
-        if (this.state.destroyed) {
-          return;
-        }
-        this.load(users);
+    this.state.loaded = false;
+    return this._findUsers(filter)
+      .then(resources => this._handleApiUsers(resources, filter))
+      .then(() => this._markSortedBySettings(filter))
+      .then(() => this._filterByKeywordsBySettings(filter))
+      .then(() => {
+        this.state.loaded = true;
       });
-    } else {
-      def = Promise.resolve();
+  },
+
+  /**
+   * Find users if the given filter needs it
+   * @param {Filter} filter
+   * @return {Promise}
+   * @private
+   */
+  _findUsers: function(filter) {
+    const requestApi = !this.filterSettings || (this.filterSettings.id !== filter.id);
+    if (!requestApi) {
+      return Promise.resolve();
     }
 
-    // Once the call API done, if any, filter locally the result by keywords if any.
-    def.then(() => {
-      this.filterSettings = filter;
+    const findOptions = {
+      silentLoading: false,
+      filter: filter.getRules(['keywords']), // All rules except keywords that is filtered on the browser.
+      order: filter.getOrders(),
+      contain: {
+        LastLoggedIn: 1
+      }
+    };
+    return User.findAll(findOptions);
+  },
 
-      // Mark the ordered column if any.
-      const orders = filter.getOrders();
-      if (orders && orders[0]) {
-        const matches = /((\w*)\.)?(\w*)\s*(asc|desc|ASC|DESC)?/i.exec(orders[0]);
-        let fieldName = matches[3];
-        const sortWay = matches[4] ? matches[4].toLowerCase() : 'asc';
+  /**
+   * Handle the find request API response
+   * @param {User.List} users The resources list from the API. If undefined, the grid doesn't need to be reloaded.
+   * @param {Filter} filter The filter to apply
+   * @return {Promise}
+   * @private
+   */
+  _handleApiUsers: function(users, filter) {
+    if (!users) {
+      return Promise.resolve();
+    }
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
+    this.view.reset();
+    const loadOptions = {};
+    const keywords = filter.getRule('keywords');
+    if (keywords && keywords != '') {
+      filter.filterByKeywordsApplied = true;
+      loadOptions.filter = {
+        keywords: keywords,
+        fields: this._getFilterFields()
+      };
+    }
 
-        if (fieldName) {
-          if (fieldName === 'last_name' || fieldName === "first_name") {
-            fieldName = 'name';
-          }
+    return this.load(users, loadOptions);
+  },
 
-          const sortedColumnModel = this.getColumnModel(fieldName);
-          if (sortedColumnModel) {
-            this.view.markColumnAsSorted(sortedColumnModel, sortWay === 'asc');
-          }
+  /**
+   * Get the fields the grid can be filter on by keywords.
+   * @returns {string[]}
+   * @private
+   */
+  _getFilterFields: function() {
+    const filterFields = ['username', 'Role.name', 'Profile.first_name', 'Profile.last_name'];
+    return filterFields;
+  },
+
+  /**
+   * Mark the grid as sorted following the filter settings.
+   * It happens when the API result is already sorted.
+   * @param {Filter}filter
+   * @private
+   */
+  _markSortedBySettings: function(filter) {
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
+    this.oldFilterSettings = this.filterSettings;
+    this.filterSettings = filter;
+
+    const orders = filter.getOrders();
+    if (orders && orders[0]) {
+      const matches = /((\w*)\.)?(\w*)\s*(asc|desc|ASC|DESC)?/i.exec(orders[0]);
+      let fieldName = matches[3];
+      const sortWay = matches[4] ? matches[4].toLowerCase() : 'asc';
+
+      if (fieldName) {
+        if (fieldName === 'last_name' || fieldName === "first_name") {
+          fieldName = 'name';
+        }
+        const sortedColumnModel = this.getColumnModel(fieldName);
+        if (sortedColumnModel) {
+          this.view.markColumnAsSorted(sortedColumnModel, sortWay === 'asc');
         }
       }
+    }
+  },
 
-      // Filter by keywords if any filter defined.
-      const keywords = filter.getRule('keywords');
-      if (keywords && keywords != '') {
-        this.filterByKeywords(keywords, {
-          searchInFields: ['username', 'Role.name', 'Profile.first_name', 'Profile.last_name']
-        });
-      } else if (this.isFiltered()) {
-        // Otherwise reset the local filtering.
-        this.resetFilter();
-      }
-
-      this.state.loaded = true;
-    });
+  /**
+   * Filter the grid by keywords following the filter settings
+   * @param {Filter} filter
+   * @returns {Promise}
+   * @private
+   */
+  _filterByKeywordsBySettings: function(filter) {
+    if (this.state.destroyed) {
+      return Promise.resolve();
+    }
+    if (filter.filterByKeywordsApplied) {
+      return;
+    }
+    const keywords = filter.getRule('keywords');
+    if (keywords && keywords != '') {
+      const filterFields = this._getFilterFields();
+      return this.filterByKeywords(keywords, filterFields);
+    } else if (this.isFiltered()) {
+      this.resetFilter();
+    }
   },
 
   /* ************************************************************** */

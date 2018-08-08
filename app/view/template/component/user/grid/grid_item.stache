@@ -1,4 +1,4 @@
-<tr id="{{id}}" class="{{#unless(mappedItem.active)}}inactive{{/unless}}">
+<tr id="{{id}}" class="{{#unless(mappedItem.active)}}inactive{{/unless}}{{#if(options.hidden}} hidden{{/if}}">
 
 {{#each(columnModels, columnModel=value num=index)}}
 	<td class="js_grid_column_{{name}} cell_{{name}} {{css.join(' ')}}">

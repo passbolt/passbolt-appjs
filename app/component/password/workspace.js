@@ -489,7 +489,10 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   '{mad.bus.element} workspace_sidebar_state_change': function() {
     const resource = this.options.selectedResources[0];
     if (resource) {
-      this._initSecondarySidebar(resource).start();
+      const component = this._initSecondarySidebar(resource);
+      if (component) {
+        component.start();
+      }
     }
   },
 
