@@ -29,7 +29,7 @@
         <div id="js_secret_edit_0" class="js_secret_edit_form">
             <input type="hidden" name="passbolt.model.Secret.id" id="js_field_secret_id_0" class="js_field_secret_id form_field" />
             <input type="hidden" name="passbolt.model.Secret.user_id" id="js_field_secret_user_id_0" class="js_field_secret_user_id form_field" />
-            <textarea name="passbolt.model.Secret.data" id="js_field_secret_data_0" class="form_field js_field_secret_data"></textarea>
+            <textarea name="passbolt.model.Secret.data" id="js_field_secret_data_0" class="form_field js_field_secret_data hidden"></textarea>
         </div>
 	</div>
 
