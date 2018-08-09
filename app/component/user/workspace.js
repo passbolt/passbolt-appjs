@@ -73,7 +73,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     return new Filter({
       id: 'default',
       label: __('All users'),
-      order: ['Profile.last_name ASC']
+      order: ['Profile.first_name ASC']
     });
   }
 
@@ -94,19 +94,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   _dispatchRoute: function() {
     const action = route.data.action;
     switch (action) {
-      case 'index': {
-        // Apply a filter to the workspace
-        let filter = null;
-        if (this.options.filterSettings == undefined) {
-          filter = this.constructor.getDefaultFilterSettings();
-        } else {
-          filter = this.options.filterSettings;
-        }
-
-        // Filter the workspace
-        MadBus.trigger('filter_workspace', {filter: filter});
-        break;
-      }
       case 'view': {
         const id = route.data.id;
         const user = User.connection.instanceStore.get(id);

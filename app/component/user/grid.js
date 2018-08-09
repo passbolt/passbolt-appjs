@@ -135,7 +135,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
       index: 'Profile',
       css: ['m-cell'],
       label: __('User'),
-      sortable: true
+      sortable: true,
+      sortOn: 'profile.first_name'
     });
     columns.push(nameColumn);
 

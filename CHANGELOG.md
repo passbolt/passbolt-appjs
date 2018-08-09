@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2933: Upgrade to canjs 4
 - PASSBOLT-2926: Fix session timeout check
 - PASSBOLT-2940: Implement routes
+- PASSBOLT-2941: Grid performance fix
+- PASSBOLT-2805: Sort by date fix and sort by user first_name by default
 
 ## [2.1.0] - 2018-06-14
 ### Added
