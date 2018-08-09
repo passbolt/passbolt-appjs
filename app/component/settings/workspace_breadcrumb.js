@@ -15,6 +15,7 @@ import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
+import route from 'can-route';
 import User from 'app/model/map/user';
 import uuid from 'uuid/v4';
 
@@ -30,6 +31,36 @@ const WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settin
   }
 
 }, /** @prototype */ {
+
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    this._super(el, options);
+    this._initRouteListener();
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    // We have to proceed like following to execute the dispatch route in the scope of the instance, and be able to remove the listener when the component is destroyed.
+    const executeFunc = () => this._dispatchRoute();
+    route.data.on('action', executeFunc);
+    this.state.on('destroyed', () => route.data.off('action', executeFunc));
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    if (route.data.controller == 'Settings') {
+      const section = route.data.action;
+      this.refreshMenuItems(section);
+    }
+  },
 
   /**
    * @inheritdoc
@@ -108,6 +139,8 @@ const WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settin
         }
       })
     ];
+
+    this._dispatchRoute();
   },
 
   /**

@@ -14,6 +14,7 @@
 import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import MadBus from 'passbolt-mad/control/bus';
+import route from 'can-route';
 import template from 'app/view/template/component/settings/workspace_primary_menu.stache!';
 
 const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.WorkspacePrimaryMenu', /** @static */ {
@@ -23,6 +24,52 @@ const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Work
   }
 
 }, /** @prototype */ {
+
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    this._super(el, options);
+    this._initRouteListener();
+  },
+
+  /**
+   * Initialize the route listener
+   * @private
+   */
+  _initRouteListener: function() {
+    // We have to proceed like following to execute the dispatch route in the scope of the instance, and be able to remove the listener when the component is destroyed.
+    const executeFunc = () => this._dispatchRoute();
+    route.data.on('action', executeFunc);
+    this.state.on('destroyed', () => route.data.off('action', executeFunc));
+  },
+
+  /**
+   * Dispatch route
+   * @private
+   */
+  _dispatchRoute: function() {
+    if (route.data.controller == 'Settings') {
+      const section = route.data.action;
+      this._enableSection(section);
+    }
+  },
+
+  /**
+   * Enable a section
+   * @param {string} section The target section
+   */
+  _enableSection: function(section) {
+    if (section == 'profile') {
+      this.options.editButton.state.hidden = false;
+      this.options.publicKeyButton.state.hidden = true;
+      this.options.privateKeyButton.state.hidden = true;
+    } else if (section == 'keys') {
+      this.options.editButton.state.hidden = true;
+      this.options.publicKeyButton.state.hidden = false;
+      this.options.privateKeyButton.state.hidden = false;
+    }
+  },
 
   /**
    * After start hook.
@@ -51,6 +98,7 @@ const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Work
     this.options.privateKeyButton = privateKeyButton;
 
     this.on();
+    this._dispatchRoute();
   },
 
   /* ************************************************************** */
@@ -76,28 +124,6 @@ const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Work
    */
   '{privateKeyButton.element} click': function() {
     MadBus.trigger('passbolt.settings.download_private_key');
-  },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
-  /**
-   * Observe when the user changes section inside the workspace, and adjust the menu items accordingly
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_settings_section': function(el, ev) {
-    const section = ev.data.section;
-    if (section == 'profile') {
-      this.options.editButton.state.hidden = false;
-      this.options.publicKeyButton.state.hidden = true;
-      this.options.privateKeyButton.state.hidden = true;
-    } else if (section == 'keys') {
-      this.options.editButton.state.hidden = true;
-      this.options.publicKeyButton.state.hidden = false;
-      this.options.privateKeyButton.state.hidden = false;
-    }
   }
 });
 
