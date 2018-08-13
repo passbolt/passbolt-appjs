@@ -22,6 +22,7 @@ import DialogComponent from 'passbolt-mad/component/dialog';
 import GridComponent from 'app/component/password/grid';
 import MadBus from 'passbolt-mad/control/bus';
 import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
+import Plugin from 'app/util/plugin';
 
 import PrimaryMenuComponent from 'app/component/password/workspace_primary_menu';
 import PrimarySidebarComponent from 'app/component/password/primary_sidebar';
