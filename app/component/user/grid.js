@@ -275,6 +275,15 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     this.view.unselectItem(item);
   },
 
+
+  /**
+   * @inheritdoc
+   */
+  sort: function(columnModel, sortAsc) {
+    this.options.selectedUsers.splice(0);
+    return this._super(columnModel, sortAsc);
+  },
+
   /**
    * Filter the browser using a filter settings object
    * @param {Filter} filter The filter to

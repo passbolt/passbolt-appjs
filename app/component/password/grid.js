@@ -326,6 +326,14 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   },
 
   /**
+   * @inheritdoc
+   */
+  sort: function(columnModel, sortAsc) {
+    this.options.selectedResources.splice(0);
+    return this._super(columnModel, sortAsc);
+  },
+
+  /**
    * Find resources if the given filter needs it
    * @param {Filter} filter
    * @return {Promise}
