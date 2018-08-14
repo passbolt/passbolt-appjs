@@ -33,7 +33,16 @@ const GroupsFilterSidebarSectionComponent = Component.extend('passbolt.component
     const peopleGroupsList = new PeopleGroupsListComponent('#js_wsp_users_groups_list', {
       selectedGroups: this.options.selectedGroups
     });
+    peopleGroupsList.state.on('empty', (ev, empty) => this._onGroupListEmptyChange(empty));
     peopleGroupsList.start();
+  },
+
+  /**
+   * Observe when the component is empty / filled
+   * @param {boolean} empty True if empty, false otherwise
+   */
+  _onGroupListEmptyChange(empty) {
+    this.state.empty = empty;
   }
 
 });

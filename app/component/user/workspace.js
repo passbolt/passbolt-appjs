@@ -72,6 +72,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   getDefaultFilterSettings: function() {
     return new Filter({
       id: 'default',
+      type: 'default',
       label: __('All users'),
       order: ['Profile.first_name ASC']
     });

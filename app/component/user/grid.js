@@ -22,9 +22,11 @@ import GroupUser from 'app/model/map/group_user';
 import MadMap from 'passbolt-mad/util/map/map';
 import User from 'app/model/map/user';
 import UserGridView from 'app/view/component/user/grid';
+import View from 'passbolt-mad/view/view';
 
 import cellAvatarTemplate from 'app/view/template/component/user/grid/cell_avatar.stache!';
 import columnHeaderSelectTemplate from 'app/view/template/component/user/grid/column_header_select.stache!';
+import gridFilteredEmptyTemplate from 'app/view/template/component/user/grid/grid_filtered_empty.stache!';
 import itemTemplate from 'app/view/template/component/user/grid/grid_item.stache!';
 
 const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /** @static */ {
@@ -232,8 +234,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * Reset the grid
    */
   reset: function() {
-    this.filtered = false;
-    this.filterSettings = null;
     const sortedColumnModel = this.getColumnModel('name');
     this.view.markColumnAsSorted(sortedColumnModel, true);
     this._super();
@@ -289,14 +289,11 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @param {Filter} filter The filter to
    */
   filterBySettings: function(filter) {
-    this.state.loaded = false;
+    this.view.reset();
     return this._findUsers(filter)
-      .then(resources => this._handleApiUsers(resources, filter))
+      .then(users => this._handleApiUsers(users, filter))
       .then(() => this._markSortedBySettings(filter))
-      .then(() => this._filterByKeywordsBySettings(filter))
-      .then(() => {
-        this.state.loaded = true;
-      });
+      .then(() => this._filterByKeywordsBySettings(filter));
   },
 
   /**
@@ -330,6 +327,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @private
    */
   _handleApiUsers: function(users, filter) {
+    this.filterSettings = filter;
     if (!users) {
       return Promise.resolve();
     }
@@ -356,8 +354,49 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @private
    */
   _getFilterFields: function() {
-    const filterFields = ['username', 'Role.name', 'Profile.first_name', 'Profile.last_name'];
+    const filterFields = ['username', 'role.name', 'profile.first_name', 'profile.last_name'];
     return filterFields;
+  },
+
+  /**
+   * Observe when the component is empty
+   * @param {boolean} empty True if empty, false otherwise
+   */
+  onEmptyChange: function(empty) {
+    this._super(empty);
+    // Remove the empty feedback before the grid is loaded, otherwise the rows are inserted under the feedback.
+    if (this.state.filtering && !empty) {
+      $(this.element).removeClass('empty');
+      $('.empty-content', this.element).remove();
+    }
+  },
+
+  /**
+   * Observe when the component is loaded
+   * @param {boolean} loaded True if loaded, false otherwise
+   */
+  onLoadedChange: function(loaded) {
+    this._super(loaded);
+    if (this.state.destroyed) {
+      return;
+    }
+
+    const empty = this.state.empty;
+    if (!loaded || !empty) {
+      if (this.state.filtering && $(this.element).hasClass('filtered')) {
+        return;
+      }
+      $('.empty-content', this.element).remove();
+      return;
+    }
+
+    if (this.state.filtered) {
+      if ($('.empty-content', this.element).length) {
+        return;
+      }
+      const empty_html = View.render(gridFilteredEmptyTemplate);
+      $('.tableview-content', this.element).prepend(empty_html);
+    }
   },
 
   /**
@@ -370,8 +409,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     if (this.state.destroyed) {
       return Promise.resolve();
     }
-    this.oldFilterSettings = this.filterSettings;
-    this.filterSettings = filter;
 
     const orders = filter.getOrders();
     if (orders && orders[0]) {
@@ -408,7 +445,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     if (keywords && keywords != '') {
       const filterFields = this._getFilterFields();
       return this.filterByKeywords(keywords, filterFields);
-    } else if (this.isFiltered()) {
+    } else if (this.state.filtered) {
       this.resetFilter();
     }
   },

@@ -1,0 +1,4 @@
+<div class="empty-content">
+	<h2>{{__('None of your passwords are yet marked as favorite.')}}</h2>
+	<p>{{__('Add stars to passwords your want to easily find later.')}}</p>
+</div>

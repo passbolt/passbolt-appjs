@@ -1,0 +1,4 @@
+<div class="empty-content">
+	<h2>{{__('None of the users matched this search.')}}</h2>
+	<p>{{__('Try another search or use the left panel to navigate into your organization.')}}</p>
+</div>

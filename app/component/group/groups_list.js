@@ -57,8 +57,13 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
    * @inheritdoc
    */
   afterStart: function() {
+    this.state.loaded = false;
     this.setViewData('withMenu', this.options.withMenu);
-    this.loadGroups(this.options.defaultGroupFilter);
+    this._findGroups(this.options.defaultGroupFilter)
+      .then(groups => this.load(groups))
+      .then(() => {
+        this.state.loaded = true;
+      });
     this._super();
   },
 
@@ -91,28 +96,20 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
   },
 
   /**
-   * Load groups after retrieving them from API according to a given filter.
-   * @param json filter
+   * Find groups.
+   * @param {object} filter
    *   The filter required. Provide {} if no filter
    *   Example: {"has-users":"xxx-xxx-xxx-xxx-xxx"}
+   * @return {Promise}
+   * @private
    */
-  loadGroups: function(filter) {
+  _findGroups: function(filter) {
     const findOptions = {
       contain: {'my_group_user': 1},
       order: ['Group.name ASC'],
       filter: filter
     };
-    this.state.loaded = false;
-    Group.findAll(findOptions)
-      .then(groups => {
-        if (this.state.destroyed) {
-          return;
-        }
-        this.load(groups);
-        this.state.loaded = true;
-      }, error => {
-        throw error;
-      });
+    return Group.findAll(findOptions);
   },
 
   /**
@@ -151,6 +148,7 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
   _filterWorkspaceByGroup: function(group) {
     this.selectedFilter = new Filter({
       id: `workspace_filter_group_${group.id}_${uuid()}`,
+      type: 'group',
       label: group.name + __(' (group)'),
       rules: {
         'has-groups': group.id

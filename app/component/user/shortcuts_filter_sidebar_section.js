@@ -58,6 +58,7 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
       label: __('Recently modified'),
       filter: new Filter({
         id: 'workspace_filter_modified',
+        type: 'modified',
         label: __('Recently modified'),
         order: ['User.modified DESC']
       })

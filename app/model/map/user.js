@@ -170,6 +170,9 @@ User.connection = connect([connectParse, connectDataUrl, connectConstructor, con
         url: 'users.json',
         type: 'GET',
         params: params
+      }).then((users) => {
+
+        return users;
       });
     },
     destroyData: function(params) {

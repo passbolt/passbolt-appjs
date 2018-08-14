@@ -38,6 +38,9 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
     const tree = this._initTree();
     this._findUserGroups()
       .then(groups => {
+        if (!groups.length) {
+          this.state.empty = true;
+        }
         tree.load(groups);
         this.state.loaded = true;
         tree.state.loaded = true;

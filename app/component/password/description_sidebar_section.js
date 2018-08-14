@@ -43,13 +43,13 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     this._super();
     const resource = this.options.resource;
     this.setViewData('resource', resource);
-    this.setViewData('editable', resource.permission.isAllowedTo(PermissionType.UPDATE));
+    this.setViewData('canEdit', resource.permission.isAllowedTo(PermissionType.UPDATE));
   },
 
   /**
    * Observe when the user want to edit the instance's resource description
    */
-  '{element} a#js_edit_description_button, p.description_content click': function() {
+  '{element} a#js_edit_description_button, p.description_content click, em.empty-content click': function() {
     const resource = this.options.resource;
     const canUpdate = resource.permission.isAllowedTo(PermissionType.UPDATE);
     if (!canUpdate) {
@@ -58,6 +58,15 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     if (!this.editing) {
       this.enableEditMode();
     } else {
+      this.disableEditMode();
+    }
+  },
+
+  /**
+   * Observe when the user want to cancel the edit operation.
+   */
+  '{element} #js_resource_description_edit_cancel click': function() {
+    if (this.editing) {
       this.disableEditMode();
     }
   },
@@ -97,7 +106,7 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
         }
       }
     };
-    $('.description_content', $(this.element)).addClass('hidden');
+    $('.description_content, .empty-content', this.element).addClass('hidden');
     const selector = $('.accordion-content', this.element);
     const form = ComponentHelper.create(selector, 'last', ResourceEditDescriptionForm, formOptions);
     form.start();
@@ -110,7 +119,7 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
   disableEditMode: function() {
     this.editing = false;
     this.form.destroyAndRemove();
-    $('.description_content', $(this.element)).removeClass('hidden');
+    $('.description_content, .empty-content', this.element).removeClass('hidden');
   },
 
   /**

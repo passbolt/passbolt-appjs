@@ -2,4 +2,7 @@
     <h4><a class="accordion-trigger" role="button">{{ __('Groups') }}</a></h4>
 </div>
 
-<ul class="accordion-content shared-with" id="js_user_groups_list"></ul>
+<div class="accordion-content">
+    <em class="hidden empty-feedback">{{ __('The user is not a member of any group yet') }}</em>
+    <ul class="shared-with" id="js_user_groups_list"></ul>
+</div>

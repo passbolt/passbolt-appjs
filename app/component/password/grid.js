@@ -31,7 +31,12 @@ import columnHeaderFavoriteTemplate from 'app/view/template/component/password/g
 import cellSecretTemplate from 'app/view/template/component/password/grid/cell_secret_template.stache!';
 import cellUsernameTemplate from 'app/view/template/component/password/grid/cell_username_template.stache!';
 import cellUriTemplate from 'app/view/template/component/password/grid/cell_uri_template.stache!';
-import gridEmptyTemplate from 'app/view/template/component/password/grid/grid_empty.stache!';
+import gridWelcomeTemplate from 'app/view/template/component/password/grid/grid_welcome.stache!';
+import gridFilteredEmptyTemplate from 'app/view/template/component/password/grid/grid_filtered_empty.stache!';
+import gridFavoriteEmptyTemplate from 'app/view/template/component/password/grid/grid_favorite_empty.stache!';
+import gridGroupEmptyTemplate from 'app/view/template/component/password/grid/grid_group_empty.stache!';
+import gridOwnerEmptyTemplate from 'app/view/template/component/password/grid/grid_owner_empty.stache!';
+import gridSharedEmptyTemplate from 'app/view/template/component/password/grid/grid_shared_empty.stache!';
 
 const PasswordGridComponent = GridComponent.extend('passbolt.component.password.Grid', /** @static */ {
 
@@ -53,12 +58,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @type {Filter}
    */
   filterSettings: null,
-
-  /**
-   * Keep a trace of the old filter used to filter the browser.
-   * @type {Filter}
-   */
-  oldFilterSettings: null,
 
   /**
    * The array of select checkbox components.
@@ -312,17 +311,12 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @return {Promise}
    */
   filterBySettings: function(filter) {
-    this.state.loaded = false;
     this.view.reset();
     return this._findResources(filter)
       .then(resources => this._handleApiResources(resources, filter))
       .then(() => this._markSortedBySettings(filter))
       .then(() => this._filterByKeywordsBySettings(filter))
-      .then(() => this._selectResourceBySettings(filter))
-      .then(() => {
-        this._showHideEmptyFeeback();
-        this.state.loaded = true;
-      });
+      .then(() => this._selectResourceBySettings(filter));
   },
 
   /**
@@ -362,6 +356,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @private
    */
   _handleApiResources: function(resources, filter) {
+    this.filterSettings = filter;
     if (!resources) {
       return Promise.resolve();
     }
@@ -369,9 +364,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       return Promise.resolve();
     }
     this.view.reset();
-    if (!resources.length) {
-      this.state.empty = true;
-    }
     const loadOptions = {};
     const keywords = filter.getRule('keywords');
     if (keywords && keywords != '') {
@@ -395,8 +387,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     if (this.state.destroyed) {
       return Promise.resolve();
     }
-    this.oldFilterSettings = this.filterSettings;
-    this.filterSettings = filter;
 
     const orders = filter.getOrders();
     if (orders && orders[0]) {
@@ -430,8 +420,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     if (keywords && keywords != '') {
       const filterFields = this._getFilterFields();
       return this.filterByKeywords(keywords, filterFields);
-    } else if (this.isFiltered()) {
-      this.resetFilter();
+    } else if (this.state.filtered) {
+      return this.resetFilter();
     }
   },
 
@@ -466,23 +456,82 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   },
 
   /**
-   * Display an empty feedback for the all items filter
-   * @private
+   * Observe when the component is empty
+   * @param {boolean} empty True if empty, false otherwise
    */
-  _showHideEmptyFeeback: function() {
+  onEmptyChange: function(empty) {
+    this._super(empty);
+    // Remove the empty feedback before the grid is loaded, otherwise the rows are inserted under the feedback.
+    if (this.state.filtering && !empty) {
+      $(this.element).removeClass('all_items');
+      $('.empty-content', this.element).remove();
+    }
+  },
+
+  /**
+   * Observe when the component is loaded
+   * @param {boolean} loaded True if loaded, false otherwise
+   */
+  onLoadedChange: function(loaded) {
+    this._super(loaded);
     if (this.state.destroyed) {
       return;
     }
-    const isEmpty = this.options.items.length == 0;
-    const isAllItemsFilter = this.filterSettings.id == 'default';
-    if (isEmpty && isAllItemsFilter && !this.isFiltered()) {
-      $(this.element).addClass('empty all_items');
-      const empty_html = View.render(gridEmptyTemplate);
-      $('.tableview-content', this.element).prepend(empty_html);
-    } else {
-      $(this.element).removeClass('empty all_items');
+
+    const empty = this.state.empty;
+    if (!loaded || !empty) {
+      if (this.state.filtering && $(this.element).hasClass('filtered')) {
+        return;
+      }
+      $(this.element).removeClass('all_items');
       $('.empty-content', this.element).remove();
+      return;
     }
+
+    let emptyTemplate;
+    const emptyCssClasses = [];
+    switch (this.filterSettings.type) {
+      case 'default': {
+        if (this.state.filtered) {
+          // Template already in the dom. In case of filtering we don't remove it from the dom when the component is unloaded to avoid blinking.
+          if ($('.empty-content', this.element).length) {
+            return;
+          }
+          emptyTemplate = gridFilteredEmptyTemplate;
+        } else {
+          emptyCssClasses.push('all_items');
+          emptyTemplate = gridWelcomeTemplate;
+        }
+        break;
+      }
+      case 'group':
+        emptyTemplate = gridGroupEmptyTemplate;
+        break;
+      case 'owner': {
+        emptyTemplate = gridOwnerEmptyTemplate;
+        break;
+      }
+      case 'modified': {
+        emptyCssClasses.push('all_items');
+        emptyTemplate = gridWelcomeTemplate;
+        break;
+      }
+      case 'favorite': {
+        emptyTemplate = gridFavoriteEmptyTemplate;
+        break;
+      }
+      case 'shared_with_me': {
+        emptyTemplate = gridSharedEmptyTemplate;
+        break;
+      }
+      default:{
+        return;
+      }
+    }
+
+    $(this.element).addClass(emptyCssClasses);
+    const empty_html = View.render(emptyTemplate);
+    $('.tableview-content', this.element).prepend(empty_html);
   },
 
   /**
@@ -493,7 +542,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    */
   '{Resource} created': function(Constructor, ev, resource) {
     this.insertItem(resource, null, 'first');
-    this._showHideEmptyFeeback();
   },
 
   /**

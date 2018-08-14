@@ -1,0 +1,4 @@
+<div class="empty-content">
+	<h2>{{__('No passwords are shared with you yet.')}}</h2>
+	<p>{{__('It does feel a bit empty here. Wait for a team member to share a password with you.')}}</p>
+</div>

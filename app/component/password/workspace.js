@@ -61,6 +61,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   getDefaultFilterSettings: function() {
     const filter = new Filter({
       id: 'default',
+      type: 'default',
       label: __('All items'),
       order: ['Resource.modified DESC']
     });
@@ -517,10 +518,17 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * When a new filter is applied to the workspace.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} filter_workspace': function() {
+  '{mad.bus.element} filter_workspace': function(el, ev) {
+    const filter = ev.data.filter;
     // When filtering the resources browser, unselect all the resources.
     this.options.selectedResources.splice(0, this.options.selectedResources.length);
+    // Unselect all group if the filter does not target a group (dirty).
+    if (!filter.rules['is-shared-with-group']) {
+      this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
+    }
   },
 
   /**

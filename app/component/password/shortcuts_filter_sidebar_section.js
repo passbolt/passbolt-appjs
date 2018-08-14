@@ -58,6 +58,7 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
       label: __('Favorite'),
       filter: new Filter({
         id: 'workspace_filter_favorite',
+        type: 'favorite',
         label: __('Favorite'),
         rules: {
           'is-favorite': true
@@ -73,6 +74,7 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
       label: __('Recently modified'),
       filter: new Filter({
         id: 'workspace_filter_modified',
+        type: 'modified',
         label: __('Recently modified'),
         order: ['Resource.modified DESC']
       })
@@ -85,6 +87,7 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
       label: __('Shared with me'),
       filter: new Filter({
         id: 'workspace_filter_shared',
+        type: 'shared_with_me',
         label: __('Shared with me'),
         rules: {
           'is-shared-with-me': true
@@ -100,6 +103,7 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
       label: __('Items I own'),
       filter: new Filter({
         id: 'workspace_filter_own',
+        type: 'owner',
         label: __('Items I own'),
         rules: {
           'is-owned-by-me': true

@@ -9,4 +9,7 @@
         </div>
     </li>
 </ul>
-<ul id="js_wsp_users_groups_list" class="accordion-content"></ul>
+<div class="accordion-content">
+    <em class="hidden empty-content">{{ __('empty') }}</em>
+    <ul id="js_wsp_users_groups_list"></ul>
+</div>

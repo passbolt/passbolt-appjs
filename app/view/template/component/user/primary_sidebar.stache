@@ -1,3 +1,3 @@
 <div class="navigation first shortcuts" id="js_wsp_users_filter_shortcuts"></div>
 
-<div class="navigation groups" id="js_wsp_users_groups"></div>
+<div class="navigation groups accordion" id="js_wsp_users_groups"></div>

@@ -25,8 +25,7 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
     label: 'Password Workspace Primary Sidebar',
     template: template,
     defaultFilter: null,
-    // State strategy
-    state: 'loading'
+    selectedGroups: null
   }
 
 }, /** @prototype */ {
@@ -55,7 +54,9 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
    * Initialize the groups filter section
    */
   _initGroupsFilterSection: function() {
-    const component = new GroupsFilterSidebarSectionComponent('#js_wsp_pwd_password_categories');
+    const component = new GroupsFilterSidebarSectionComponent('#js_wsp_pwd_password_categories', {
+      selectedGroups: this.options.selectedGroups
+    });
     component.start();
   },
 

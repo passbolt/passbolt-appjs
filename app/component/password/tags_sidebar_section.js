@@ -87,18 +87,18 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
   },
 
   /**
-   * Init form.
+   * Enable the edit mode.
    */
-  _initForm: function() {
-    const slugs = this.options.resource.tags.attr()
-      .reduce((accumulator, currentValue) => [...accumulator, currentValue.slug], []);
-
-    // Remove any message if any.
+  enableEditMode: function() {
+    this._editing = true;
+    this.options.tree.state.hidden = true;
     this._hideEmptyMessage();
 
-    // Init the form
+    const slugs = this.options.resource.tags.attr()
+      .reduce((accumulator, currentValue) => [...accumulator, currentValue.slug], []);
     const formHtml = View.render(tagUpdateFormTemplate);
     $('.accordion-content', this.element).append(formHtml);
+
     const tagEditorSelector = '#js_edit_tags_form';
     $(tagEditorSelector).tagEditor({
       startTags: slugs,
@@ -117,10 +117,21 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
   },
 
   /**
+   * Disable the edit mode
+   */
+  disableEditMode: function() {
+    this._editing = false;
+    const tagEditorSelector = '#js_edit_tags_form';
+    $(tagEditorSelector).remove();
+    this.options.tree.state.hidden = false;
+    this._showEmptyMessage();
+  },
+
+  /**
    * Hide the empty message if any.
    */
   _hideEmptyMessage: function() {
-    $('#js_tag_sidebar_section_empty_message').addClass('hidden');
+    $('.empty-content', this.element).addClass('hidden');
   },
 
   /**
@@ -128,18 +139,8 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    */
   _showEmptyMessage: function() {
     if (!this.options.resource.tags.length) {
-      $('#js_tag_sidebar_section_empty_message').removeClass('hidden');
+      $('.empty-content', this.element).removeClass('hidden');
     }
-  },
-
-  /**
-   * Destroy form
-   */
-  _destroyForm: function() {
-    this._editing = false;
-    const tagEditorSelector = '#js_edit_tags_form';
-    $(tagEditorSelector).remove();
-    this.options.tree.state.hidden = false;
   },
 
   /**
@@ -188,9 +189,9 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     return Tag.updateResourceTags(this.options.resource.id, slugs)
       .then(tags => {
         this.options.resource.tags = tags;
+        this.disableEditMode();
         tree.reset();
         this._loadTags(tags);
-        this._destroyForm();
         MadBus.trigger('resource_tags_updated', [this.options.resource]);
       });
   },
@@ -252,19 +253,29 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * Cancel the changes
    */
   '{element} #js_tags_editor_cancel click': function() {
-    this._destroyForm();
+    this.disableEditMode();
   },
 
   /**
    * Save the list of tags
    */
   '{element} #js_edit_tags_button click': function() {
-    if (this._editing) {
-      return;
+    if (!this._editing) {
+      this.enableEditMode();
+    } else {
+      this.disableEditMode();
     }
-    this._editing = true;
-    this.options.tree.state.hidden = true;
-    this._initForm();
+  },
+
+  /**
+   * Save the list of tags
+   */
+  '{element} em.empty-content click': function() {
+    if (!this._editing) {
+      this.enableEditMode();
+    } else {
+      this.disableEditMode();
+    }
   },
 
   /**
@@ -276,6 +287,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     const tag = DomData.get(li, Tag.shortName);
     const filter = new Filter({
       id: `workspace_filter_tag_${tag.id}`,
+      type: 'tag',
       label: tag.slug + __(' (tag)'),
       rules: {
         'has-tag': tag.slug

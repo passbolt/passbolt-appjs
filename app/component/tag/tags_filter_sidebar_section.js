@@ -45,12 +45,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   afterStart: function() {
     this._initTree();
     this._findTags()
-      .then(tags => {
-        if (this.state.destroyed) {
-          return;
-        }
-        this._loadTree(tags);
-      });
+      .then(tags => this._loadTree(tags));
   },
 
   /**
@@ -60,8 +55,17 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     const tree = new TreeComponent('#js_wsp_password_filter_tags_list', {
       map: this._getTreeMap()
     });
+    tree.state.on('empty', (ev, empty) => this._onTagListEmptyChange(empty));
     tree.start();
     this.options.tree = tree;
+  },
+
+  /**
+   * Observe when the component is empty / filled
+   * @param {boolean} empty True if empty, false otherwise
+   */
+  _onTagListEmptyChange(empty) {
+    this.state.empty = empty;
   },
 
   /**
@@ -102,6 +106,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
         // If the previously selected tag is not visible, reset the workspace.
         const filter = new Filter({
           id: 'default',
+          type: 'default',
           label: __('All items'),
           order: ['Resource.modified DESC']
         });
@@ -125,11 +130,11 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    * @param {array<Tag>} tags
    */
   _loadTree: function(tags) {
-    this.options.tree.reset();
-    if (tags.length) {
-      this.options.tree.load(tags);
-      this.state.hidden = false;
+    if (this.state.destroyed) {
+      return;
     }
+    this.options.tree.reset();
+    this.options.tree.load(tags);
     this.state.loaded = true;
   },
 
@@ -206,6 +211,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
 
     const filter = new Filter({
       id: `workspace_filter_tag_${tag.id}`,
+      type: 'tag',
       label: tag.slug + __(' (tag)'),
       rules: {
         'has-tag': tag.slug
@@ -224,7 +230,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   '{mad.bus.element} filter_workspace': function(el, ev) {
     const filter = ev.data.filter;
     // If the workspace is not filtered by tag.
-    if (!filter.id.match(/^workspace_filter_tag_/)) {
+    if (filter.type != 'tag') {
       this.options.filter = null;
       this.options.tree.unselectAll();
     } else {
@@ -280,6 +286,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
              */
             const filter = new Filter({
               id: 'default',
+              type: 'default',
               label: __('All items'),
               order: ['Resource.modified DESC'],
               resource: resource
@@ -313,6 +320,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
           // Retrieve tag.
           const filter = new Filter({
             id: `workspace_filter_tag_${tag.id}`,
+            type: 'tag',
             label: tag.slug + __(' (tag)'),
             rules: {
               'has-tag': tag.slug

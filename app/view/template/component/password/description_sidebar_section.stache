@@ -3,12 +3,20 @@
 </div>
 
 <div class="accordion-content">
-	{{#if(editable)}}
+	{{#if(canEdit)}}
 	<a class="edit_description_button section-action" id="js_edit_description_button">
 		<i class="fa fa-fw fa-edit"></i>
 		<span class="visuallyhidden"><%= __('edit') %></span>
 	</a>
 	{{/if}}
 
-	<p class="description_content">{{ resource.description }}</p>
+	{{#if(resource.description)}}
+	<p class="description_content">{{resource.description}}</p>
+	{{#else}}
+		{{#if(canEdit)}}
+	<em class="empty-content">{{__('There is no description yet, click edit to add one')}}</em>
+		{{#else}}
+	<em class="empty-content">{{__('There is no description')}}</em>
+		{{/if}}
+	{{/if}}
 </div>

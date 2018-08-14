@@ -12,4 +12,7 @@
         </div>
     </li>
 </ul>
-<ul class="accordion-content" id="js_wsp_password_filter_tags_list"></ul>
+<div class="accordion-content">
+    <em class="hidden empty-content">{{ __('empty') }}</em>
+    <ul id="js_wsp_password_filter_tags_list"></ul>
+</div>

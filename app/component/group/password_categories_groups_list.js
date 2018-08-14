@@ -43,6 +43,7 @@ const PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.compon
   _filterWorkspaceByGroup: function(group) {
     this.selectedFilter = new Filter({
       id: `workspace_filter_group_${group.id}`,
+      type: 'group',
       label: __('%s (group)', group.name),
       rules: {
         'is-shared-with-group': group.id

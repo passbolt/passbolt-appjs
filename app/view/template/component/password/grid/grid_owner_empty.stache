@@ -1,0 +1,4 @@
+<div class="empty-content">
+	<h2>{{ __('You do not own any passwords yet.')}}</h2>
+	<p>{{ __('It does feel a bit empty here. Create your first password.') }}</p>
+</div>
