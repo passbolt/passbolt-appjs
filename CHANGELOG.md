@@ -4,14 +4,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
-- PASSBOLT-2896: Fix filter by tag from the password details sidebar
+- Route rewriting should take in account passbolt installed in a subirectory
+
+## [2.2.0] - 2018-06-13
+### Added
 - PASSBOLT-2906: Enable CSRF protection
+
+### Fixed
+- PASSBOLT-2896: Fix filter by tag from the password details sidebar
 - PASSBOLT-2903: Fix logout link. It should target a full based url link
-- PASSBOLT-2933: Upgrade to canjs 4
 - PASSBOLT-2926: Fix session timeout check
 - PASSBOLT-2940: Implement routes
-- PASSBOLT-2941: Grid performance fix
 - PASSBOLT-2805: Sort by date fix and sort by user first_name by default
+
+### Improved
+- PASSBOLT-2933: Upgrade to canjs 4
+- PASSBOLT-2941: Grid performance fix
 
 ## [2.1.0] - 2018-06-14
 ### Added
@@ -35,4 +43,5 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - LU: Logged in user
 
 [Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.1.0...HEAD
+[2.2.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/passbolt/passbolt-appjs/compare/5df5207...v2.1.0
