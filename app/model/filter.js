@@ -20,6 +20,8 @@ class Filter {
   constructor(options) {
     Object.assign(this, {
       id: '',
+      type: '',
+      forceReload: false,
       label: '',
       rules: {},
       order: {}

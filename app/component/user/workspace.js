@@ -410,9 +410,14 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       data: user,
       action: 'create',
       callbacks: {
-        submit: function(formData) {
+        submit: (formData) => {
           const userToCreate = new User(formData['User']);
-          self._saveUser(userToCreate, form, dialog);
+          // The component will be marked as loaded when its children will be marked as loaded.
+          this.state.loaded = false;
+          self._saveUser(userToCreate, form, dialog)
+            .then(() => {
+              this._resetFilter();
+            });
         }
       }
     });
@@ -448,13 +453,15 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {User} user The target user
    * @param {Form} form The form object
    * @param {Dialog} dialog The dialog object
+   * @return {Promise}
    */
   _saveUser: function(user, form, dialog) {
-    user.save()
+    return user.save()
       .then(() => {
         dialog.remove();
       }, response => {
         form.showErrors({User: response.body});
+        return Promise.reject();
       });
   },
 
@@ -595,6 +602,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    */
   _resetFilter: function() {
     const filter = UserWorkspaceComponent.getDefaultFilterSettings();
+    filter.forceReload = true;
     MadBus.trigger('filter_workspace', {filter: filter});
   },
 

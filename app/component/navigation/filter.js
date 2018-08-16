@@ -79,6 +79,8 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
      */
     if (this.options.workspace instanceof SettingsWorkspaceComponent) {
       const settingsWorkspaceFilter = UserWorkspaceComponent.getDefaultFilterSettings();
+      settingsWorkspaceFilter.id = 'search';
+      settingsWorkspaceFilter.type = 'search';
       settingsWorkspaceFilter.setRule('keywords', keywords);
       const workspace = 'user';
       const options = {filterSettings: settingsWorkspaceFilter};
@@ -86,6 +88,8 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
     } else {
       // Otherwise filter the current workspace.
       const workspaceFilter = this.options.workspace.constructor.getDefaultFilterSettings();
+      workspaceFilter.id = 'search';
+      workspaceFilter.type = 'search';
       workspaceFilter.setRule('keywords', keywords);
       MadBus.trigger('filter_workspace', {filter: workspaceFilter});
     }

@@ -311,7 +311,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @return {Promise}
    */
   filterBySettings: function(filter) {
-    this.view.reset();
     return this._findResources(filter)
       .then(resources => this._handleApiResources(resources, filter))
       .then(() => this._markSortedBySettings(filter))
@@ -334,7 +333,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @private
    */
   _findResources: function(filter) {
-    const requestApi = !this.filterSettings || (this.filterSettings.id !== filter.id);
+    const requestApi = filter.forceReload || !this.filterSettings || (this.filterSettings.id !== filter.id);
     if (!requestApi) {
       return Promise.resolve();
     }
@@ -492,21 +491,22 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     const emptyCssClasses = [];
     switch (this.filterSettings.type) {
       case 'default': {
-        if (this.state.filtered) {
-          // Template already in the dom. In case of filtering we don't remove it from the dom when the component is unloaded to avoid blinking.
-          if ($('.empty-content', this.element).length) {
-            return;
-          }
-          emptyTemplate = gridFilteredEmptyTemplate;
-        } else {
-          emptyCssClasses.push('all_items');
-          emptyTemplate = gridWelcomeTemplate;
-        }
+        emptyCssClasses.push('all_items');
+        emptyTemplate = gridWelcomeTemplate;
         break;
       }
-      case 'group':
+      case 'search': {
+        // Template already in the dom. In case of filtering we don't remove it from the dom when the component is unloaded to avoid blinking.
+        if ($('.empty-content', this.element).length) {
+          return;
+        }
+        emptyTemplate = gridFilteredEmptyTemplate;
+        break;
+      }
+      case 'group': {
         emptyTemplate = gridGroupEmptyTemplate;
         break;
+      }
       case 'owner': {
         emptyTemplate = gridOwnerEmptyTemplate;
         break;
@@ -532,16 +532,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     $(this.element).addClass(emptyCssClasses);
     const empty_html = View.render(emptyTemplate);
     $('.tableview-content', this.element).prepend(empty_html);
-  },
-
-  /**
-   * Observe when a resource is created and add it to the browser.
-   * @param {Object} Constructor The constructor
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {Resource} resource The created resource
-   */
-  '{Resource} created': function(Constructor, ev, resource) {
-    this.insertItem(resource, null, 'first');
   },
 
   /**

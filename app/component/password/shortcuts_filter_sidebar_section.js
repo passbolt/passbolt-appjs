@@ -140,6 +140,8 @@ const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.ex
     menu.options.items.forEach(item => {
       if (item.filter.id == filter.id) {
         menu.selectItem(item);
+      } else if (filter.id == 'search' && item.filter.id == 'default') {
+        menu.selectItem(item);
       }
     });
   }

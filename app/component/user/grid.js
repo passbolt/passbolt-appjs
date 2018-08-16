@@ -289,7 +289,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @param {Filter} filter The filter to
    */
   filterBySettings: function(filter) {
-    this.view.reset();
     return this._findUsers(filter)
       .then(users => this._handleApiUsers(users, filter))
       .then(() => this._markSortedBySettings(filter))
@@ -303,7 +302,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @private
    */
   _findUsers: function(filter) {
-    const requestApi = !this.filterSettings || (this.filterSettings.id !== filter.id);
+    const requestApi = filter.forceReload || !this.filterSettings || (this.filterSettings.id !== filter.id);
     if (!requestApi) {
       return Promise.resolve();
     }
@@ -453,17 +452,6 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
   /* ************************************************************** */
   /* LISTEN TO THE MODEL EVENTS */
   /* ************************************************************** */
-
-  /**
-   * Observe when a user is created.
-   * @param {User.prototype} model The model reference
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {User} resource The created resource
-   */
-  '{User} created': function(model, ev, user) {
-    this.insertItem(user, null, 'first');
-    return false;
-  },
 
   /**
    * Observe when a user is updated.

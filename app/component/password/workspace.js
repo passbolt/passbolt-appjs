@@ -337,9 +337,14 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Dialog} dialog The dialog object
    */
   _saveResource: function(resource, form, dialog) {
+    this.state.loaded = false;
     resource.save()
       .then(() => {
         dialog.remove();
+        const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+        filter.forceReload = true;
+        MadBus.trigger('filter_workspace', {filter: filter});
+        this.state.loaded = true;
       }, v => {
         form.showErrors(JSON.parse(v.responseText)['body']);
       });

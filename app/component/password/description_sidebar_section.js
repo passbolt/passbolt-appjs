@@ -41,18 +41,25 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    */
   beforeRender: function() {
     this._super();
-    const resource = this.options.resource;
-    this.setViewData('resource', resource);
-    this.setViewData('canEdit', resource.permission.isAllowedTo(PermissionType.UPDATE));
+    this.setViewData('resource', this.options.resource);
+    this.setViewData('canEdit', this._canUpdate());
   },
 
   /**
-   * Observe when the user want to edit the instance's resource description
+   * Check if the user can update the description
+   * @return {boolean} True if yes, false otherwise
+   * @private
    */
-  '{element} a#js_edit_description_button, p.description_content click, em.empty-content click': function() {
+  _canUpdate() {
     const resource = this.options.resource;
-    const canUpdate = resource.permission.isAllowedTo(PermissionType.UPDATE);
-    if (!canUpdate) {
+    return resource.permission.isAllowedTo(PermissionType.UPDATE);
+  },
+
+  /**
+   * Observe when the user click on the edit button
+   */
+  '{element} a#js_edit_description_button click': function() {
+    if (!this._canUpdate()) {
       return;
     }
     if (!this.editing) {
@@ -60,6 +67,26 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     } else {
       this.disableEditMode();
     }
+  },
+
+  /**
+   * Observe when the user click on the edit button
+   */
+  '{element} p.description_content click': function() {
+    if (!this._canUpdate() || this._editing) {
+      return;
+    }
+    this.enableEditMode();
+  },
+
+  /**
+   * Observe when the user click on the edit button
+   */
+  '{element} em.empty-content click': function() {
+    if (!this._canUpdate() || this._editing) {
+      return;
+    }
+    this.enableEditMode();
   },
 
   /**
