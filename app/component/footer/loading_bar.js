@@ -87,9 +87,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
   _listenRequestCompleted: function(requests) {
     requests.forEach(request => {
       if (!request.silentLoading) {
-        if (this.state.loadingProcesses) {
-          this.state.loadingProcesses--;
-        }
+        this.state.loadingProcesses--;
       }
     });
   },
@@ -115,9 +113,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
    */
   _listenComponentLoadedChanges: function(component, loaded) {
     if (loaded) {
-      if (this.state.loadingProcesses) {
-        this.state.loadingProcesses--;
-      }
+      this.state.loadingProcesses--;
     } else {
       this.state.loadingProcesses++;
     }
@@ -131,9 +127,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
    */
   _listenComponentDestroyedChanges: function(component, destroyed) {
     if (destroyed) {
-      if (this.state.loadingProcesses) {
-        this.state.loadingProcesses--;
-      }
+      this.state.loadingProcesses--;
     }
   },
 
@@ -167,8 +161,14 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
 
     this._progressing = true;
     if (!this._initialized) {
+      // If everything is completed before the initialization step, exit.
+      if (this.state.loadingProcesses <= 0) {
+        this.state.loadingProcesses = 0;
+        this._progressing = false;
+        return;
+      }
       this._initProgress();
-    } else if (!this.state.loadingProcesses) {
+    } else if (this.state.loadingProcesses <= 0) {
       this._completeProgress();
     } else {
       this._updateProgress();
@@ -200,13 +200,12 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
     this._animateBar(100, 100)
       .then(() => {
         $('.progress-bar span', this.element).width(0);
+        this._progressedSpace = 100;
+        this._maxProcesses = 0;
+        this.state.loadingProcesses = 0;
         this._completing = false;
         this._progressing = false;
         this._initialized = false;
-        this._progressedSpace = 100;
-        if (!this.state.loadingProcesses) {
-          this._maxProcesses = 0;
-        }
       });
   },
 

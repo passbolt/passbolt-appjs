@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Route rewriting should take in account passbolt installed in a subirectory
+- PASSBOLT-2950: Display empty content feedbacks
+- PASSBOLT-2965: Group filter link stays active after switching to a non group filter
+- Fix the loading bar stuck in the initialization state
 
 ## [2.2.0] - 2018-06-13
 ### Added
