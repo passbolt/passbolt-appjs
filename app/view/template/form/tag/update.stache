@@ -8,7 +8,7 @@
             </div>
             <div class="message notice">
                 <i class="fa fa-fw fa-info-circle"></i>
-                <strong>{{ __('Pro tip') }}:</strong> {{ __('Tags starting with # are shared with all users who have access. Separate tags using comas.') }}
+                <strong>{{ __('Pro tip') }}:</strong> {{ __('Tags starting with # are shared with all users who have access. Separate tags using commas.') }}
             </div>
         </div>
         <div class="actions">
