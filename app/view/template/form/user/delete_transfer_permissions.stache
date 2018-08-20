@@ -1,0 +1,42 @@
+<div class="form-content intro">
+    <p>
+        <strong>You are about to delete {{user.profile.fullName()}}.</strong>
+    </p>
+    <p>
+        This user is the owner of passwords or groups.
+        You need to transfer the ownership to other users to continue.
+    </p>
+</div>
+<div class="ownership-transfer scroll">
+{{#if(groups.length)}}
+    <h3>Groups</h3>
+    <ul class="ownership-transfer-items">
+    {{#each(groups)}}
+        <li>
+            <div class="input select required">
+                <label for="transfer_group_manager_{{id}}">{{name}} ({{__('Group')}}) {{__('new manager')}}:</label>
+                <select name="data[Group][{{id}}]" id="transfer_group_manager_{{id}}" class="fluid"></select>
+            </div>
+        </li>
+    {{/each}}
+    </ul>
+{{/if}}
+{{#if(resources.length)}}
+    <h3>Passwords</h3>
+    <ul class="ownership-transfer-items">
+    {{#each(resources)}}
+        <li>
+            <div class="input select required">
+                <label for="transfer_resource_owner_{{id}}">{{name}} ({{__('Password'}}) {{__('new owner')}}:</label>
+                <select name="data[Resource][{{id}}]" id="transfer_resource_owner_{{id}}" class="fluid"></select>
+            </div>
+        </li>
+    {{/each}}
+    </ul>
+{{/if}}
+</div>
+
+<div class="submit-wrapper clearfix">
+    <input type="submit" class="button primary warning" value="{{ __('delete user')}}" />
+    <a class="js-dialog-cancel cancel">{{ __('cancel')}}</a>
+</div>

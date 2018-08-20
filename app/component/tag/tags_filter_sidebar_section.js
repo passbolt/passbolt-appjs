@@ -64,7 +64,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    * Observe when the component is empty / filled
    * @param {boolean} empty True if empty, false otherwise
    */
-  _onTagListEmptyChange(empty) {
+  _onTagListEmptyChange: function(empty) {
     this.state.empty = empty;
   },
 

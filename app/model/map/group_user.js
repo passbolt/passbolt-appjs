@@ -27,4 +27,20 @@ const GroupUser = DefineMap.extend('passbolt.model.GroupUser', {
 DefineMap.setReference('GroupUser', GroupUser);
 GroupUser.List = DefineList.extend({'#': {Type: GroupUser}});
 
+/**
+ * Sort the groups users alphabetically.
+ */
+GroupUser.List.prototype.sortAlphabetically = function() {
+  this.sort((a, b) => {
+    const aValue = a.user ? a.user.profile.first_name : a.group.name;
+    const bValue = b.user ? b.user.profile.first_name : b.group.name;
+    if (aValue < bValue) {
+      return -1;
+    } else if (aValue > bValue) {
+      return 1;
+    }
+    return 0;
+  });
+};
+
 export default GroupUser;

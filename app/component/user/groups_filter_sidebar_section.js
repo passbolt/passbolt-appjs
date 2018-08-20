@@ -41,7 +41,7 @@ const GroupsFilterSidebarSectionComponent = Component.extend('passbolt.component
    * Observe when the component is empty / filled
    * @param {boolean} empty True if empty, false otherwise
    */
-  _onGroupListEmptyChange(empty) {
+  _onGroupListEmptyChange: function(empty) {
     this.state.empty = empty;
   }
 

@@ -50,7 +50,7 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * @return {boolean} True if yes, false otherwise
    * @private
    */
-  _canUpdate() {
+  _canUpdate: function() {
     const resource = this.options.resource;
     return resource.permission.isAllowedTo(PermissionType.UPDATE);
   },

@@ -32,6 +32,8 @@ import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
 import setObject from 'passbolt-mad/util/set/set';
 import User from 'app/model/map/user';
 import UserCreateForm from 'app/form/user/create';
+import UserDelete from 'app/model/map/user_delete';
+import UserDeleteTransferPermissionForm from 'app/form/user/delete_transfer_permission';
 import UserSecondarySidebarComponent from 'app/component/user/user_secondary_sidebar';
 import uuid from 'uuid/v4';
 
@@ -40,7 +42,6 @@ import groupDeleteConfirmTemplate from 'app/view/template/component/group/delete
 import groupDeleteErrorTemplate from 'app/view/template/component/group/delete_error.stache!';
 import template from 'app/view/template/component/user/workspace.stache!';
 import userDeleteConfirmTemplate from 'app/view/template/component/user/delete_confirm.stache!';
-import userDeleteErrorTemplate from 'app/view/template/component/user/delete_error_dialog.stache!';
 
 const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace', /** @static */ {
 
@@ -410,7 +411,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       data: user,
       action: 'create',
       callbacks: {
-        submit: (formData) => {
+        submit: formData => {
           const userToCreate = new User(formData['User']);
           // The component will be marked as loaded when its children will be marked as loaded.
           this.state.loaded = false;
@@ -511,7 +512,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {Group} group The target group
    * @param {array<Resource>} resources The resources that need a permission transfer
    */
-  _deleteGroupError: function(group, resources) {
+  _deleteGroupError: function(group, data) {
     const dialog = ConfirmDialogComponent.instantiate({
       label: __('You cannot delete this group!'),
       subtitle: __('You are trying to delete the group "%s"!', group.name),
@@ -522,7 +523,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       content: groupDeleteErrorTemplate,
       viewData: {
         group: group,
-        resources: resources
+        resources: data.resources.sole_owner
       },
       action: function() {
         dialog.remove();
@@ -539,20 +540,16 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {User} user The user to delete.
    */
   deleteUser: function(user) {
-    const self = this;
-
     user.deleteDryRun()
-      // In case of success.
       .then(() => {
-      // Display the delete confirmation dialog.
-        self._deleteUserConfirm(user);
+        this._deleteUserConfirm(user);
       })
-      // In case of error.
       .then(null, response => {
-        // Display the error dialog.
         if (response.body) {
-          const data = response.body;
-          self._deleteUserError(user, data);
+          response.body.user_id = user.id;
+          // Cannot be done by the User model, the can-define module does not support well circular references.
+          const userDelete = new UserDelete(response.body);
+          this._openDeleteUserTransferPermissionsDialog(user, userDelete);
         }
       });
   },
@@ -569,31 +566,33 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         label: __('delete user'),
         cssClasses: ['warning']
       },
-      action: function() {
-        user.destroy();
-      }
+      action: () => user.delete()
     }).start();
   },
 
   /**
-   * Notify the user regarding the delete failure.
+   * Display the user transfer permissions dialog.
    * @param {User} user The user to delete.
    * @param {array} data An object containing the error target
    */
-  _deleteUserError: function(user, data) {
-    const dialog = ConfirmDialogComponent.instantiate({
+  _openDeleteUserTransferPermissionsDialog: function(user, userDelete) {
+    const dialog = DialogComponent.instantiate({
       label: __('You cannot delete this user!'),
-      subtitle: __('You are trying to delete the user "%s"!', user.profile.fullName()),
-      content: userDeleteErrorTemplate,
-      viewData: data,
-      submitButton: {
-        label: __('Got it!'),
-        cssClasses: []
-      },
-      action: function() {
-        dialog.remove();
-      }
+      cssClasses: ['delete-user-dialog', 'dialog-wrapper']
     }).start();
+
+    // Attach the component to the dialog.
+    dialog.add(UserDeleteTransferPermissionForm, {
+      id: 'js_delete_user',
+      user: user,
+      userDelete: userDelete,
+      callbacks: {
+        submit: formData => {
+          user.delete(formData);
+          dialog.remove();
+        }
+      }
+    });
   },
 
   /**

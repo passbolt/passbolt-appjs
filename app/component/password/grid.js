@@ -524,7 +524,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
         emptyTemplate = gridSharedEmptyTemplate;
         break;
       }
-      default:{
+      default: {
         return;
       }
     }

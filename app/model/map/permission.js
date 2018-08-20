@@ -33,9 +33,8 @@ const Permission = DefineMap.extend('passbolt.model.Permission', {
   aro: 'string',
   aro_foreign_key: 'string',
   aro_foreign_label: 'string',
-  permissionType: PermissionType,
-  user: User,
   group: Group,
+  user: User,
 
   /**
    * Check that the permission level allows requested permission
@@ -48,6 +47,22 @@ const Permission = DefineMap.extend('passbolt.model.Permission', {
 });
 DefineMap.setReference('Permission', Permission);
 Permission.List = DefineList.extend({'#': {Type: Permission}});
+
+/**
+ * Sort the permissions alphabetically.
+ */
+Permission.List.prototype.sortAlphabetically = function() {
+  this.sort((a, b) => {
+    const aValue = a.user ? a.user.profile.first_name : a.group.name;
+    const bValue = b.user ? b.user.profile.first_name : b.group.name;
+    if (aValue < bValue) {
+      return -1;
+    } else if (aValue > bValue) {
+      return 1;
+    }
+    return 0;
+  });
+};
 
 /*
  * Default validation rules.

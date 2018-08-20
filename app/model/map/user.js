@@ -47,9 +47,8 @@ const User = DefineMap.extend('passbolt.model.User', {
    * @returns {Promise}
    */
   deleteDryRun: function() {
-    // @todo To migrate to API v2
     return Ajax.request({
-      url: `users/${this.id}/dry-run.json`,
+      url: `users/${this.id}/dry-run.json?api-version=v2`,
       type: 'DELETE',
       silentNotify: true
     });
@@ -75,6 +74,43 @@ User.validationRules = {
  * @type {User}
  */
 User.current = null;
+
+/**
+ * Delete a user.
+ * Use this function instead of the standard destroy function. The destroy function of the can layer does not get
+ * extra parameters, however a http DELETE request can get a body we use to pass the transfer data.
+ * @param {object} transfer The transfer of rights to apply before deleting the user.
+ * @returns {Promise}
+ * @inherits
+ */
+User.prototype.delete = function(transfer) {
+  const request = {
+    _xhr: null,
+    id: uuid(),
+    url: `users/${this.id}.json?api-version=v2`,
+    method: 'DELETE',
+    headers: {'X-CSRF-Token': Config.read('app.csrfToken')},
+    beforeSend: xhr => { request._xhr = xhr; },
+    data: {transfer: transfer}
+  };
+
+  Ajax._registerRequest(request);
+  return $.ajax(request)
+    .then(data => Ajax.handleSuccess(request, data))
+    .then(() => {
+      // Destroy the local entity.
+      this.destroy();
+    })
+    .then(null, jqXHR => {
+      let jsonData = {};
+      if (jqXHR.responseText) {
+        try {
+          jsonData = $.parseJSON(jqXHR.responseText);
+        } catch (e) { }
+      }
+      return Ajax.handleError(request, jsonData);
+    });
+};
 
 /**
  * Get the logged-in user.
@@ -170,21 +206,11 @@ User.connection = connect([connectParse, connectDataUrl, connectConstructor, con
         url: 'users.json',
         type: 'GET',
         params: params
-      }).then((users) => {
-
-        return users;
-      });
+      }).then(users => users);
     },
-    destroyData: function(params) {
-      const _params = {
-        id: params.id,
-        'api-version': 'v2'
-      };
-      return Ajax.request({
-        url: 'users/{id}.json',
-        type: 'DELETE',
-        params: _params
-      });
+    destroyData: function() {
+      // @see User::delete() function
+      return Promise.resolve({});
     }
   }
 });

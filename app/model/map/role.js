@@ -22,7 +22,7 @@ import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/const
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 
-const Role = DefineMap.extend('passbolt.model.User', {
+const Role = DefineMap.extend('passbolt.model.Role', {
   id: 'string',
   name: 'string'
 });

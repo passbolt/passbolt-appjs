@@ -42,13 +42,8 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
   modified: 'string',
   description: 'string',
   creator: User,
-  //modifier: User,
   favorite: Favorite,
   permission: Permission,
-  /*
-   *secrets: Secret.List,
-   *tags: Tag.List
-   */
 
   /**
    * Check if the resource is marked as favorite.

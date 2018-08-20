@@ -48,7 +48,8 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
      * Canjs should be able to observe Map in a Control as a function, however it doesn't.
      * Test it again after we completed the migration of the model to the canjs style.
      */
-    Group: Group
+    Group: Group,
+    User: User
   }
 
 }, /** @prototype */ {
@@ -157,6 +158,20 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
     MadBus.trigger('filter_workspace', {filter: this.selectedFilter});
   },
 
+  /**
+   * Update the list with data from the API.
+   */
+  _update: function() {
+    this._findGroups(this.options.defaultGroupFilter)
+      .then(groups => {
+        const oldGroup = this.options.items;
+        const groupsToDelete = oldGroup.filter(group => groups.indexOf(group) == -1);
+        // @todo groups to add. Maybe move this function in the parent class (Tree).
+        groupsToDelete.forEach(group => Group.dispatch('destroyed', [group]));
+        this.options.items = groups;
+      });
+  },
+
   /* ************************************************************** */
   /* LISTEN TO THE MODEL EVENTS */
   /* ************************************************************** */
@@ -228,10 +243,6 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
     });
   },
 
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
-
   /**
    * @inheritsDoc
    */
@@ -244,6 +255,14 @@ const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /
      * @see the "{selectedGroups} add" templated function
      */
     groups.splice(0, groups.length, item);
+  },
+
+  /**
+   * Observe when a user is destroyed.
+   * - Refresh the list if required
+   */
+  '{User} destroyed': function() {
+    this._update();
   }
 
 });
