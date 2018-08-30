@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.3.0] - 2018-08-30
 ### Fixed
 - Route rewriting should take in account passbolt installed in a subirectory
 - PASSBOLT-2965: Group filter link stays active after switching to a non group filter
@@ -10,9 +12,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Improved
 - PASSBOLT-2950: Display empty content feedbacks
-- PASSBOLT-2971 Reset the workspaces when a resource or a user is created
+- PASSBOLT-2971: Reset the workspaces when a resource or a user is created
+- PASSBOLT-2267: As an admin deleting a user I can transfer ownership of this user shared passwords to another user that have read access.
 
-## [2.2.0] - 2018-06-13
+## [2.2.0] - 2018-08-13
 ### Added
 - PASSBOLT-2906: Enable CSRF protection
 
@@ -48,6 +51,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/passbolt/passbolt-appjs/compare/5df5207...v2.1.0
