@@ -60,7 +60,7 @@ const ActionsTabComponent = TabComponent.extend('passbolt.component.password.Act
       cssClasses: ['share-tab'],
       acoInstance: this.options.resource,
       callbacks: {
-        shared: () => this.options.dialog.remove()
+        submit: data => this._share(data)
       }
     });
   },
@@ -71,7 +71,6 @@ const ActionsTabComponent = TabComponent.extend('passbolt.component.password.Act
    * @param {array} data The form data
    */
   _save: function(data) {
-    const self = this;
     const resourceData = data['Resource'];
 
     // define in which edit case we are.
@@ -82,10 +81,18 @@ const ActionsTabComponent = TabComponent.extend('passbolt.component.password.Act
     }
 
     this.options.resource.assign(resourceData);
-    this.options.resource.save()
-      .then(() => {
-        self.options.dialog.remove();
-      });
+    this.options.resource.save();
+    this.options.dialog.remove();
+  },
+
+  /**
+   * Share the resource
+   *
+   * @param {array} data The form data
+   */
+  _share: function(data) {
+    this.options.dialog.remove();
+    this.options.resource.share(data);
   },
 
   /**

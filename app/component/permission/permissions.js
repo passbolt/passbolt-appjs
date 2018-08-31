@@ -462,7 +462,6 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
    * @param {array} armoreds (optional) the secret encrypted for new users.
    */
   save: function(armoreds) {
-    const self = this;
     const data = {};
     const acoForeignKey = this.options.acoInstance.id;
 
@@ -486,13 +485,7 @@ const PermissionsComponent = Component.extend('passbolt.component.permission.Per
       }
     }
 
-    // Share the resource
-    this.options.acoInstance.share(data)
-      .then(() => {
-        if (self.options.callbacks.shared) {
-          self.options.callbacks.shared();
-        }
-      });
+    this.options.callbacks.submit(data);
   },
 
   /* ************************************************************** */
