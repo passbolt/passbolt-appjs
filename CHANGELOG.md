@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PASSBOLT-2534: As LU I should not be able to copy to clipboard empty login/url
 
 ## [2.3.0] - 2018-08-30
 ### Fixed

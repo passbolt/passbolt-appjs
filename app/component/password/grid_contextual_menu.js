@@ -39,6 +39,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const copyUsernameItem = new Action({
       id: 'js_password_browser_menu_copy_username',
       label: __('Copy username'),
+      enabled: resource.username != null,
       action: () => this._copyLogin()
     });
     items.push(copyUsernameItem);
@@ -55,6 +56,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const copyUriItem = new Action({
       id: 'js_password_browser_menu_copy_uri',
       label: __('Copy URI'),
+      enabled: resource.uri != null,
       action: () => this._copyUri()
     });
     items.push(copyUriItem);
@@ -63,6 +65,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const openUriItem = new Action({
       id: 'js_password_browser_menu_open_uri',
       label: __('Open URI in a new tab'),
+      enabled: resource.uri != null,
       cssClasses: ['separator-after'],
       action: () => this._openUri()
     });

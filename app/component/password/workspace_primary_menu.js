@@ -82,8 +82,8 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
 
     // Copy login
     const copyLoginItem = new Action({
-      id: uuid(),
-      label: __('copy login to clipboard'),
+      id: 'js_wk_menu_copy_login_action',
+      label: __('copy username to clipboard'),
       cssClasses: [],
       action: () => this._copyLogin()
     });
@@ -91,7 +91,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
 
     // Copy secret
     const copySecretItem = new Action({
-      id: uuid(),
+      id: 'js_wk_menu_copy_secret_action',
       label: __('copy password to clipboard'),
       cssClasses: [],
       action: () => this._copySecret()
@@ -210,6 +210,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     const canEdit = permission.isAllowedTo(PermissionType.UPDATE);
     const canAdmin = permission.isAllowedTo(PermissionType.ADMIN);
     const moreButtonDeleteItemId = 'js_wk_menu_delete_action';
+    const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
     this.secretCopyButton.state.disabled = false;
     this.editButton.state.disabled = !canEdit;
     this.shareButton.state.disabled = !canAdmin;
@@ -218,6 +219,11 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
       this.moreButton.enableItem(moreButtonDeleteItemId);
     } else {
       this.moreButton.disableItem(moreButtonDeleteItemId);
+    }
+    if (resource.username == null) {
+      this.moreButton.disableItem(moreButtonCopyLoginItemId);
+    } else {
+      this.moreButton.enableItem(moreButtonCopyLoginItemId);
     }
   },
 
