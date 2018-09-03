@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2534: As LU I should not be able to copy to clipboard empty login/url
 - PASSBOLT-2017: As LU when I save a password (create/edit) the dialog shouldn't persist until the request is processed by the API
 
+### Added
+- PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk
+
 ## [2.3.0] - 2018-08-30
 ### Fixed
 - Route rewriting should take in account passbolt installed in a subirectory

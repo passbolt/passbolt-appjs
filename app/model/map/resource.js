@@ -180,6 +180,19 @@ Resource.getFilteredFields = function(filteredCase) {
   return filteredFields;
 };
 
+/**
+ * Delete all the resources.
+ * @param {Resource.List} resources
+ * @return {Promise}
+ */
+Resource.deleteAll = function(resources) {
+  const promises = resources.reduce((promise, resource) => {
+    resource.__SILENT_NOTIFY__ = true;
+    return promise.then(() => resource.destroy());
+  }, Promise.resolve([]));
+  return promises;
+};
+
 Resource.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
   Map: Resource,
   List: Resource.List,
@@ -209,6 +222,7 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
       return Ajax.request({
         url: 'resources/{id}.json?api-version=v2',
         type: 'DELETE',
+        silentNotify: params.__SILENT_NOTIFY__ ? params.__SILENT_NOTIFY__ : false,
         params: _params
       });
     },

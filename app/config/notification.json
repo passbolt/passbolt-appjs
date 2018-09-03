@@ -16,6 +16,9 @@
 			"app_resources_delete_success": {
 				"msg": "The password has been deleted"
 			},
+			"app_resources_delete_all_success": {
+				"msg": "The passwords have been deleted"
+			},
 			"app_resources_update_success": {
 			  "msg": "The password has been updated successfully"
 			},

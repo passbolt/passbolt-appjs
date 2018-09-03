@@ -38,7 +38,7 @@ import Resource from 'app/model/map/resource';
 import commentDeleteConfirmTemplate from 'app/view/template/component/comment/delete_confirm.stache!';
 import createButtonTemplate from 'app/view/template/component/workspace/create_button.stache!';
 import importButtonTemplate from 'app/view/template/component/workspace/import_button.stache!';
-import resourceDeleteConfirmTemplate from 'app/view/template/component/password/delete_confirm.stache!';
+import resourcesDeleteConfirmTemplate from 'app/view/template/component/password/delete_confirm.stache!';
 import template from 'app/view/template/component/password/workspace.stache!';
 
 const PasswordWorkspaceComponent = Component.extend('passbolt.component.password.Workspace', /** @static */ {
@@ -389,23 +389,48 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   },
 
   /**
-   * Perform a resource deletion.
+   * Open the resource(s) delete dialog.
    *
-   * @param {Resource} resource The resource to delete
+   * @param {Resource.List} resources The resource to delete
    */
-  deleteResource: function(resource) {
+  openDeleteResourcesDialog: function(resources) {
+    const multipleDelete = resources.length > 1;
     const dialog = ConfirmDialogComponent.instantiate({
       label: __('Do you really want to delete?'),
-      content: resourceDeleteConfirmTemplate,
+      content: resourcesDeleteConfirmTemplate,
       submitButton: {
-        label: __('delete password'),
+        label: multipleDelete ? __('delete passwords') : __('delete password'),
         cssClasses: ['warning']
       },
-      action: function() {
-        resource.destroy();
-      }
+      action: () => this._deleteResources(resources)
     });
+    dialog.setViewData('multipleDelete', multipleDelete);
     dialog.start();
+  },
+
+  /**
+   * Perform the resource(s) delete
+   *
+   * @param {Resource.List} resources The resource to delete
+   */
+  _deleteResources: function(resources) {
+    const multipleDelete = resources.length > 1;
+    this.state.loaded = false;
+    this.options.selectedResources.splice(0, this.options.selectedResources.length);
+    if (multipleDelete) {
+      Resource.deleteAll(resources)
+        .then(() =>  {
+          MadBus.trigger('passbolt_notify', {
+            title: 'app_resources_delete_all_success',
+            status: 'success'
+          });
+          this.state.loaded = true;
+        });
+    } else {
+      resources[0].destroy().then(() => {
+        this.state.loaded = true;
+      });
+    }
   },
 
   /**
@@ -511,7 +536,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * Observe when the user wants to create a new instance
    */
   '{mainButton.element} click': function() {
-    MadBus.trigger('request_resource_creation');
+    MadBus.trigger('request_resource_create');
   },
 
   /**
@@ -539,58 +564,70 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   /**
    * Observe when the user requests a resource creation
    */
-  '{mad.bus.element} request_resource_creation': function() {
+  '{mad.bus.element} request_resource_create': function() {
     const resource = new Resource({});
     this.openCreateResourceDialog(resource);
   },
 
   /**
-   * Observe when the user requests a resource edition
+   * Observe when the user wants to edit a resource
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_resource_edition': function(el, ev) {
+  '{mad.bus.element} request_resource_edit': function(el, ev) {
     const resource = ev.data.resource;
     this.openEditResourceDialog(resource);
   },
 
   /**
-   * Observe when the user requests a resource deletion
+   * Observe when the user wants to delete a resource
    *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_resource_deletion': function(el, ev) {
+  '{mad.bus.element} request_resource_delete': function(el, ev) {
     const resource = ev.data.resource;
-    this.deleteResource(resource);
+    const resources = new Resource.List([resource]);
+    this.openDeleteResourcesDialog(resources);
   },
 
   /**
-   * Observe when the user requests a resource deletion
+   * Observe when the user wants to delete resources
+   *
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_resource_sharing': function(el, ev) {
+  '{mad.bus.element} request_resources_delete': function(el, ev) {
+    const resources = ev.data.resources;
+    this.openDeleteResourcesDialog(resources);
+  },
+
+  /**
+   * Observe when the user wants to share a resource
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} request_resource_share': function(el, ev) {
     const resource = ev.data.resource;
     this.openShareResourceDialog(resource);
   },
 
   /**
-   * Observe when the user requests to set an instance as favorite
+   * Observe when the user wants to mark a resource as favorite
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_favorite': function(el, ev) {
+  '{mad.bus.element} request_resource_favorite': function(el, ev) {
     const resource = ev.data.resource;
     this.favoriteResource(resource);
   },
 
   /**
-   * Observe when the user requests to unset an instance as favorite
+   * Observe when the user wants to unmark a resource from favorite
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_unfavorite': function(el, ev) {
+  '{mad.bus.element} request_resource_unfavorite': function(el, ev) {
     const resource = ev.data.resource;
     this.unfavoriteResource(resource);
   },

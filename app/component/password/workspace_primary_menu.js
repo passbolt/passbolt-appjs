@@ -154,8 +154,8 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Delete
    */
   _delete: function() {
-    const resource = this.options.selectedResources[0];
-    MadBus.trigger('request_resource_deletion', {resource: resource});
+    const resources = this.options.selectedResources.slice(0);
+    MadBus.trigger('request_resources_delete', {resources: resources});
   },
 
   /**
@@ -163,7 +163,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   _edit: function() {
     const resource = this.options.selectedResources[0];
-    MadBus.trigger('request_resource_edition', {resource: resource});
+    MadBus.trigger('request_resource_edit', {resource: resource});
   },
 
   /**
@@ -185,12 +185,44 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   /**
    * Observe when a resource is selected
    */
-  '{selectedResources} add': function() {
-    const resourceSelected = this.options.selectedResources.length == 1;
-    if (resourceSelected) {
-      this.resourceSelected();
-    } else {
-      this.reset();
+  '{selectedResources} length': function() {
+    const resources = this.options.selectedResources;
+    switch(resources.length) {
+      case 0: {
+        this.reset();
+        break;
+      }
+      case 1: {
+        this.reset();
+        this.resourceSelected();
+        break;
+      }
+      default: {
+        this.reset();
+        this.resourcesSelected();
+      }
+    }
+  },
+
+  /**
+   * Observe when a resource is selected
+   */
+  '{selectedResources} remove': function() {
+    const resources = this.options.selectedResources;
+    switch(resources.length) {
+      case 0: {
+        this.reset();
+        break;
+      }
+      case 1: {
+        this.reset();
+        this.resourceSelected();
+        break;
+      }
+      default: {
+        this.reset();
+        this.resourcesSelected();
+      }
     }
   },
 
@@ -228,13 +260,37 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   },
 
   /**
+   * Resourecs is selected, adapt the buttons states.
+   */
+  resourcesSelected: function() {
+    const moreButtonDeleteItemId = 'js_wk_menu_delete_action';
+    const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
+    const moreButtonCopySecretItemId = 'js_wk_menu_copy_secret_action';
+    const canDelete = this.options.selectedResources.reduce((carry, resource) => {
+      return resource.permission.isAllowedTo(PermissionType.UPDATE) && carry;
+    }, true);
+    if (canDelete) {
+      this.moreButton.state.disabled = false;
+      this.moreButton.disableItem(moreButtonCopyLoginItemId);
+      this.moreButton.disableItem(moreButtonCopySecretItemId);
+      this.moreButton.enableItem(moreButtonDeleteItemId);
+    } else {
+      this.moreButton.state.disabled = true;
+    }
+  },
+
+  /**
    * Reset the buttons states to their original.
    */
   reset: function() {
+    const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
+    const moreButtonCopySecretItemId = 'js_wk_menu_copy_secret_action';
     this.secretCopyButton.state.disabled = true;
     this.editButton.state.disabled = true;
     this.shareButton.state.disabled = true;
     this.moreButton.state.disabled = true;
+    this.moreButton.enableItem(moreButtonCopyLoginItemId);
+    this.moreButton.enableItem(moreButtonCopySecretItemId);
   }
 
 });

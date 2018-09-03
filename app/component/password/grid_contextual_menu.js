@@ -141,7 +141,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    */
   _edit: function() {
     const resource = this.options.resource;
-    MadBus.trigger('request_resource_edition', {resource: resource});
+    MadBus.trigger('request_resource_edit', {resource: resource});
     this.remove();
   },
 
@@ -150,7 +150,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    */
   _share: function() {
     const resource = this.options.resource;
-    MadBus.trigger('request_resource_sharing', {resource: resource});
+    MadBus.trigger('request_resource_share', {resource: resource});
     this.remove();
   },
 
@@ -159,7 +159,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    */
   _delete: function() {
     const resource = this.options.resource;
-    MadBus.trigger('request_resource_deletion', {resource: resource});
+    MadBus.trigger('request_resource_delete', {resource: resource});
     this.remove();
   }
 

@@ -275,8 +275,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @return {bool}
    */
   isSelected: function(item) {
-    return this.options.selectedResources.length > 0
-			&& this.options.selectedResources[0].id == item.id;
+    const resources = this.options.selectedResources;
+    return resources.indexOf(item) != -1;
   },
 
   /**
@@ -557,10 +557,24 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    */
   '{element} item_selected': function(el, ev) {
     const item = ev.data.item;
-    if (this.isSelected(item)) {
-      this.options.selectedResources.splice(0);
+    const srcEv = ev.data.srcEv;
+    const resources = this.options.selectedResources;
+    const multipleSelect = resources.length > 1;
+
+    // The shift key enable the multiple select.
+    if (!srcEv.shiftKey) {
+      if (this.isSelected(item) && !multipleSelect) {
+        resources.splice(0);
+      } else {
+        resources.splice(0, resources.length, item);
+      }
     } else {
-      this.options.selectedResources.splice(0, this.options.selectedResources.length, item);
+      if (this.isSelected(item)) {
+        const position = resources.indexOf(item);
+        resources.splice(position, 1);
+      } else {
+        resources.push(item);
+      }
     }
   },
 
@@ -608,16 +622,24 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @param {HTMLEvent} ev The event which occurred
    */
   '{element} .js_checkbox_multiple_select checked': function(el, ev) {
+    ev.stopPropagation();
     const id = ev.data;
     const resource = this.options.items.filter({id: id}).pop();
-    this.options.selectedResources.splice(0, this.options.selectedResources.length, resource);
+    this.options.selectedResources.push(resource);
   },
 
   /**
    * Listen to the uncheck event on any checkbox form element components.
    */
-  '{element} .js_checkbox_multiple_select unchecked': function() {
-    this.options.selectedResources.splice(0, this.options.selectedResources.length);
+  '{element} .js_checkbox_multiple_select unchecked': function(el, ev) {
+    ev.stopPropagation();
+    const id = ev.data;
+    const resources = this.options.selectedResources;
+    const unselectedResources = resources.filter((resource) => resource.id == id);
+    if (unselectedResources.length) {
+      const position = resources.indexOf(unselectedResources[0]);
+      resources.splice(position, 1);
+    }
   },
 
   /**

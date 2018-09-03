@@ -1,1 +1,5 @@
+{{#if(multipleDelete)}}
+{{ __('Please confirm you really want to delete the passwords. After clicking ok, the passwords will be') }} <strong>{{ __('deleted permanently') }}</strong>.
+{{#else}}
 {{ __('Please confirm you really want to delete the password. After clicking ok, the password will be') }} <strong>{{ __('deleted permanently') }}</strong>.
+{{/if}}
