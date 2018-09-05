@@ -171,7 +171,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   _share: function() {
     const resource = this.options.selectedResources[0];
-    MadBus.trigger('request_resource_sharing', {resource: resource});
+    MadBus.trigger('request_resource_share', {resource: resource});
   },
 
   /**

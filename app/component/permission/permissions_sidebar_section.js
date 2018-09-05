@@ -159,7 +159,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    */
   '{element} a#js_edit_permissions_button click': function() {
     const resource = this.options.acoInstance;
-    MadBus.trigger('request_resource_sharing', {resource: resource});
+    MadBus.trigger('request_resource_share', {resource: resource});
   }
 
 });
