@@ -22,6 +22,8 @@ import DialogComponent from 'passbolt-mad/component/dialog';
 import Filter from 'app/model/filter';
 import GridComponent from 'app/component/user/grid';
 import Group from 'app/model/map/group';
+import GroupDelete from 'app/model/map/group_delete';
+import GroupDeleteTransferPermissionForm from 'app/form/group/delete_transfer_permission';
 import GroupEditComponent from 'app/component/group/edit';
 import GroupSecondarySidebarComponent from 'app/component/group/group_secondary_sidebar';
 import MadBus from 'passbolt-mad/control/bus';
@@ -471,14 +473,14 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {Group} group
    */
   deleteGroup: function(group) {
-    const self = this;
-
-    // First do a dry run to determine whether the group can be deleted.
     group.deleteDryRun()
       .then(resources => {
-        self._deleteGroupConfirm(group, resources);
+        this._deleteGroupConfirm(group, resources);
       }, response => {
-        self._deleteGroupError(group, response.body);
+        response.body.group_id = group.id;
+        // Cannot be done by the Group model, the can-define module does not support well circular references.
+        const groupDelete = new GroupDelete(response.body);
+        this._openDeleteGroupTransferPermissionsDialog(group, groupDelete);
       });
   },
 
@@ -501,35 +503,35 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         resources: resources
       },
       action: function() {
-        group.destroy();
+        group.delete();
       }
     });
     dialog.start();
   },
 
   /**
-   * Let the user know why the group cannot be deleted
-   * @param {Group} group The target group
-   * @param {array<Resource>} resources The resources that need a permission transfer
+   * Display the group transfer permissions dialog.
+   * @param {Group} group The group to delete.
+   * @param {GroupDelete} groupDelete An object containing the error target
    */
-  _deleteGroupError: function(group, data) {
-    const dialog = ConfirmDialogComponent.instantiate({
+  _openDeleteGroupTransferPermissionsDialog: function(group, groupDelete) {
+    const dialog = DialogComponent.instantiate({
       label: __('You cannot delete this group!'),
-      subtitle: __('You are trying to delete the group "%s"!', group.name),
-      submitButton: {
-        label: __('Got it!'),
-        cssClasses: []
-      },
-      content: groupDeleteErrorTemplate,
-      viewData: {
-        group: group,
-        resources: data.resources.sole_owner
-      },
-      action: function() {
-        dialog.remove();
+      cssClasses: ['delete-group-dialog', 'dialog-wrapper']
+    }).start();
+
+    // Attach the component to the dialog.
+    dialog.add(GroupDeleteTransferPermissionForm, {
+      id: 'js_delete_group',
+      group: group,
+      groupDelete: groupDelete,
+      callbacks: {
+        submit: formData => {
+          group.delete(formData);
+          dialog.remove();
+        }
       }
     });
-    dialog.start();
   },
 
   /**

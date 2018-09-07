@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import Ajax from 'app/net/ajax';
+import Config from 'passbolt-mad/config/config';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
@@ -26,6 +27,7 @@ import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import GroupUser from 'app/model/map/group_user';
 import User from 'app/model/map/user';
+import uuid from 'uuid/v4';
 
 const Group = DefineMap.extend('passbolt.model.Group', {
   id: 'string',
@@ -122,20 +124,51 @@ Group.findView = function(id) {
   return Group.findOne(options);
 };
 
+/**
+ * Delete a group.
+ * Use this function instead of the standard destroy function. The destroy function of the can layer does not get
+ * extra parameters, however a http DELETE request can get a body we use to pass the transfer data.
+ * @param {object} transfer The transfer of rights to apply before deleting the user.
+ * @returns {Promise}
+ * @inherits
+ */
+Group.prototype.delete = function(transfer) {
+  const request = {
+    _xhr: null,
+    id: uuid(),
+    url: `groups/${this.id}.json?api-version=v2`,
+    method: 'DELETE',
+    headers: {'X-CSRF-Token': Config.read('app.csrfToken')},
+    beforeSend: xhr => { request._xhr = xhr; },
+    data: {transfer: transfer}
+  };
+
+  Ajax._registerRequest(request);
+  return $.ajax(request)
+    .then(data => Ajax.handleSuccess(request, data))
+    .then(() => {
+      // Destroy the local entity.
+      this.destroy();
+    })
+    .then(null, jqXHR => {
+      let jsonData = {};
+      if (jqXHR.responseText) {
+        try {
+          jsonData = $.parseJSON(jqXHR.responseText);
+        } catch (e) { }
+      }
+      return Ajax.handleError(request, jsonData);
+    });
+};
+
 Group.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: Group,
   List: Group.List,
   url: {
     resource: '/',
-    destroyData: function(params) {
-      const _params = {
-        id: params.id
-      };
-      return Ajax.request({
-        url: 'groups/{id}.json?api-version=v2',
-        type: 'DELETE',
-        params: _params
-      });
+    destroyData: function() {
+      // @see Group::delete() function
+      return Promise.resolve({});
     },
     getData: function(params) {
       return Ajax.request({

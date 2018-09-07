@@ -16,7 +16,7 @@ import getObject from 'can-util/js/get/get';
 import Group from 'app/model/map/group';
 import Resource from 'app/model/map/resource';
 
-const Yaya = DefineMap.extend('passbolt.model.Yaya', {
+const UserDelete = DefineMap.extend('passbolt.model.UserDelete', {
   user_id: 'string',
   groups_to_delete: Group.List,
   errors: {
@@ -84,4 +84,4 @@ const Yaya = DefineMap.extend('passbolt.model.Yaya', {
 
 });
 
-export default Yaya;
+export default UserDelete;

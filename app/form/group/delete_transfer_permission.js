@@ -13,18 +13,17 @@
  */
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
 import Form from 'passbolt-mad/form/form';
-import GroupUser from 'app/model/map/group_user';
 import getObject from 'can-util/js/get/get';
 import Permission from 'app/model/map/permission';
 
-import template from 'app/view/template/form/user/delete_transfer_permissions.stache!';
+import template from 'app/view/template/form/group/delete_transfer_permissions.stache!';
 
-const DeleteTransferPermissionForm = Form.extend('passbolt.form.user.DeleteTransferPermissionForm', /** @static */ {
+const DeleteTransferPermissionForm = Form.extend('passbolt.form.group.DeleteTransferPermissionForm', /** @static */ {
 
   defaults: {
     template: template,
-    user: null,
-    userDelete: {}
+    group: null,
+    groupDelete: {}
   }
 
 }, /** @prototype */ {
@@ -34,10 +33,9 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.user.DeleteTrans
    */
   init: function(el, options) {
     this._super(el, options);
-    this.user = this.options.user;
-    const userDelete = this.options.userDelete;
-    this.groups = userDelete.getGroupsToTransferManager();
-    this.resources = userDelete.getResourcesToTransferOwner();
+    this.group = this.options.group;
+    const groupDelete = this.options.groupDelete;
+    this.resources = groupDelete.getResourcesToTransferOwner();
   },
 
   /**
@@ -45,49 +43,14 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.user.DeleteTrans
    */
   beforeRender: function() {
     this.setViewData('resources', this.resources);
-    this.setViewData('groups', this.groups);
-    this.setViewData('user', this.user);
+    this.setViewData('group', this.group);
   },
 
   /**
    * @inheritdoc
    */
   afterStart: function() {
-    this._initGroupsTransferSection();
     this._initResourcesTransferSection();
-  },
-
-  /**
-   * Initialize the groups transfer section
-   */
-  _initGroupsTransferSection: function() {
-    this.groups.forEach(group => {
-      const groupsUsers = new GroupUser.List(group.groups_users);
-      groupsUsers.sortAlphabetically();
-      const users = this._prepareGroupsTransferUsersViewData(groupsUsers);
-      const dropdownSelector = `transfer_group_manager_${group.id}`;
-      const dropdown = new DropdownComponent(`#${dropdownSelector}`, {
-        emptyValue: false,
-        validate: false,
-        modelReference: `transfer.managers.${group.id}`,
-        availableValues: users,
-        value: Object.keys(users)[0]
-      });
-      dropdown.start();
-      this.addElement(dropdown);
-    });
-  },
-
-  /**
-   * Prepare a group transfer available users for the view.
-   * @param {GroupUser.List} groupsUsers
-   * @return {object}
-   */
-  _prepareGroupsTransferUsersViewData: function(groupsUsers) {
-    return groupsUsers.reduce((carry, groupUser) => {
-      carry[groupUser.id] = `${groupUser.user.profile.first_name} ${groupUser.user.profile.last_name} (${groupUser.user.username})`;
-      return carry;
-    }, {});
   },
 
   /**
@@ -112,7 +75,7 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.user.DeleteTrans
   },
 
   /**
-   * Prepare a resource transfer available users for the view.
+   * Prepare a resource transfer available users or groups for the view.
    * @param {Permission.List} permissions
    * @return {object}
    */
@@ -132,14 +95,10 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.user.DeleteTrans
   getData: function() {
     const data = this._super();
     const owners = getObject(data, 'transfer.owners') || {};
-    const managers = getObject(data, 'transfer.managers') || {};
-    const transfer = {owners: [], managers: []};
+    const transfer = {owners: []};
 
     for (const aco in owners) {
       transfer.owners.push({aco_foreign_key: aco, id: owners[aco]});
-    }
-    for (const groupId in managers) {
-      transfer.managers.push({group_id: groupId, id: managers[groupId]});
     }
 
     return transfer;
