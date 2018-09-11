@@ -1,6 +1,7 @@
 import CanDefineMap from 'can-define/map/map';
 import route from 'can-route';
 import RoutePushstate from 'can-route-pushstate';
+import $ from 'jquery';
 
 const AppViewModel = CanDefineMap.extend({
   controller: 'string',
@@ -10,7 +11,7 @@ const appState = new AppViewModel();
 route.data = appState;
 route.urlData = new RoutePushstate();
 const appUrl = new URL($('base').attr('href'));
-route.root = appUrl.pathname;
+route.urlData.root = appUrl.pathname;
 
 // Groups routes
 route.register('/app/groups/delete/{id}', {controller: 'User', action: 'groupDelete'});
