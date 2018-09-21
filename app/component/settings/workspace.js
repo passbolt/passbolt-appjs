@@ -129,7 +129,7 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
     if (plugins && plugins.accountSettings) {
       const themeItem = new Action({
         id: uuid(),
-        name: 'keys',
+        name: 'theme',
         label: __('Theme'),
         action: () => this._goToSection('theme')
       });
