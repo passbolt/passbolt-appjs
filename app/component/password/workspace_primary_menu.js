@@ -227,13 +227,6 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   },
 
   /**
-   * Observe when a resource is unselected
-   */
-  '{selectedResources} remove': function() {
-    this.reset();
-  },
-
-  /**
    * A resource is selected, adapt the buttons states.
    */
   resourceSelected: function() {

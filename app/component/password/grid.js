@@ -65,6 +65,11 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   _selectCheckboxComponents: {},
 
   /**
+   * Multi select initial element reference.
+   */
+  _multiShiftSelectFirstElement: null,
+
+  /**
    * @inheritdoc
    */
   init: function(el, options) {
@@ -560,21 +565,39 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     const item = ev.data.item;
     const srcEv = ev.data.srcEv;
     const resources = this.options.selectedResources;
-    const multipleSelect = resources.length > 1;
 
-    // The shift key enable the multiple select.
-    if (!srcEv.shiftKey) {
-      if (this.isSelected(item) && !multipleSelect) {
-        resources.splice(0);
-      } else {
-        resources.splice(0, resources.length, item);
-      }
-    } else {
+    if (srcEv.metaKey) {
+      this.state.selectType = 'multiple';
       if (this.isSelected(item)) {
         const position = resources.indexOf(item);
         resources.splice(position, 1);
       } else {
         resources.push(item);
+      }
+    } else if (srcEv.shiftKey) {
+      if (!resources.length) {
+        this._multiShiftSelectFirstElement = item;
+        this.state.selectType = 'multiple-range';
+        resources.push(item);
+        return;
+      }
+      else if (resources.length && this.state.selectType != 'multiple-range') {
+        this._multiShiftSelectFirstElement = resources.get(resources.length - 1);
+        this.state.selectType = 'multiple-range';
+      }
+      if (this._multiShiftSelectFirstElement.id == item.id) {
+        resources.splice(0, resources.length, item);
+      }  else {
+        resources.splice(0, resources.length);
+        const rangeResources = this.options.items.filterRange(this._multiShiftSelectFirstElement, item);
+        resources.push.apply(resources, rangeResources);
+      }
+    } else {
+      this.state.selectType = 'single';
+      if (resources.length == 1 && this.isSelected(item)) {
+        resources.splice(0);
+      } else {
+        resources.splice(0, resources.length, item);
       }
     }
   },
