@@ -289,6 +289,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @param {Filter} filter The filter to
    */
   filterBySettings: function(filter) {
+    this.state.loaded = false;
     return this._findUsers(filter)
       .then(users => this._handleApiUsers(users, filter))
       .then(() => this._markSortedBySettings(filter))
@@ -302,7 +303,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    * @private
    */
   _findUsers: function(filter) {
-    const requestApi = filter.forceReload || !this.filterSettings || (this.filterSettings.id !== filter.id);
+    const requestApi = filter.forceReload || !this.filterSettings || !(filter.id == 'search' && this.filterSettings.id === filter.id);
     if (!requestApi) {
       return Promise.resolve();
     }

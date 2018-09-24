@@ -311,6 +311,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @return {Promise}
    */
   filterBySettings: function(filter) {
+    this.state.loaded = false;
     return this._findResources(filter)
       .then(resources => this._handleApiResources(resources, filter))
       .then(() => this._markSortedBySettings(filter))
@@ -333,7 +334,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @private
    */
   _findResources: function(filter) {
-    const requestApi = filter.forceReload || !this.filterSettings || (this.filterSettings.id !== filter.id);
+    const requestApi = filter.forceReload || !this.filterSettings || !(filter.id == 'search' && this.filterSettings.id === filter.id);
     if (!requestApi) {
       return Promise.resolve();
     }
