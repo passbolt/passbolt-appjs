@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3024: As LU I can't access the theme manager screen via url
 - PASSBOLT-2976: Fix API requests issues when the user is going to another workspace
 
+### Improved
+- PASSBOLT-3073: As LU I should get a visual feedback directly after filtering the passwords or the users workspace
+
 ### Added
 - PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk
 
