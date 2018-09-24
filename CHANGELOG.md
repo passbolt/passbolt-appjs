@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2017: As LU when I save a password (create/edit) the dialog shouldn't persist until the request is processed by the API
 - PASSBOLT-3063: Fix appjs base url and subfolder
 - PASSBOLT-3024: As LU I can't access the theme manager screen via url
+- PASSBOLT-2976: Fix API requests issues when the user is going to another workspace
 
 ### Added
 - PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk

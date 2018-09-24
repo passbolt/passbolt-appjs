@@ -80,6 +80,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   afterStart: function() {
     this._firstLoad = true;
+    this._workspace = null
     this._initFooter();
     this._initHeader();
     SessionCheck.instantiate();
@@ -135,15 +136,8 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * @param {array} options The additional options to use during the workspace creation
    */
   _enableWorkspace: function(name, options) {
-    this._destroyWorkspace();
-    /**
-     * We have to initialize the workspace in a timeout in order to allow all the events of this scope to be resolve.
-     * Such as the previous workspace destroy function() which is called by an event and clean some DOM element.
-     * Another way to do this would be to treat the destroy sequentially.
-     */
-    setTimeout(() => {
-      this._initWorkspace(name, options);
-    }, 0);
+    this._destroyWorkspace()
+      .then(() => this._initWorkspace(name, options));
   },
 
   /**
@@ -185,6 +179,16 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     if (ContextualMenuComponent._instance) {
       ContextualMenuComponent._instance.destroyAndRemove();
     }
+
+    return new Promise(resolve => {
+      const checkInterval = setInterval(() => {
+        if (!this._workspace || this._workspace.state.destroyed) {
+          clearInterval(checkInterval);
+          this._workspace = null;
+          resolve();
+        }
+      }, 200);
+    });
   },
 
   /**
@@ -200,6 +204,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     const selector = $('#js_app_panel_main');
     const WorkspaceComponent = this._getWorkspaceClassByName(name);
     const workspace = ComponentHelper.create(selector, 'last', WorkspaceComponent, workspaceOptions);
+    this._workspace = workspace;
     this.addLoadedDependency(workspace);
     workspace.start();
 
