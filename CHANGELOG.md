@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk
+- PASSBOLT-2972: As LU I should be able to select multiple passwords with classic keyboard interactions (command and shift keys)
 
 ## [2.3.0] - 2018-08-30
 ### Fixed
