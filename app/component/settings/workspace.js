@@ -25,6 +25,7 @@ import ProfileComponent from 'app/component/profile/profile';
 import route from 'can-route';
 import TabComponent from 'passbolt-mad/component/tab';
 import ThemeComponent from 'app/component/settings/theme';
+import MfaComponent from 'app/component/settings/mfa';
 import User from 'app/model/map/user';
 import UserCreateForm from 'app/form/user/create';
 import uuid from 'uuid/v4';
@@ -126,14 +127,25 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
 
     // Theme
     const plugins = Config.read('server.passbolt.plugins');
-    if (plugins && plugins.accountSettings) {
-      const themeItem = new Action({
-        id: uuid(),
-        name: 'theme',
-        label: __('Theme'),
-        action: () => this._goToSection('theme')
-      });
-      menu.insertItem(themeItem);
+    if (plugins) {
+      if (plugins.accountSettings) {
+        const themeItem = new Action({
+          id: uuid(),
+          name: 'theme',
+          label: __('Theme'),
+          action: () => this._goToSection('theme')
+        });
+        menu.insertItem(themeItem);
+      }
+      if (plugins.multiFactorAuthentication) {
+        const mfaItem = new Action({
+          id: uuid(),
+          name: 'mfa',
+          label: __('Multi Factor Authentication'),
+          action: () => this._goToSection('mfa')
+        });
+        menu.insertItem(mfaItem);
+      }
     }
 
     // Keys
@@ -171,12 +183,21 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
 
     // Theme tab
     const plugins = Config.read('server.passbolt.plugins');
-    if (plugins && plugins.accountSettings) {
-      tabs.addTab(ThemeComponent, {
-        id: 'js_settings_theme_tab',
-        label: 'theme'
-      });
+    if (plugins) {
+      if (plugins.accountSettings) {
+        tabs.addTab(ThemeComponent, {
+          id: 'js_settings_theme_tab',
+          label: 'theme'
+        });
+      }
+      if (plugins.multiFactorAuthentication) {
+        tabs.addTab(MfaComponent, {
+          id: 'js_settings_mfa_tab',
+          label: 'mfa'
+        });
+      }
     }
+
   },
 
   /**
