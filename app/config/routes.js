@@ -36,6 +36,7 @@ route.register('/app/users/view/{id}', {controller: 'User', action: 'view'});
 route.register('/app/settings/keys', {controller: 'Settings', action: 'keys'});
 route.register('/app/settings/profile', {controller: 'Settings', action: 'profile'});
 route.register('/app/settings/theme', {controller: 'Settings', action: 'theme'});
+route.register('/app/settings/mfa', {controller: 'Settings', action: 'mfa'});
 route.register('/app/settings', {controller: 'Settings', action: 'profile'});
 
 // Default route

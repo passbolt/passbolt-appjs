@@ -16,6 +16,7 @@ import DialogComponent from 'passbolt-mad/component/dialog';
 import MadBus from 'passbolt-mad/control/bus';
 import Response from 'passbolt-mad/net/response';
 import SessionExpiredComponent from 'app/component/session/session_expired';
+import MfaRequiredComponent from 'app/component/mfa/mfa_required';
 
 /**
  * @inherits passbolt-mad/Ajax
@@ -49,6 +50,7 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
     return this._super(request, data)
       .then(data => {
         this._triggerNotification(request, request._response);
+        this._mfaRequired(request, request._response);
         return Promise.resolve(data);
       });
   },
@@ -77,13 +79,46 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
      * send a notification on the event bus for any successful response.
      * the notification system will take care of filtering what should be displayed.
      */
-    if (MadBus.bus && (request.silentNotify == undefined || !request.silentNotify)) {
+    if (MadBus.bus && (request.silentNotify === undefined || !request.silentNotify)) {
       MadBus.trigger('passbolt_notify', {
         title: response.header.title,
         status: response.header.status,
         data: response
       });
     }
+  },
+
+  /**
+   * Redirect the user to the multiple factor authentication page if required
+   *
+   * @param request
+   * @param response
+   * @private
+   */
+  _mfaRequired: function(request, response) {
+    if (response.header) {
+      if (response.header.code === 200 && response.header.url.startsWith('/mfa')) {
+        // If the mfa required dialog is already displayed.
+        if ($('.mfa-required-dialog').length > 0) {
+          return;
+        }
+
+        const dialog = DialogComponent.instantiate({
+          label: __('MFA Required'),
+          cssClasses: ['mfa-required-dialog', 'dialog-wrapper']
+        }).start();
+
+        // attach the component to the dialog
+        // do not use json urls
+        let url = response.header.url.replace(".json", "");
+        if (url.startsWith('/')) {
+          url = url.substring(1);
+        }
+        dialog.add(MfaRequiredComponent, {url: url});
+      }
+      return true;
+    }
+    return false;
   },
 
   /**
@@ -99,7 +134,7 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
      * Redirect the user to the front page.
      */
     if (response.header) {
-      if (response.header.status == Response.STATUS_ERROR && response.header.code == 403) {
+      if (response.header.status === Response.STATUS_ERROR && response.header.code === 403) {
         // If the session expired dialog is already displayed.
         if ($('.session-expired-dialog').length > 0) {
           return;
@@ -120,7 +155,6 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
   }
 
 }, /** @prototype */ {
-
 });
 
 export default AppAjax;
