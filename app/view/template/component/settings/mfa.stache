@@ -1,1 +1,1 @@
-<div style='height:100%;' >test</div>
+<iframe id='js_mfa_iframe' src='/mfa/totp/setup' width='100%' height='100%'></iframe>
