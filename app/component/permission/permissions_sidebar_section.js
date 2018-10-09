@@ -21,7 +21,7 @@ import TreeComponent from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
 
 import template from 'app/view/template/component/permission/permissions_sidebar_section.stache!';
-import permissionlistItemTemplate from 'app/view/template/component/permission/permission_list_item_2.stache!';
+import permissionlistItemTemplate from 'app/view/template/component/permission/permissions_sidebar_list_item.stache!';
 
 const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.permission.PermissionsSidebarSection', /** @static */ {
 

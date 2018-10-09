@@ -59,26 +59,17 @@ PermissionType.validationRules = {
   }]
 };
 
-
 /**
  * Get permission type formated.
  * @return {string}
  */
 PermissionType.formatToString = function(permId) {
-  let returnValue = '';
-  if (permId == undefined) {
-    console.error('Warning, PermissionType.toString called without permId');
-    return 'can read';
-  }
   switch (permId.toString()) {
     case PermissionType.ADMIN.toString():
-      returnValue = __('is %s', PermissionType.PERMISSION_TYPES[permId]);
-      break;
+      return __('is %s', PermissionType.PERMISSION_TYPES[permId]);
     default:
-      returnValue = __('can %s', PermissionType.PERMISSION_TYPES[permId]);
-      break;
+      return __('can %s', PermissionType.PERMISSION_TYPES[permId]);
   }
-  return returnValue;
 };
 
 export default PermissionType;

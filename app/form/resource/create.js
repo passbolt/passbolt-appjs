@@ -25,7 +25,6 @@ const CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 
   defaults: {
     secretField: null,
-    // @todo should be dynamic functions of creation or update
     action: 'create',
     secretsForms: [],
     resource: null,

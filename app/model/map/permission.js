@@ -34,35 +34,9 @@ const Permission = DefineMap.extend('passbolt.model.Permission', {
   aro_foreign_key: 'string',
   aro_foreign_label: 'string',
   group: Group,
-  user: User,
-
-  /**
-   * Check that the permission level allows requested permission
-   * @param permissionType
-   * @returns {boolean}
-   */
-  isAllowedTo: function(permissionType) {
-    return this.type >= permissionType;
-  }
+  user: User
 });
 DefineMap.setReference('Permission', Permission);
-Permission.List = DefineList.extend({'#': {Type: Permission}});
-
-/**
- * Sort the permissions alphabetically.
- */
-Permission.List.prototype.sortAlphabetically = function() {
-  this.sort((a, b) => {
-    const aValue = a.user ? a.user.profile.first_name : a.group.name;
-    const bValue = b.user ? b.user.profile.first_name : b.group.name;
-    if (aValue < bValue) {
-      return -1;
-    } else if (aValue > bValue) {
-      return 1;
-    }
-    return 0;
-  });
-};
 
 /*
  * Default validation rules.
@@ -84,15 +58,49 @@ Permission.validationRules = {
   ]
 };
 
+/**
+ * Check that the permission level allows requested permission
+ * @param permissionType
+ * @returns {boolean}
+ */
+Permission.prototype.isAllowedTo = function(permissionType) {
+  return this.type >= permissionType;
+};
+
+/**
+ * Permission list.
+ */
+Permission.List = DefineList.extend({'#': {Type: Permission}});
+
+/**
+ * Sort the permissions alphabetically.
+ */
+Permission.List.prototype.sortAlphabetically = function() {
+  this.sort((a, b) => {
+    const aValue = a.user ? a.user.profile.first_name : a.group.name;
+    const bValue = b.user ? b.user.profile.first_name : b.group.name;
+    if (aValue < bValue) {
+      return -1;
+    } else if (aValue > bValue) {
+      return 1;
+    }
+    return 0;
+  });
+};
+
 Permission.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
   Map: Permission,
   List: Permission.List,
   url: {
     resource: '/',
     getListData: function(params) {
+      let url = 'permissions.json';
+      if (params.aco_foreign_key) {
+        url = 'permissions/{aco}/{aco_foreign_key}.json';
+      }
       params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'permissions/{aco}/{aco_foreign_key}.json',
+        url: url,
         type: 'GET',
         params: params
       });

@@ -73,28 +73,11 @@ class Plugin {
   }
 
   /**
-   * Request the plugin to insert the share iframe
-   * @param {string} resourceId The target resource id
-   * @param {string} armored The armored secret
+   * Request the plugin to insert the bulk share iframe
+   * @param {array} resourcesIds The list of resources ids to share
    */
-  static insertShareIframe(resourceId, armored) {
-    this.send('passbolt.plugin.resource_share', {resourceId: resourceId, armored: armored});
-  }
-
-  /**
-   * Remove permission in the share iframe.
-   * @param {string} userId
-   * @param {boolean} isTemporaryPermission
-   */
-  static shareIframeRemovePermission(userId, isTemporaryPermission) {
-    this.send('passbolt.share.remove_permission', {userId: userId, isTemporaryPermission: isTemporaryPermission});
-  }
-
-  /**
-   * Request the plugin to encrypt the secret regarding the share changes.
-   */
-  static shareIframeEncrypt() {
-    this.send('passbolt.share.encrypt');
+  static insertShareIframe(resourcesIds) {
+    this.send('passbolt.plugin.resources_share', {resourcesIds: resourcesIds});
   }
 
   /**

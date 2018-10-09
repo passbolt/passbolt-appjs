@@ -3,19 +3,20 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk
+- PASSBOLT-2983: As LU I should be able to share multiple passwords in bulk
+
+### Improved
+- PASSBOLT-3073: As LU I should get a visual feedback directly after filtering the passwords or the users workspace
+- PASSBOLT-2972: As LU I should be able to select multiple passwords with classic keyboard interactions (command and shift keys)
+
 ### Fixed
 - PASSBOLT-2534: As LU I should not be able to copy to clipboard empty login/url
 - PASSBOLT-2017: As LU when I save a password (create/edit) the dialog shouldn't persist until the request is processed by the API
 - PASSBOLT-3063: Fix appjs base url and subfolder
 - PASSBOLT-3024: As LU I can't access the theme manager screen via url
 - PASSBOLT-2976: Fix API requests issues when the user is going to another workspace
-
-### Improved
-- PASSBOLT-3073: As LU I should get a visual feedback directly after filtering the passwords or the users workspace
-
-### Added
-- PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk
-- PASSBOLT-2972: As LU I should be able to select multiple passwords with classic keyboard interactions (command and shift keys)
 
 ## [2.3.0] - 2018-08-30
 ### Fixed

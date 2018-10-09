@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import ActionsTabComponent from 'app/component/password/actions_tab';
 import BreadcrumbComponent from 'app/component/password/workspace_breadcrumb';
 import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
@@ -27,6 +26,7 @@ import Plugin from 'app/util/plugin';
 import PrimaryMenuComponent from 'app/component/password/workspace_primary_menu';
 import PrimarySidebarComponent from 'app/component/password/primary_sidebar';
 import ResourceCreateForm from 'app/form/resource/create';
+import ResourceEditForm from 'app/form/resource/edit';
 import route from 'can-route';
 import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
 
@@ -310,7 +310,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Resource} resource The target resource entity.
    */
   openCreateResourceDialog: function(resource) {
-    const self = this;
     const dialog = DialogComponent.instantiate({
       label: __('Create Password'),
       cssClasses: ['create-password-dialog', 'dialog-wrapper']
@@ -320,10 +319,10 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     const form = dialog.add(ResourceCreateForm, {
       data: resource,
       callbacks: {
-        submit: function(data) {
+        submit: (data) => {
           delete data['Resource']['id'];
           const resourceToSave = new Resource(data['Resource']);
-          self._saveResource(resourceToSave, form, dialog);
+          this._saveResource(resourceToSave, form, dialog);
         }
       }
     });
@@ -352,40 +351,45 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Open the resource edit dialog.
-   *
    * @param {Resource} resource The target user entity.
    */
   openEditResourceDialog: function(resource) {
     const dialog = DialogComponent.instantiate({
-      label: __('Edit Password'),
+      label: __('Edit'),
+      subtitle: resource.name,
       cssClasses: ['edit-password-dialog', 'dialog-wrapper']
     }).start();
 
-    // Attach the Resource Actions Tab Controller into the dialog
-    const tab = dialog.add(ActionsTabComponent, {
-      resource: resource,
-      dialog: dialog
+    // Attach the form to the dialog
+    dialog.add(ResourceEditForm, {
+      id: 'js_rs_edit',
+      label: __('Edit'),
+      action: 'edit',
+      data: resource,
+      callbacks: {
+        submit: data => {
+          const resourceData = data['Resource'];
+          // If not secrets present, no need to add them to the API request.
+          if (resourceData.secrets.length > 0) {
+            resourceData['__FILTER_CASE__'] = 'edit_with_secrets';
+          } else {
+            resourceData['__FILTER_CASE__'] = 'edit';
+          }
+          resource.assign(resourceData);
+          resource.save();
+          dialog.remove();
+        }
+      }
     });
-    tab.enableTab('js_rs_edit');
   },
 
   /**
-   * Open the resource share dialog.
+   * Open the bulk resources share dialog.
    *
-   * @param {Resource} resource The target user entity.
+   * @param {Resource.List} resources The target resources.
    */
-  openShareResourceDialog: function(resource) {
-    const dialog = DialogComponent.instantiate({
-      label: __('Share Password'),
-      cssClasses: ['share-password-dialog', 'dialog-wrapper']
-    }).start();
-
-    // Attach the Resource Actions Tab Controller into the dialog
-    const tab = dialog.add(ActionsTabComponent, {
-      resource: resource,
-      dialog: dialog
-    });
-    tab.enableTab('js_rs_permission');
+  openShareResourcesDialog: function(resources) {
+    Plugin.insertShareIframe(resources.map(resource => resource.id));
   },
 
   /**
@@ -609,7 +613,17 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} request_resource_share': function(el, ev) {
     const resource = ev.data.resource;
-    this.openShareResourceDialog(resource);
+    this.openShareResourcesDialog([resource]);
+  },
+
+  /**
+   * Observe when the user wants to share a resources
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} request_resources_share': function(el, ev) {
+    const resources = ev.data.resources;
+    this.openShareResourcesDialog(resources);
   },
 
   /**
@@ -677,6 +691,54 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       const workspace = 'password';
       MadBus.trigger('request_workspace', {workspace: workspace});
     }
+  },
+
+  /**
+   * Observe when the plugin informs that the share operation has been completed.
+   */
+  '{mad.bus.element} passbolt.share.complete': function() {
+    MadBus.trigger('passbolt_notify', {
+      status: 'success',
+      title: 'app_share_share_success'
+    });
+
+    const selectedResources = this.options.selectedResources;
+    const previouslySelectedResources = selectedResources.get();
+
+    // Unselect all the resources.
+    // The user could have lost his access to some of them.
+    // Retrieve the resources and then select the ones the user can still access.
+    selectedResources.splice(0);
+
+    const findOptions = {
+      contain: {permission: 1},
+      filter: {
+        'has-id': previouslySelectedResources.map(resource => resource.id)
+      }
+    };
+    Resource.findAll(findOptions)
+      .then(resources => {
+        const sharedResourcesIds = resources.map(resource => resource.id).get();
+        // Destroy locally the resource the user lost his access.
+        for (let i = previouslySelectedResources.length-1; i>=0; i--) {
+          const resource = previouslySelectedResources[i];
+          if (sharedResourcesIds.indexOf(resource.id) == -1) {
+            Resource.dispatch('destroyed', [resource]);
+          }
+        }
+        // Reselect the resources the user has still access to.
+        if (resources.length) {
+          selectedResources.push.apply(selectedResources, resources);
+        }
+      });
+  },
+
+  /**
+   * Observe when the plugin informs that the user wants to go to the edit dialog from the share dialog
+   */
+  '{mad.bus.element} passbolt.share.go-to-edit': function() {
+    const resource = this.options.selectedResources.get(0);
+    MadBus.trigger('request_resource_edit', {resource});
   },
 
   /**

@@ -170,8 +170,12 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Share
    */
   _share: function() {
-    const resource = this.options.selectedResources[0];
-    MadBus.trigger('request_resource_share', {resource: resource});
+    const resources = this.options.selectedResources;
+    if (resources.length > 1) {
+      MadBus.trigger('request_resources_share', {resources: resources});
+    } else {
+      MadBus.trigger('request_resource_share', {resource: resources[0]});
+    }
   },
 
   /**
@@ -209,7 +213,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   '{selectedResources} remove': function() {
     const resources = this.options.selectedResources;
-    switch(resources.length) {
+    switch (resources.length) {
       case 0: {
         this.reset();
         break;
@@ -259,9 +263,13 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     const moreButtonDeleteItemId = 'js_wk_menu_delete_action';
     const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
     const moreButtonCopySecretItemId = 'js_wk_menu_copy_secret_action';
-    const canDelete = this.options.selectedResources.reduce((carry, resource) => {
-      return resource.permission.isAllowedTo(PermissionType.UPDATE) && carry;
-    }, true);
+    const resources = this.options.selectedResources;
+    const {canDelete, canShare} = resources.reduce((carry, resource) => {
+      return {
+        canDelete: resource.permission.isAllowedTo(PermissionType.UPDATE) && carry.canDelete,
+        canShare: resource.permission.isAllowedTo(PermissionType.ADMIN) && carry.canShare
+      };
+    }, {canDelete: true, canShare: true});
     if (canDelete) {
       this.moreButton.state.disabled = false;
       this.moreButton.disableItem(moreButtonCopyLoginItemId);
@@ -269,6 +277,9 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
       this.moreButton.enableItem(moreButtonDeleteItemId);
     } else {
       this.moreButton.state.disabled = true;
+    }
+    if (canShare) {
+      this.shareButton.state.disabled = false;
     }
   },
 

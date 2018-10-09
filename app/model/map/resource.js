@@ -79,21 +79,11 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
   },
 
   /**
-   * Share the resource.
-   * @param resource
-   * @param params
-   * @returns {Promise.<T>|*}
+   * Find the resource that may have change.
+   * If the resource is found, canjs will throw an event to notify about the changes.
+   * If the resource cannot be found, notify about its destruction.
+   * @private
    */
-  share: function(params) {
-    return Ajax.request({
-      url: `share/resource/${this.id}.json?api-version=v1`,
-      type: 'PUT',
-      params: params
-    }).then(() => {
-      this._reloadResource();
-    });
-  },
-
   _reloadResource: function() {
     const findOptions = {
       id: this.id,
@@ -112,6 +102,20 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
 });
 DefineMap.setReference('Resource', Resource);
 Resource.List = DefineList.extend({'#': {Type: Resource}});
+
+/**
+ * Sort the permissions alphabetically.
+ */
+Resource.List.prototype.sortAlphabetically = function() {
+  this.sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    } else if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  });
+};
 
 /*
  * Default validation rules.

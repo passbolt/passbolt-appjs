@@ -43,6 +43,8 @@
 
 </div>
 
+<div id="js-edit-feedbacks" class="feedbacks message hidden"></div>
+
 <div class="submit-wrapper clearfix">
     <input type="submit" class="button primary" value="{{ __('save')}}" />
     <a class="js-dialog-cancel cancel">{{ __('cancel')}}</a>
