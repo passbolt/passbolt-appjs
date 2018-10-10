@@ -68,6 +68,10 @@ const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.Work
       this.options.editButton.state.hidden = true;
       this.options.publicKeyButton.state.hidden = false;
       this.options.privateKeyButton.state.hidden = false;
+    } else {
+      this.options.editButton.state.hidden = true;
+      this.options.publicKeyButton.state.hidden = true;
+      this.options.privateKeyButton.state.hidden = true;
     }
   },
 
