@@ -9,13 +9,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Improved
 - PASSBOLT-3073: As LU I should get a visual feedback directly after filtering the passwords or the users workspace
-- PASSBOLT-2972: As LU I should be able to select multiple passwords with classic keyboard interactions (command and shift keys)
+- PASSBOLT-2972: As LU I should be able to select multiple passwords with standard keyboard interactions (command and shift keys)
 
 ### Fixed
 - PASSBOLT-2534: As LU I should not be able to copy to clipboard empty login/url
 - PASSBOLT-2017: As LU when I save a password (create/edit) the dialog shouldn't persist until the request is processed by the API
 - PASSBOLT-3063: Fix appjs base url and subfolder
-- PASSBOLT-3024: As LU I can't access the theme manager screen via url
+- PASSBOLT-3024: As LU I can access the theme manager screen via /settings/theme url
 - PASSBOLT-2976: Fix API requests issues when the user is going to another workspace
 - PASSBOLT-2982: Fix session expired check
 
