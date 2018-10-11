@@ -87,11 +87,7 @@ const WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settin
     const allUsersItem = new Action({
       id: uuid(),
       label: __('All users'),
-      action: function() {
-        // Switch to user workspace.
-        const workspace = 'user';
-        MadBus.trigger('request_workspace', {workspace: workspace});
-      }
+      action: () => route.data.update({controller: 'User', action: 'index'})
     });
     this.menuItems.push(allUsersItem);
 
@@ -99,10 +95,7 @@ const WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settin
     const profileItem = new Action({
       id: uuid(),
       label: User.getCurrent().profile.fullName(),
-      action: function() {
-        const section = 'profile';
-        MadBus.trigger('request_settings_section', {section: section});
-      }
+      action: () => route.data.update({controller: 'Settings', action: 'profile'})
     });
     this.menuItems.push(profileItem);
 
@@ -134,6 +127,16 @@ const WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settin
       new Action({
         id: uuid(),
         label: __('Theme'),
+        action: function() {
+          return;
+        }
+      })
+    ];
+    // MFA section.
+    this.sectionMenuItems['mfa'] = [
+      new Action({
+        id: uuid(),
+        label: __('Multi factor authentication'),
         action: function() {
           return;
         }
