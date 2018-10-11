@@ -82,7 +82,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   afterStart: function() {
     this._firstLoad = true;
-    this._workspace = null
+    this._workspace = null;
     this._initFooter();
     this._initHeader();
     this._initSessionCheck();

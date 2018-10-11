@@ -12,14 +12,12 @@
  * @since         2.0.0
  */
 import Component from 'passbolt-mad/component/component';
-
-import template from 'app/view/template/component/settings/mfa.stache!';
+import HtmlHelper from 'passbolt-mad/helper/html';
+import Session from 'app/model/utility/session';
 
 const MfaComponent = Component.extend('passbolt.component.settings.mfa', /** @static */ {
 
-  defaults: {
-    template: template,
-  }
+  defaults: {}
 
 }, /** @prototype */ {
 
@@ -27,7 +25,12 @@ const MfaComponent = Component.extend('passbolt.component.settings.mfa', /** @st
    * @inheritdoc
    */
   afterStart: function() {
-  },
+    Session.check()
+      .then(() => {
+        const iframeContent = `<iframe id='js_mfa_iframe' src='${APP_URL}/mfa/totp/setup/start' width='100%' height='100%'></iframe>`;
+        HtmlHelper.create($(this.element), 'inside_replace', iframeContent);
+      });
+  }
 });
 
 export default MfaComponent;
