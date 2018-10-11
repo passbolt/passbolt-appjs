@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3024: As LU I can access the theme manager screen via /settings/theme url
 - PASSBOLT-2976: Fix API requests issues when the user is going to another workspace
 - PASSBOLT-2982: Fix session expired check
+- PASSBOLT-3086: As LU when I have 100+ passwords I cannot see the passwords after the 100th more than once
 
 ## [2.3.0] - 2018-08-30
 ### Fixed
