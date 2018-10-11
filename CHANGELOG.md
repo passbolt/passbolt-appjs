@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3063: Fix appjs base url and subfolder
 - PASSBOLT-3024: As LU I can't access the theme manager screen via url
 - PASSBOLT-2976: Fix API requests issues when the user is going to another workspace
+- PASSBOLT-2982: Fix session expired check
 
 ## [2.3.0] - 2018-08-30
 ### Fixed

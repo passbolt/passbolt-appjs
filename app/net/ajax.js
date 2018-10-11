@@ -99,7 +99,8 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
      * Redirect the user to the front page.
      */
     if (response.header) {
-      if (response.header.status == Response.STATUS_ERROR && response.header.code == 403) {
+      const sessionExpiredAutoRedirect = request.sessionExpiredAutoRedirect != undefined ? request.sessionExpiredAutoRedirect : true;
+      if (response.header.code == 403 && response.header.message == 'You need to login to access this location.' && sessionExpiredAutoRedirect) {
         // If the session expired dialog is already displayed.
         if ($('.session-expired-dialog').length > 0) {
           return;

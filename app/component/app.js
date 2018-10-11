@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Ajax from 'app/net/ajax';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
@@ -22,7 +23,7 @@ import NotificationComponent from 'app/component/footer/notification';
 import PasswordWorkspaceComponent from 'app/component/password/workspace';
 import ProfileHeaderDropdownComponent from 'app/component/profile/header_dropdown';
 import route from 'can-route';
-import SessionCheck from 'app/model/session_check';
+import Session from 'app/model/utility/session';
 import SettingsWorkspaceComponent from 'app/component/settings/workspace';
 import String from 'can-string';
 import User from 'app/model/map/user';
@@ -43,6 +44,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * @inheritdoc
    */
   init: function(el, options) {
+    this._sessionCheckTimeout = null;
     this._initRouteListener();
     return this._super(el, options);
   },
@@ -83,7 +85,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     this._workspace = null
     this._initFooter();
     this._initHeader();
-    SessionCheck.instantiate();
+    this._initSessionCheck();
     this._dispatchRoute();
     this._super();
   },
@@ -119,6 +121,34 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
       user: User.getCurrent()
     });
     profileHeaderDropdownComponent.start();
+  },
+
+  /**
+   * Init the session
+   */
+  _initSessionCheck: function() {
+    // On the last API request, schedule a session check.
+    Ajax._requests.on('length', (ev, length) => {
+      if (!length) {
+        this._scheduleSessionCheck();
+      }
+    });
+  },
+
+  /**
+   *
+   * @private
+   */
+  _scheduleSessionCheck: function() {
+    const timeout = Session.getTimeout();
+    if (this._sessionCheckTimeout != null) {
+      clearTimeout(this._sessionCheckTimeout);
+      this._sessionCheckTimeout = null;
+    }
+    this._sessionCheckTimeout = setTimeout(() => {
+      // If the session is expired, the app/net/ajax error handler will redirect the user to the login page.
+      $('html').one('mousemove mousedown keypress mousewheel', () => Session.check());
+    }, timeout);
   },
 
   /**
