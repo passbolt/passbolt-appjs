@@ -14,7 +14,6 @@ import Ajax from 'passbolt-mad/net/ajax';
 import Config from 'passbolt-mad/config/config';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import MadBus from 'passbolt-mad/control/bus';
-import Response from 'passbolt-mad/net/response';
 import SessionExpiredComponent from 'app/component/session/session_expired';
 import MfaRequiredComponent from 'app/component/mfa/mfa_required';
 
@@ -50,7 +49,6 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
     return this._super(request, data)
       .then(data => {
         this._triggerNotification(request, request._response);
-        this._mfaRequired(request, request._response);
         return Promise.resolve(data);
       });
   },
@@ -63,6 +61,7 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
       .then(null, data => {
         this._triggerNotification(request, request._response);
         this._sessionExpired(request, data);
+        this._mfaRequired(request, request._response);
         return Promise.reject(data);
       });
   },
@@ -97,7 +96,7 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
    */
   _mfaRequired: function(request, response) {
     if (response.header) {
-      if (response.header.code === 200 && response.header.url.startsWith('/mfa')) {
+      if (response.header.code === 403 && response.header.url.startsWith('/mfa/verify/error')) {
         // If the mfa required dialog is already displayed.
         if ($('.mfa-required-dialog').length > 0) {
           return;
@@ -109,12 +108,8 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
         }).start();
 
         // attach the component to the dialog
-        // do not use json urls
-        let url = response.header.url.replace(".json", "");
-        if (url.startsWith('/')) {
-          url = url.substring(1);
-        }
-        dialog.add(MfaRequiredComponent, {url: url});
+        // let the server redirect where needed
+        dialog.add(MfaRequiredComponent, {url: '/'});
       }
       return true;
     }
@@ -134,8 +129,8 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
      * Redirect the user to the front page.
      */
     if (response.header) {
-      const sessionExpiredAutoRedirect = request.sessionExpiredAutoRedirect != undefined ? request.sessionExpiredAutoRedirect : true;
-      if (response.header.code == 403 && response.header.message == 'You need to login to access this location.' && sessionExpiredAutoRedirect) {
+      const sessionExpiredAutoRedirect = request.sessionExpiredAutoRedirect !== undefined ? request.sessionExpiredAutoRedirect : true;
+      if (response.header.code === 403 && response.header.message === 'You need to login to access this location.' && sessionExpiredAutoRedirect) {
         // If the session expired dialog is already displayed.
         if ($('.session-expired-dialog').length > 0) {
           return;
