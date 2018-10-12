@@ -697,11 +697,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * Observe when the plugin informs that the share operation has been completed.
    */
   '{mad.bus.element} passbolt.share.complete': function() {
-    MadBus.trigger('passbolt_notify', {
-      status: 'success',
-      title: 'app_share_share_success'
-    });
-
     const selectedResources = this.options.selectedResources;
     const previouslySelectedResources = selectedResources.get();
 
