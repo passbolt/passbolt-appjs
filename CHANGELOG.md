@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.4.0] - 2018-10-12
 ### Added
 - PASSBOLT-2972: As LU I should be able to delete multiple passwords in bulk
 - PASSBOLT-2983: As LU I should be able to share multiple passwords in bulk
@@ -67,7 +69,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/passbolt/passbolt-appjs/compare/5df5207...v2.1.0
