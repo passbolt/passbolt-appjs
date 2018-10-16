@@ -383,7 +383,9 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     if (this.state.destroyed) {
       return Promise.resolve();
     }
+    this.state.selectType = null;
     this.view.reset();
+    this._uncheckSelectAllCheckbox();
     const loadOptions = {};
     const keywords = filter.getRule('keywords');
     if (keywords && keywords != '') {
