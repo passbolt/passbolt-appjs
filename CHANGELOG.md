@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-3093: As LU I can select all passwords to perform a bulk operation
 
 ## [2.4.0] - 2018-10-12
 ### Added

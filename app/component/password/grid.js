@@ -48,7 +48,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     silentLoading: false,
     loadedOnStart: false,
     Resource: Resource,
-    paginate: true
+    paginate: true,
+    selectAllCheckboxSelector: '#js-passwords-select-all'
   }
 
 }, /** @prototype */ {
@@ -119,6 +120,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       index: 'multipleSelect',
       css: ['selections s-cell'],
       label: columnHeaderSelectTemplate,
+      sortable: false,
       afterRender: (cellElement, cellValue, mappedItem, item, columnModel) =>
         this._initSelectColumnComponent(cellElement, cellValue, mappedItem, item, columnModel)
     });
@@ -217,6 +219,19 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     );
     checkbox.start();
     this._selectCheckboxComponents[item.id] = checkbox;
+  },
+
+  /**
+   * After an item is rendered select mark it has selected if it has been previously selected.
+   * It is usefull to mark paginated items as selected.
+   * @inheritdoc
+   */
+  _afterRenderItem: function(item, mappedItem) {
+    this._super(item, mappedItem);
+    if (this.isSelected(item)) {
+      this.selectItem(item);
+      this._selectCheckboxComponents[item.id].setValue([item.id]);
+    }
   },
 
   /**
@@ -566,6 +581,11 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     const srcEv = ev.data.srcEv;
     const resources = this.options.selectedResources;
 
+    // Disable the select all checkbox component if previously selected.
+    if (this.state.selectType == 'all') {
+      this._uncheckSelectAllCheckbox();
+    }
+
     if (srcEv.metaKey) {
       this.state.selectType = 'multiple';
       if (this.isSelected(item)) {
@@ -698,6 +718,28 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     items.forEach(item => {
       this.select(item);
     });
+  },
+
+  /**
+   * Init the select all checkbox
+   */
+  _uncheckSelectAllCheckbox: function() {
+    $(this.options.selectAllCheckboxSelector).prop('checked', false);
+  },
+
+  /**
+   * Observe when all items are selected
+   */
+  '{element} {selectAllCheckboxSelector} click': function() {
+    const resources = this.options.selectedResources;
+    resources.splice(0, resources.length);
+    // If already in select all mode
+    if (this.state.selectType == 'all') {
+      this.state.selectType = null;
+      return;
+    }
+    this.state.selectType = 'all';
+    resources.replace(this.options.items);
   }
 
 });

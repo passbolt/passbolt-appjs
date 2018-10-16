@@ -508,7 +508,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLElement} el The element the event occurred on
    */
   '{selectedResources} length': function() {
-    const init = this.options.selectedResources.length == 1;
+    const init = this.options.selectedResources.length === 1;
     if (init) {
       const component = this._initSecondarySidebar();
       if (component) {
@@ -698,32 +698,16 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} passbolt.share.complete': function() {
     const selectedResources = this.options.selectedResources;
-    const previouslySelectedResources = selectedResources.get();
+    const selectedResourcesIds = selectedResources.map(resource => resource.id).get();
 
     // Unselect all the resources.
     // The user could have lost his access to some of them.
     // Retrieve the resources and then select the ones the user can still access.
     selectedResources.splice(0);
-
-    const findOptions = {
-      contain: {permission: 1},
-      filter: {
-        'has-id': previouslySelectedResources.map(resource => resource.id)
-      }
-    };
-    Resource.findAll(findOptions)
+    Resource.updateResourcesAfterShare(selectedResourcesIds)
       .then(resources => {
-        const sharedResourcesIds = resources.map(resource => resource.id).get();
-        // Destroy locally the resource the user lost his access.
-        for (let i = previouslySelectedResources.length-1; i>=0; i--) {
-          const resource = previouslySelectedResources[i];
-          if (sharedResourcesIds.indexOf(resource.id) == -1) {
-            Resource.dispatch('destroyed', [resource]);
-          }
-        }
-        // Reselect the resources the user has still access to.
         if (resources.length) {
-          selectedResources.push.apply(selectedResources, resources);
+          selectedResources.replace(resources);
         }
       });
   },
