@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import Ajax from 'app/net/ajax';
+import chunk from 'passbolt-mad/util/array/chunk';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
@@ -195,6 +196,46 @@ Resource.deleteAll = function(resources) {
     return promise.then(() => resource.destroy());
   }, Promise.resolve([]));
   return promises;
+};
+
+/**
+ * Update resources after they have been shared.
+ * - Update the permission of the current user locally
+ * - Destroy them locally if the user has not access to them
+ * @param resourcesIds
+ * @return {Promise}
+ */
+Resource.updateResourcesAfterShare = function(resourcesIds) {
+  // Retrieve the resources by batch of 100 to avoid any 414 response.
+  const batchSize = 100;
+  if (resourcesIds.length > batchSize) {
+    const resourcesIdsParts = chunk(resourcesIds, batchSize);
+    return resourcesIdsParts.reduce((promise, resourcesIdsPart) => {
+      return promise.then(carry => {
+        return Resource.updateResourcesAfterShare(resourcesIdsPart)
+          .then(resources => carry.concat(resources));
+
+      });
+    }, Promise.resolve(new Resource.List()));
+  }
+
+  const findOptions = {
+    contain: {permission: 1},
+    filter: {
+      'has-id': resourcesIds
+    }
+  };
+  return Resource.findAll(findOptions)
+    .then(resources => {
+      // Delete locally the resources that are not returned by the API request, it means the user does not have access to it anymore.
+      const updatedResourcesIds = resources.map(resource => resource.id).get();
+      const deletedResourcesIds = resourcesIds.filter(item => !updatedResourcesIds.includes(item));
+      deletedResourcesIds.forEach(deletedResourceId => {
+        const resource = Resource.connection.instanceStore.get(deletedResourceId);
+        Resource.dispatch('destroyed', [resource]);
+      });
+      return resources;
+    });
 };
 
 Resource.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
