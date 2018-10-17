@@ -16,6 +16,7 @@ import Clipboard from 'app/util/clipboard';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import FavoriteComponent from 'app/component/favorite/favorite';
+import getObject from 'can-util/js/get/get';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
@@ -69,6 +70,16 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * Multi select initial element reference.
    */
   _multiShiftSelectFirstElement: null,
+
+  /**
+   * Pending filter timeout to execute once the grid is loaded.
+   */
+  _pendingFilterTimeout: null,
+
+  /**
+   * A filter is currently applied to the grid
+   */
+  _applyingFilter: false,
 
   /**
    * @inheritdoc
@@ -331,12 +342,23 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @return {Promise}
    */
   filterBySettings: function(filter) {
+    // Only one filter can be applied at a time.
+    if (this._applyingFilter) {
+      clearTimeout(this._pendingFilterTimeout);
+      this._pendingFilterTimeout = setTimeout(() => this.filterBySettings(filter), 200);
+      return;
+    }
+
     this.state.loaded = false;
+    this._applyingFilter = true;
     return this._findResources(filter)
       .then(resources => this._handleApiResources(resources, filter))
       .then(() => this._markSortedBySettings(filter))
       .then(() => this._filterByKeywordsBySettings(filter))
-      .then(() => this._selectResourceBySettings(filter));
+      .then(() => this._selectResourceBySettings(filter))
+      .then(() => {
+        this._applyingFilter = false;
+      });
   },
 
   /**
@@ -354,8 +376,16 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @private
    */
   _findResources: function(filter) {
-    const requestApi = filter.forceReload || !this.filterSettings || !(filter.id == 'search' && this.filterSettings.id === filter.id);
-    if (!requestApi) {
+    const forceReload = filter.forceReload;
+    const oldFilterId = getObject(this, 'filterSettings.id');
+    const searching =
+      // The user was already searching or is on all items
+      (filter.id == 'search' && (oldFilterId == 'search' || oldFilterId == 'default'))
+      // The user empty the search bar
+      || (filter.id == 'default' && oldFilterId == 'search');
+
+    // Do not request the API if the user is performing a search on the default filter
+    if (searching && !forceReload) {
       return Promise.resolve();
     }
 
@@ -383,6 +413,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     if (this.state.destroyed) {
       return Promise.resolve();
     }
+
     this.state.selectType = null;
     this.view.reset();
     this._uncheckSelectAllCheckbox();
