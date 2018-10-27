@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - PASSBOLT-3093: As LU I can select all passwords to perform a bulk operation
+- PASSBOLT-3121: MFA administration screen
 
 ### Fixed
 - PASSBOLT-3150: I should not see duplicates rows when I filter my passwords by keywords

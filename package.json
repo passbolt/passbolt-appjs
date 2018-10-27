@@ -98,7 +98,7 @@
     "jssha": "~2.0.1",
     "moment": "^2.10.0",
     "moment-timezone": "^0.5.0",
-    "passbolt-mad": "git+https://git@github.com/passbolt/passbolt_mad.git#master",
+    "passbolt-mad": "^2.5.0",
     "react-view-model": "1.0.1",
     "steal": "^1.12.4",
     "steal-stache": "^4.0.0",

@@ -1,0 +1,17 @@
+<div class="js_administration_workspace">
+
+    <div class="panel left">
+        <div class="navigation first">
+            <ul id="js_wk_administration_menu" class="clearfix">
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel middle">
+		<div id="js_wsp_administration_breadcrumb" class="breadcrumbs">
+		</div>
+		<div id="js_wk_administration_main" class="workspace-main">
+		</div>
+    </div>
+
+</div>

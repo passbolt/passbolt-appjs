@@ -107,8 +107,10 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
           cssClasses: ['mfa-required-dialog', 'dialog-wrapper']
         }).start();
 
-        // attach the component to the dialog
-        // let the server redirect where needed
+        /*
+         * attach the component to the dialog
+         * let the server redirect where needed
+         */
         dialog.add(MfaRequiredComponent, {url: '/'});
       }
       return true;

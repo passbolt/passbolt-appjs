@@ -210,13 +210,8 @@ Resource.updateResourcesAfterShare = function(resourcesIds) {
   const batchSize = 100;
   if (resourcesIds.length > batchSize) {
     const resourcesIdsParts = chunk(resourcesIds, batchSize);
-    return resourcesIdsParts.reduce((promise, resourcesIdsPart) => {
-      return promise.then(carry => {
-        return Resource.updateResourcesAfterShare(resourcesIdsPart)
-          .then(resources => carry.concat(resources));
-
-      });
-    }, Promise.resolve(new Resource.List()));
+    return resourcesIdsParts.reduce((promise, resourcesIdsPart) => promise.then(carry => Resource.updateResourcesAfterShare(resourcesIdsPart)
+      .then(resources => carry.concat(resources))), Promise.resolve(new Resource.List()));
   }
 
   const findOptions = {

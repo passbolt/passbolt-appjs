@@ -1,3 +1,0 @@
-{{ __('This group is the sole owner of') }} {{ resources.length }} {{#if(resource.length>1)}}{{ __('passwords') }}{{#else}}{{__('password')}}{{/if}}:
-{{#resources}}{{#if(scope.index)}}, {{/if}}{{ name }}{{/each}}.
-{{__('You need to transfer the ownership to other users before you can proceed.'); }}

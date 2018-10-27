@@ -1,0 +1,18 @@
+<li>
+	<a id="js-ldap-settings-edit-button" class="button">
+		<i class="fa fa-fw fa-edit"></i>
+		<span>{{__('edit')}}</span>
+	</a>
+</li>
+<li>
+	<a id="js-ldap-settings-simulate-button" class="button hidden">
+		<i class="fa fa-fw fa-magic"></i>
+		<span>{{__('simulate synchronize')}}</span>
+	</a>
+</li>
+<li>
+	<a id="js-ldap-settings-synchronise-button" class="button hidden">
+		<i class="fa fa-fw fa-refresh"></i>
+		<span>{{__('synchronize')}}</span>
+	</a>
+</li>
