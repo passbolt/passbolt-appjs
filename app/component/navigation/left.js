@@ -12,10 +12,12 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
+import Config from 'passbolt-mad/config/config';
 import DomData from 'can-dom-data';
 import MenuComponent from 'passbolt-mad/component/menu';
 import route from 'can-route';
 import String from 'can-string';
+import User from 'app/model/map/user';
 
 const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft', /** @static */ {
 
@@ -75,6 +77,20 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
     });
     this.insertItem(usersItem);
 
+    // Administration
+    if (User.getCurrent().isAdmin) {
+      const plugins = Config.read('server.passbolt.plugins');
+      if (plugins.directorySync || plugins.multiFactorAuthentication) {
+        const helpItem = new Action({
+          id: 'js_app_nav_left_administration_link',
+          label: __('administration'),
+          cssClasses: ['administration'],
+          action: () => this._goToAdministrationWorkspace()
+        });
+        this.insertItem(helpItem);
+      }
+    }
+
     // help
     const helpItem = new Action({
       id: 'js_app_nav_left_help_link',
@@ -101,6 +117,15 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
   _goToUserWorkspace: function() {
     const controller = 'User';
     const action = 'index';
+    route.data.update({controller: controller, action: action});
+  },
+
+  /**
+   * Go to the administration workspace
+   */
+  _goToAdministrationWorkspace: function() {
+    const controller = 'Administration';
+    const action = 'mfa';
     route.data.update({controller: controller, action: action});
   },
 

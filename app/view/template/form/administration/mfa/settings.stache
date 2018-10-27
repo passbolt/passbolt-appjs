@@ -1,0 +1,63 @@
+<div class="provider-section totp">
+	<h3><span id="js-totp-provider-toggle-button" class="input toggle-switch"></span><label for="toggle_button_js-totp-provider-toggle-button">{{__('Time-based One Time Password')}}</label></h3>
+	<p class="description enabled">
+		{{__('The Time-based One Time Password provider is enabled for all users. They can setup this provider in their profile and use it as second factor authentication.')}}
+	</p>
+	<p class="description disabled">
+		{{__('The Time-based One Time Password provider is disabled for all users.')}}
+	</p>
+</div>
+
+<div class="provider-section yubikey">
+	<h3><span id="js-yubikey-provider-toggle-button" class="input toggle-switch"></span><label for="toggle_button_js-yubikey-provider-toggle-button">Yubikey</label></h3>
+	<p class="description enabled">
+		{{__('The Yubikey provider is enabled for all users. They can setup this provider in their profile and use it as second factor authentication.')}}
+	</p>
+	<p class="description disabled">
+		{{__('The Yubikey provider is disabled for all users.')}}
+	</p>
+	<div class="form-content">
+		<div class="input text js_form_element_wrapper">
+			<label>{{__('Client identifier')}}</label>
+			<input id="js-yubikey-client-id-input" type="text" class="required fluid" placeholder="123456789">
+			<div id="js-yubikey-client-id-input-feedback" class="message"></div>
+		</div>
+		<div class="input text js_form_element_wrapper">
+			<label>{{__('Secret key')}}</label>
+			<input id="js-yubikey-secret-key-input" type="{{#if(edit}}text{{#else}}password{{/if}}" class="required fluid" placeholder="**********">
+			<div id="js-yubikey-secret-key-input-feedback" class="message"></div>
+		</div>
+	</div>
+</div>
+
+<div class="provider-section duo">
+	<h3><span id="js-duo-provider-toggle-button" class="input toggle-switch"></span><label for="toggle_button_js-duo-provider-toggle-button">Duo</label></h3>
+	<p class="description enabled">
+		{{__('The Duo provider is enabled for all users. They can setup this provider in their profile and use it as second factor authentication.')}}
+	</p>
+	<p class="description disabled">
+		{{__('The Duo provider is disabled for all users.')}}
+	</p>
+	<div class="form-content">
+		<div class="input text js_form_element_wrapper">
+			<label>{{__('Hostname')}}</label>
+			<input id="js-duo-hostname-input" type="text" class="required fluid" placeholder="api-24zlkn4.duosecurity.com">
+			<div id="js-duo-hostname-input-feedback" class="message"></div>
+		</div>
+		<div class="input text js_form_element_wrapper">
+			<label>{{__('Integration key')}}</label>
+			<input id="js-duo-integration-key-input" type="text" class="required fluid" placeholder="HASJKDSQJO213123KQSLDF">
+			<div id="js-duo-integration-key-input-feedback" class="message"></div>
+		</div>
+		<div class="input text js_form_element_wrapper">
+			<label>{{__('Salt')}}</label>
+			<input id="js-duo-salt-input" type="{{#if(edit}}text{{#else}}password{{/if}}" class="required fluid" placeholder="**********">
+			<div id="js-duo-salt-input-feedback" class="message"></div>
+		</div>
+		<div class="input text js_form_element_wrapper">
+			<label>{{__('Secret key')}}</label>
+			<input id="js-duo-secret-key-input" type="{{#if(edit}}text{{#else}}password{{/if}}" class="required fluid" placeholder="**********">
+			<div id="js-duo-secret-key-input-feedback" class="message"></div>
+		</div>
+	</div>
+</div>

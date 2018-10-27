@@ -41,7 +41,6 @@ import uuid from 'uuid/v4';
 
 import createButtonTemplate from 'app/view/template/component/workspace/create_button.stache!';
 import groupDeleteConfirmTemplate from 'app/view/template/component/group/delete_confirm.stache!';
-import groupDeleteErrorTemplate from 'app/view/template/component/group/delete_error.stache!';
 import template from 'app/view/template/component/user/workspace.stache!';
 import userDeleteConfirmTemplate from 'app/view/template/component/user/delete_confirm.stache!';
 

@@ -1,0 +1,12 @@
+<li>
+    <a id="js-ldap-settings-save-button" class="button">
+        <i class="fa fa-fw fa-save"></i>
+        <span>{{__('save settings'}}</span>
+    </a>
+</li>
+<li>
+    <a id="js-ldap-settings-cancel-button" class="button">
+        <i class="fa fa-fw fa-undo"></i>
+        <span>{{__('cancel'}}</span>
+    </a>
+</li>

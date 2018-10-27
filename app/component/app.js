@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import AdministrationWorkspaceComponent from 'app/component/administration/workspace';
 import Ajax from 'app/net/ajax';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
@@ -178,6 +179,9 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   _getWorkspaceClassByName: function(name) {
     let WorkspaceClass = null;
     switch (name) {
+      case 'administration':
+        WorkspaceClass = AdministrationWorkspaceComponent;
+        break;
       case 'password':
         WorkspaceClass = PasswordWorkspaceComponent;
         break;

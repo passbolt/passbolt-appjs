@@ -197,7 +197,6 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
         });
       }
     }
-
   },
 
   /**
