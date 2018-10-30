@@ -88,9 +88,11 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
     } else {
       // Otherwise filter the current workspace.
       const workspaceFilter = this.options.workspace.constructor.getDefaultFilterSettings();
-      workspaceFilter.id = 'search';
-      workspaceFilter.type = 'search';
-      workspaceFilter.setRule('keywords', keywords);
+      if (keywords != '') {
+        workspaceFilter.id = 'search';
+        workspaceFilter.type = 'search';
+        workspaceFilter.setRule('keywords', keywords);
+      }
       MadBus.trigger('filter_workspace', {filter: workspaceFilter});
     }
   },
