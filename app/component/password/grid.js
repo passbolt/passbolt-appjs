@@ -16,6 +16,7 @@ import Clipboard from 'app/util/clipboard';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import FavoriteComponent from 'app/component/favorite/favorite';
+import getObject from 'can-util/js/get/get';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
@@ -48,7 +49,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     silentLoading: false,
     loadedOnStart: false,
     Resource: Resource,
-    paginate: true
+    paginate: true,
+    selectAllCheckboxSelector: '#js-passwords-select-all'
   }
 
 }, /** @prototype */ {
@@ -68,6 +70,16 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * Multi select initial element reference.
    */
   _multiShiftSelectFirstElement: null,
+
+  /**
+   * Pending filter timeout to execute once the grid is loaded.
+   */
+  _pendingFilterTimeout: null,
+
+  /**
+   * A filter is currently applied to the grid
+   */
+  _applyingFilter: false,
 
   /**
    * @inheritdoc
@@ -119,6 +131,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       index: 'multipleSelect',
       css: ['selections s-cell'],
       label: columnHeaderSelectTemplate,
+      sortable: false,
       afterRender: (cellElement, cellValue, mappedItem, item, columnModel) =>
         this._initSelectColumnComponent(cellElement, cellValue, mappedItem, item, columnModel)
     });
@@ -220,6 +233,19 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   },
 
   /**
+   * After an item is rendered select mark it has selected if it has been previously selected.
+   * It is usefull to mark paginated items as selected.
+   * @inheritdoc
+   */
+  _afterRenderItem: function(item, mappedItem) {
+    this._super(item, mappedItem);
+    if (this.isSelected(item)) {
+      this.selectItem(item);
+      this._selectCheckboxComponents[item.id].setValue([item.id]);
+    }
+  },
+
+  /**
    * Init the favorite component for a given cell.
    * @inheritdoc
    */
@@ -316,12 +342,23 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @return {Promise}
    */
   filterBySettings: function(filter) {
+    // Only one filter can be applied at a time.
+    if (this._applyingFilter) {
+      clearTimeout(this._pendingFilterTimeout);
+      this._pendingFilterTimeout = setTimeout(() => this.filterBySettings(filter), 200);
+      return;
+    }
+
     this.state.loaded = false;
+    this._applyingFilter = true;
     return this._findResources(filter)
       .then(resources => this._handleApiResources(resources, filter))
       .then(() => this._markSortedBySettings(filter))
       .then(() => this._filterByKeywordsBySettings(filter))
-      .then(() => this._selectResourceBySettings(filter));
+      .then(() => this._selectResourceBySettings(filter))
+      .then(() => {
+        this._applyingFilter = false;
+      });
   },
 
   /**
@@ -339,8 +376,16 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @private
    */
   _findResources: function(filter) {
-    const requestApi = filter.forceReload || !this.filterSettings || !(filter.id == 'search' && this.filterSettings.id === filter.id);
-    if (!requestApi) {
+    const forceReload = filter.forceReload;
+    const oldFilterId = getObject(this, 'filterSettings.id');
+    const searching =
+      // The user was already searching or is on all items
+      (filter.id == 'search' && (oldFilterId == 'search' || oldFilterId == 'default'))
+      // The user empty the search bar
+      || (filter.id == 'default' && oldFilterId == 'search');
+
+    // Do not request the API if the user is performing a search on the default filter
+    if (searching && !forceReload) {
       return Promise.resolve();
     }
 
@@ -368,7 +413,10 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     if (this.state.destroyed) {
       return Promise.resolve();
     }
+
+    this.state.selectType = null;
     this.view.reset();
+    this._uncheckSelectAllCheckbox();
     const loadOptions = {};
     const keywords = filter.getRule('keywords');
     if (keywords && keywords != '') {
@@ -566,6 +614,11 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     const srcEv = ev.data.srcEv;
     const resources = this.options.selectedResources;
 
+    // Disable the select all checkbox component if previously selected.
+    if (this.state.selectType == 'all') {
+      this._uncheckSelectAllCheckbox();
+    }
+
     if (srcEv.metaKey) {
       this.state.selectType = 'multiple';
       if (this.isSelected(item)) {
@@ -698,6 +751,28 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     items.forEach(item => {
       this.select(item);
     });
+  },
+
+  /**
+   * Init the select all checkbox
+   */
+  _uncheckSelectAllCheckbox: function() {
+    $(this.options.selectAllCheckboxSelector).prop('checked', false);
+  },
+
+  /**
+   * Observe when all items are selected
+   */
+  '{element} {selectAllCheckboxSelector} click': function() {
+    const resources = this.options.selectedResources;
+    resources.splice(0, resources.length);
+    // If already in select all mode
+    if (this.state.selectType == 'all') {
+      this.state.selectType = null;
+      return;
+    }
+    this.state.selectType = 'all';
+    resources.replace(this.options.items);
   }
 
 });

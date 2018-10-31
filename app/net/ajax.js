@@ -96,7 +96,7 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
    */
   _mfaRequired: function(request, response) {
     if (response.header) {
-      if (response.header.code === 403 && response.header.url.startsWith('/mfa/verify/error')) {
+      if (response.header.code === 403 && response.header.message === 'MFA authentication is required.') {
         // If the mfa required dialog is already displayed.
         if ($('.mfa-required-dialog').length > 0) {
           return;
