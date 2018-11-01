@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.5.1] - 2018-11-01
 ### Improved
 - PASSBOLT-3188: As LU the UI shouldn't crash if a password uri cannot be parsed
 
@@ -78,7 +80,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.2.0...v2.3.0
