@@ -98,15 +98,20 @@
     "jssha": "~2.0.1",
     "moment": "^2.10.0",
     "moment-timezone": "^0.5.0",
-    "passbolt-mad": "git+https://git@github.com/passbolt/passbolt_mad.git#master",
+    "passbolt-mad": "^2.5.1",
     "react-view-model": "1.0.1",
     "steal": "^1.12.4",
     "steal-stache": "^4.0.0",
     "steal-tools": "^1.11.10",
     "string-hash": "^1.1.3",
-    "urijs": "^1.17.0",
+    "urijs": "^1.19.0",
     "uuid": "^3.2.1",
-    "xregexp": "~3.2.0"
+    "xregexp": "~3.2.0",
+    "chai": "^4.0.0",
+    "mocha": "^5.2.0",
+    "sinon": "^1.16.1",
+    "testee": "^0.8.1",
+    "http-server": "^0.11.1"
   },
   "keywords": [
     "passbolt",
@@ -117,11 +122,27 @@
     "build": "steal-tools build",
     "build-watch": "steal-tools build --watch",
     "lint": "eslint app",
-    "lint-fix": "eslint --fix app"
+    "lint-fix": "eslint --fix app",
+    "test": "testee --config=test/testee.js test/test.html",
+    "test-headless": "testee --config=test/testee_headless.js test/test.html",
+    "server": "http-server"
   },
   "steal": {
     "plugins": [
       "steal-stache"
-    ]
+    ],
+    "meta": {
+      "mocha": {
+        "format": "global",
+        "exports": "mocha",
+        "deps": [
+          "passbolt-mad/test/lib/stealMochaAddDom"
+        ]
+      }
+    },
+    "paths": {
+      "chai": "node_modules/chai/chai.js",
+      "mocha": "node_modules/mocha/mocha.js"
+    }
   }
 }

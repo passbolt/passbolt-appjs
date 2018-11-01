@@ -21,7 +21,11 @@
     <li class="uri">
         <span class="label">{{ __('URL') }}</span>
         <span class="value">
-            <a href="{{ resource.safeUri() }}" target="_blank" rel="noopener">{{ resource.uri }}</a>
+            {{#if(resource.safeUrl() != '')}}
+            <a href="{{ resource.safeUrl() }}" target="_blank" rel="noopener">{{ resource.uri }}</a>
+            {{#else}}
+            {{ resource.uri }}
+            {{/if}}
         </span>
     </li>
     <li class="created">

@@ -23,6 +23,7 @@ import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/const
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import Favorite from 'app/model/map/favorite';
+import I18n from 'passbolt-mad/util/lang/i18n';
 import Permission from 'app/model/map/permission';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';
@@ -53,32 +54,6 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
   isFavorite: function() {
     return this.favorite && this.favorite.id;
   },
-
-  /**
-   * Get a safe uri.
-   *
-   * @return {string}
-   */
-  safeUri: function() {
-    if (this.uri == '' || !this.uri) {
-      return this.uri;
-    }
-    const safeUri = URI(this.uri);
-
-    /*
-     * If the uri is an url and is not absolute.
-     * Add the default http:// protocol
-     */
-    if (!safeUri.is('absolute') && safeUri.is('url')) {
-      safeUri.protocol('http');
-    }
-    if (safeUri.protocol().trim().toLowerCase() === "javascript") {
-      safeUri.protocol('http');
-    }
-
-    return safeUri.toString();
-  },
-
   /**
    * Find the resource that may have change.
    * If the resource is found, canjs will throw an event to notify about the changes.
@@ -103,6 +78,48 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
 });
 DefineMap.setReference('Resource', Resource);
 Resource.List = DefineList.extend({'#': {Type: Resource}});
+
+/**
+ * Return an url based on the resource uri.
+ * Only what is considered as an url is returned.
+ * Javascript url is not considered as safe and so an empty string is returned.
+ * Non parsable uris are not considered as safe and so an empty string is returned.
+ *
+ * Note this function does not prevent from DOM XSS injection, you have to take of escaping the string between injecting
+ * it into the DOM. With mustach {{ safeUrl }} by instance.
+ *
+ * @return {string}
+ */
+Resource.prototype.safeUrl = function() {
+  if (typeof this.uri != 'string' || this.uri == '') {
+    return '';
+  }
+
+  let safeUrl, protocol;
+  try {
+    safeUrl = URI(this.uri);
+    protocol = safeUrl.protocol().trim().toLowerCase();
+  } catch (e) {
+    // Uris that cannot be parsed are not safe.
+    return '';
+  }
+
+  if (safeUrl.is('url')) {
+    // Javascript is not safe.
+    if (protocol === "javascript") {
+      return '';
+    }
+    // If no protocol defined or a relative url is given, force the http protocol.
+    if (!safeUrl.is('absolute') || protocol == '') {
+      safeUrl.protocol('http');
+    }
+
+    // Trim the latest /
+    return safeUrl.toString().replace(/\/$/, '');
+  }
+
+  return '';
+};
 
 /**
  * Sort the permissions alphabetically.

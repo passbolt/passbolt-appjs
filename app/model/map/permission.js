@@ -27,7 +27,7 @@ import User from 'app/model/map/user';
 
 const Permission = DefineMap.extend('passbolt.model.Permission', {
   id: 'string',
-  type: 'integer',
+  type: 'number',
   aco: 'string',
   aco_foreign_key: 'string',
   aro: 'string',
