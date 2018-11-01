@@ -20,14 +20,13 @@ const MfaComponent = Component.extend('passbolt.component.settings.mfa', /** @st
   defaults: {}
 
 }, /** @prototype */ {
-
   /**
    * @inheritdoc
    */
   afterStart: function() {
     Session.check()
       .then(() => {
-        const iframeContent = `<iframe id='js_mfa_iframe' src='${APP_URL}/mfa/setup/totp/start' width='100%' height='100%'></iframe>`;
+        const iframeContent = `<iframe id='js_mfa_iframe' src='${APP_URL}/mfa/setup/select' width='100%' height='100%'></iframe>`;
         HtmlHelper.create($(this.element), 'inside_replace', iframeContent);
       });
   }
