@@ -34,6 +34,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const resource = this.options.resource;
     const canUpdate = resource.permission.isAllowedTo(PermissionType.UPDATE);
     const canAdmin = resource.permission.isAllowedTo(PermissionType.ADMIN);
+    const isSafeUrl = resource.safeUrl() != '';
 
     // Add Copy username action.
     const copyUsernameItem = new Action({
@@ -65,7 +66,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const openUriItem = new Action({
       id: 'js_password_browser_menu_open_uri',
       label: __('Open URI in a new tab'),
-      enabled: resource.uri != null,
+      enabled: resource.uri != null && isSafeUrl,
       cssClasses: ['separator-after'],
       action: () => this._openUri()
     });
@@ -131,7 +132,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    * Open uri in a new tab
    */
   _openUri: function() {
-    const uri = this.options.resource.safeUri();
+    const uri = this.options.resource.safeUrl();
     window.open(uri, '_blank');
     this.remove();
   },

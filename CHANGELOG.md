@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-- PASSBOLT-3093: As LU I can select all passwords to perform a bulk operation
+### Improved
+- PASSBOLT-3188: As LU the UI shouldn't crash if a password uri cannot be parsed
 
 ## [2.5.0] - 2018-10-30
 ### Added
