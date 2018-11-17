@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.5.3] - 2018-11-17
+- Add travis job
+
 ## [2.5.2] - 2018-11-02
 - Add the build to the repository
 
@@ -82,7 +86,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.5.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.5.3...HEAD
+[2.5.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.2...v2.5.3
 [2.5.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.1...v2.5.2
 [2.5.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.4.0...v2.5.0
