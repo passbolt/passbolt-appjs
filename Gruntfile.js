@@ -10,16 +10,28 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import $ from 'jquery';
-import "steal-mocha";
-import chai from "chai";
 
-// Define the global context.
-const glbl = typeof window !== "undefined" ? window : global;
+module.exports = function(grunt) {
 
-// Extract the expect & assert functions from chai and make them global
-glbl.expect = chai.expect;
-glbl.assert = chai.assert;
-
-// Make a global reference to the root reference element.
-glbl.$rootElement = $('#test-html');
+    grunt.registerTask("test", ["testee:tests"]);
+    
+    grunt.initConfig({
+      testee: {
+        tests: {
+            options: {
+                browsers: [{
+                    "browser": "chrome",
+                    "args": [
+                    "--headless",
+                    "--disable-gpu",
+                    "--remote-debugging-port=9222"
+                    ]
+                }]
+            },
+            src: ['test/test.html']
+        }
+      }
+    });
+  
+    grunt.loadNpmTasks('grunt-testee');
+  };
