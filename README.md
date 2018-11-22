@@ -4,43 +4,32 @@
 	    / /_/ / __ `/ ___/ ___/ __ \/ __ \/ / __/
 	   / ____/ /_/ (__  |__  ) /_/ / /_/ / / /_
 	  /_/    \__,_/____/____/_,___/\____/_/\__/
-	
-	The javascript application for the open-source password management solution for teams
-	(c) 2017 Passbolt SARL
+
+	The open source password manager for teams
+	Copyright (c) 2018 Passbolt SARL
 	https://www.passbolt.com
 
-[![Build Status](https://travis-ci.org/passbolt/passbolt_api.svg?branch=master)](https://travis-ci.org/passbolt/passbolt_api)
-[![Build Status](https://saucelabs.com/buildstatus/passbolt)](https://saucelabs.com/beta/builds/c32d4f7b34c94ebdab39baed17b4d975)
-[![Coverage Status](https://coveralls.io/repos/github/passbolt/passbolt_api/badge.svg?branch=master)](https://coveralls.io/github/passbolt/passbolt_api?branch=master)
-[![Docker Pulls](https://img.shields.io/docker/pulls/passbolt/passbolt.svg)](https://hub.docker.com/r/passbolt/passbolt/tags/)
-
-[![Build Status](https://saucelabs.com/browser-matrix/passbolt.svg)](https://saucelabs.com/beta/builds/2b2d0f3a120a4818a137fda932a86c75)
+[![Build Status](https://travis-ci.org/passbolt/passbolt-appjs.svg?branch=master)](https://travis-ci.org/passbolt/passbolt-appjs)
 
 ## License
 
-Passbolt is distributed under the [Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-## About Passbolt
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.  See the
+GNU Affero General Public License for more details.
 
-Passbolt is an open source password manager for teams. It allows you to securely share and store credentials.
-For instance, the wifi password of your office, the administrator password of a router or your organisation's social media account passwords, all of them can be secured using passbolt.
+[Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
 
-Passbolt is different from the other password managers because:
-- It is primarily designed for teams and not individuals
-- It is free & open source
-- It is respectful of privacy
-- It is based on OpenPGP, a proven cryptographic standard
-- It is easy to use for both novices and IT professionals alike
-- It is extensible thanks to its RESTful API
+## About Passbolt Appjs
+
+Passbolt Application Js is the browser application provided by the [passbolt_api](https://github.com/passbolt/passbolt_api)
 
 Find out more: [https://www.passbolt.com](https://www.passbolt.com "Passbolt Homepage")
-
-### What does it look like?
-
-[![Login](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login.png)
-[![Browse passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4.png)
-[![Share passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share.png)
-
 
 ### Trying out passbolt
 
@@ -71,11 +60,6 @@ The passbolt team will take the following actions:
 - Release new versions of all affected major versions.
 - Prominently feature the problem in the release announcement.
 - Give credit in the release announcement to the reporter if they so desire.
-
-## To develop
-on passbolt-appjs: npm run build-watch
-on passbolt_api: grunt appjs-watch
-Before committing, don't forget to do a npm run build, otherwise the dev versions will be committed with the prod build.
 
 ## Credits
 

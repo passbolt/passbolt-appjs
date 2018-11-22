@@ -101,10 +101,10 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       username: 'username',
       secret: 'Secret',
       uri: 'uri',
-      safeUri: {
+      safeUrl: {
         key: 'uri',
         func: function(value, map, item) {
-          return item.safeUri();
+          return item.safeUrl();
         }
       },
       modified: {
