@@ -130,7 +130,7 @@ MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstruct
         url: 'mfa/settings.json',
         type: 'GET',
         params: params
-      });
+      }).then(settings => MfaSettings.mapFromApi(settings));
     },
     updateData: function(params) {
       return Ajax.request({
