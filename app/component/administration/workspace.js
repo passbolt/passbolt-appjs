@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.6.0
  */
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
@@ -50,13 +50,13 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
     $('#js_wsp_administration_breadcrumb').empty();
     this._initPrimarySidebar();
     this._initMfaSection();
-    //this._initUsersDirectorySection();
+    this._initUsersDirectorySection();
   },
 
   /**
    * Init the primary sidebar.
    */
-  _initPrimarySidebar: function() {
+  _initPrimarySidebar: function () {
     const plugins = Config.read('server.passbolt.plugins');
     const menu = new MenuComponent('#js_wk_administration_menu', {});
     menu.start();
@@ -74,20 +74,18 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
       }
     }
 
-    /*
-     *if (plugins.directorySync) {
-     *  const usersDirectorySettingsItem = new Action({
-     *    id: uuid(),
-     *    name: 'usersDirectory',
-     *    label: __('Users Directory'),
-     *    action: () => this._goToSection('usersDirectory')
-     *  });
-     *  menu.insertItem(usersDirectorySettingsItem);
-     *  if (/usersDirectory/.test(route.data.action)) {
-     *    menu.selectItem(usersDirectorySettingsItem);
-     *  }
-     *}
-     */
+    if (plugins.directorySync) {
+      const usersDirectorySettingsItem = new Action({
+        id: uuid(),
+        name: 'usersDirectory',
+        label: __('Users Directory'),
+        action: () => this._goToSection('usersDirectory')
+      });
+      menu.insertItem(usersDirectorySettingsItem);
+      if (/usersDirectory/.test(route.data.action)) {
+        menu.selectItem(usersDirectorySettingsItem);
+      }
+    }
   },
 
   /**

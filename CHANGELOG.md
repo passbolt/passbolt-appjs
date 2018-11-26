@@ -3,11 +3,16 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- PASSBOLT-3130: Ldap administration scren
+- PASSBOLT-3121: MFA administration screen
 
 ## [2.5.3] - 2018-11-17
+### Improved
 - Add travis job
 
 ## [2.5.2] - 2018-11-02
+### Improved
 - Add the build to the repository
 
 ## [2.5.1] - 2018-11-01
@@ -17,7 +22,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [2.5.0] - 2018-10-30
 ### Added
 - PASSBOLT-3093: As LU I can select all passwords to perform a bulk operation
-- PASSBOLT-3121: MFA administration screen
 
 ### Fixed
 - PASSBOLT-3150: I should not see duplicates rows when I filter my passwords by keywords

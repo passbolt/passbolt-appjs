@@ -14,18 +14,18 @@
 	</div>
 	<div class="input text js_form_element_wrapper">
 		<label>{{__('Domain')}}</label>
-		<input id="js-domain-input" type="text" class="required fluid" placeholder="domain.ext">
-		<div id="js-domain-input-feedback" class="message"></div>
+		<input id="js-domain-name-input" type="text" class="required fluid" placeholder="domain.ext">
+		<div id="js-domain-name-input-feedback" class="message"></div>
 	</div>
 	<div class="singleline connection_info protocol_host_port clearfix js_form_element_wrapper">
 		<label>{{__('Server url')}}</label>
 		<div class="input text field_protocol_host">
 			<div class="input text protocol">
-				<select id="js-connection-protocol-input" class="required fluid" required="required"></select>
+				<select id="js-connection-connection-type-input" class="required fluid" required="required"></select>
 			</div>
 			<div class="input text host">
-				<input id="js-host-input" type="text" class="required fluid" placeholder="host">
-				<div id="js-host-input-feedback" class="message"></div>
+				<input id="js-server-input" type="text" class="required fluid" placeholder="host">
+				<div id="js-server-input-feedback" class="message"></div>
 			</div>
 		</div>
 		<div class="input text port">
@@ -82,27 +82,27 @@
 	<h3>{{__('Synchronization options')}}</h3>
 	<div class="input select js_form_element_wrapper">
 		<label>{{__('Default admin')}}</label>
-		<select id="js-default-admin-select" class="required fluid" required="required"></select>
+		<select id="js-default-user-select" class="required fluid" required="required"></select>
 		<div class="message">{{__('The default admin user is the admin user that will perform the operations for the the directory.')}}</div>
-		<div id="js-default-admin-select-feedback" class="message"></div>
+		<div id="js-default-user-select-feedback" class="message"></div>
 	</div>
 	<div class="input select js_form_element_wrapper">
 		<label>{{__('Default group admin')}}</label>
-		<select id="js-default-group-admin-select" class="required fluid" required="required"></select>
+		<select id="js-default-group-admin-user-select" class="required fluid" required="required"></select>
 		<div class="message">{{__('The default group admin user is the admin user that will be the group manager of newly created group.')}}</div>
-		<div id="js-default-group-admin-select-feedback" class="message"></div>
+		<div id="js-default-group-admin-user-select-feedback" class="message"></div>
 	</div>
 
-	<div class="input text clearfix">
+	<div class="input text clearfix"> 
 		<label>{{__('Sync operations')}}</label>
 		<div class="col6">
-			<div id="js-sync-create-users-toggle-button" class="input toggle-switch"></div>
-			<div id="js-sync-delete-users-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-users-create-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-users-delete-toggle-button" class="input toggle-switch"></div>
 		</div>
 		<div class="col6 last">
-			<div id="js-sync-create-groups-toggle-button" class="input toggle-switch"></div>
-			<div id="js-sync-delete-groups-toggle-button" class="input toggle-switch"></div>
-			<div id="js-sync-update-groups-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-groups-create-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-groups-delete-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-groups-update-toggle-button" class="input toggle-switch"></div>
 		</div>
 	</div>
 </div>

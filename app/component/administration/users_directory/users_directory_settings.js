@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.6.0
  */
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
@@ -138,7 +138,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
           });
       }
     } else {
-      this.usersDirectorySettings.disable()
+      this.usersDirectorySettings.destroy()
         .then(() =>  {
           route.data.update({controller: 'Administration', action: 'usersDirectory'});
           this.refresh();

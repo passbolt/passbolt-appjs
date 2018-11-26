@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.6.0
  */
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
@@ -45,7 +45,7 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    * @inheritdoc
    */
   afterStart: function() {
-    this._initForm(this.options.mfaSettings);
+    this._initForm();
     this._initEditForm();
     this.state.loaded = true;
     this.state.hidden = false;
@@ -63,7 +63,8 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
   /**
    * Init the form.
    */
-  _initForm: function(mfaSettings) {
+  _initForm: function() {
+    const mfaSettings = this.options.mfaSettings;
     this._initFormTotpSection(mfaSettings);
     this._initFormYubikeySection(mfaSettings);
     this._initFormDuoSection(mfaSettings);

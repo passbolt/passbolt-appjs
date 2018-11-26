@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.5.0
+ * @since         2.6.0
  */
 import Component from 'passbolt-mad/component/component';
 import template from 'app/view/template/component/administration/users_directory/primary_menu.stache!';
