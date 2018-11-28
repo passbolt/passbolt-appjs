@@ -113,7 +113,7 @@ MfaSettings.mapToApi = function(data) {
       hostname: data.duo_hostname,
       integrationKey: data.duo_integration_key,
       salt: data.duo_salt,
-      secretKey: data.yubikey_secret_key
+      secretKey: data.duo_secret_key
     };
   }
   return result;
