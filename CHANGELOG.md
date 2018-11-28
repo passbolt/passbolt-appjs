@@ -4,8 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- PASSBOLT-3130: Ldap administration scren
-- PASSBOLT-3121: MFA administration screen
+- PASSBOLT-3130: As AD I can configure my user directory integration from the administration panel
+- PASSBOLT-3121: As AD I can configure my multi factor authentication integrations from the administration panel
+- PASSBOLT-3235: As AD I can synchronize my user directory from the administration panel
 
 ## [2.5.3] - 2018-11-17
 ### Improved

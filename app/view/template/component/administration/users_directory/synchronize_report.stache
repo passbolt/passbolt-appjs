@@ -1,0 +1,51 @@
+<p>
+    {{#if(usersSynchronized)}}{{ usersSynchronized }} user(s){{#if(groupsSynchronized)}} and{{/if}}{{/if}}
+    {{#if(groupsSynchronized)}}{{ groupsSynchronized }} group(s){{/if}}
+    were synchronized
+</p>
+{{#if(groupsError || usersError)}}
+<p class="error inline-error">Some resources won't be synchronized and will require your attention, see the full report.</p>
+{{/if}}
+
+<div class="accordion operation-details closed">
+    <div class="accordion-header">
+        <a role="link">{{__('Full report')}}</a>
+    </div>
+    <div class="accordion-content hidden" style="display: none;">
+        <div class="input text">
+            <label for="js_field_debug" class="visuallyhidden">{{__('Full report')}}</label>
+            <textarea>
+-----------------------------------------------------------------------------
+ Users
+-----------------------------------------------------------------------------
+
+Synchronized:
+- The user ada@passbolt.com was mapped with an existing user in passbolt.
+- The user betty@passbolt.com was mapped with an existing user in passbolt.
+- The user zoe@passbolt.com was successfully added to passbolt.
+- The user neil@passbolt.com was successfully added to passbolt.
+
+Error:
+- The previously deleted user sofia@passbolt.com was not re-added to passbolt.
+  To ignore this error in the next sync please run
+  ./bin/cake directory_sync ignore-create --id=16789f75-2cf7-4755-9bd9-634d1ff42240 --model=DirectoryEntries
+
+-----------------------------------------------------------------------------
+ Groups
+-----------------------------------------------------------------------------
+Synchronized:
+- The group Finance was successfully added to passbolt.
+- The group DevOps was successfully added to passbolt.
+
+Error:
+- The group Operations could not be mapped with an existing group in passbolt because it was created after.
+  To ignore this error in the next sync please run
+  ./bin/cake directory_sync ignore-create --id=91ea4dda-8925-4799-8b0a-279b9cde0610 --model=DirectoryEntries
+
+Ignored:
+- The user CN=Zoe Logos,OU=PassboltUsers,DC=passbolt,DC=local could not be added to group Finance because there is no matching directory entry in passbolt.
+- The user CN=Zoe Logos,OU=PassboltUsers,DC=passbolt,DC=local could not be added to group Operations because there is no matching directory entry in passbolt.
+            </textarea>
+        </div>
+    </div>
+</div>
