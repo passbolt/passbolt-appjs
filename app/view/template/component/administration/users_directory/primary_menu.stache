@@ -1,17 +1,17 @@
 <li>
-	<a id="js-ldap-settings-edit-button" class="button">
+	<a id="js-ldap-settings-edit-button" class="button disabled" disabled="disabled">
 		<i class="fa fa-fw fa-edit"></i>
 		<span>{{__('edit')}}</span>
 	</a>
 </li>
 <li>
-	<a id="js-ldap-settings-simulate-button" class="button hidden">
+	<a id="js-ldap-settings-simulate-button" class="button disabled" disabled="disabled">
 		<i class="fa fa-fw fa-magic"></i>
 		<span>{{__('simulate synchronize')}}</span>
 	</a>
 </li>
 <li>
-	<a id="js-ldap-settings-synchronise-button" class="button hidden">
+	<a id="js-ldap-settings-synchronize-button" class="button disabled" disabled="disabled">
 		<i class="fa fa-fw fa-refresh"></i>
 		<span>{{__('synchronize')}}</span>
 	</a>

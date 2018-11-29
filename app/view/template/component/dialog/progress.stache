@@ -1,0 +1,35 @@
+
+<div class="dialog">
+    <div class="dialog-header">
+        <h2><span class="dialog-header-title">{{label}}</span>{{#if(subtitle)}}<span class="dialog-header-subtitle">{{subtitle}}</span>{{/if}}{{#if(titleInfo)}}<div class="more_details tooltip-alt">
+                <i class="fa fa-info-circle"></i>
+                <div class="tooltip-text right">
+                    {{#if(titleInfo.name)}}
+                        {{>titleInfo}}
+                    {{#else}}
+                        {{titleInfo}}
+                    {{/if}}
+                </div>
+            </div>{{/if}}
+        </h2>
+        <a class="dialog-close">
+            <i class="fa fa-close"></i>
+            <span class="visuallyhidden">close</span>
+        </a>
+    </div>
+    <div class="js_dialog_content dialog-content">
+        <!-- Form content class to have the white background -->
+        <div class="form-content">
+            <label>{{ __('Take a deep breath and enjoy being in the present moment...') }}</label>
+            <div class="progress-bar-wrapper">
+                <span id="js_progress_bar_container" class="progress-bar big infinite">
+                    <span class="progress"></span>
+                </span>
+            </div>
+            <div class="progress-details">
+                <span id="js_progress_step_label" class="progress-step-label">&nbsp;</span>
+                <span style="float:right" class="progress-percent"><span id="js_progress_percent"></span></span>
+            </div>
+        </div>
+    </div>
+</div>
