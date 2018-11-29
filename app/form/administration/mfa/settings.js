@@ -146,12 +146,12 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
     );
 
     this.addElement(
-      new TextboxComponent('#js-duo-hostname-input', {
-        modelReference: 'MfaSettings.duo_hostname',
+      new TextboxComponent('#js-duo-host-name-input', {
+        modelReference: 'MfaSettings.duo_host_name',
         state: {disabled: true},
         validate: formData => formData.MfaSettings.duo_provider
       }).start(),
-      new FeedbackComponent('#js-duo-hostname-input-feedback', {}).start()
+      new FeedbackComponent('#js-duo-host-name-input-feedback', {}).start()
     );
 
     this.addElement(
