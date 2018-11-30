@@ -263,6 +263,14 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
       }).start(),
       new FeedbackComponent('#js-user-object-class-input-feedback', {}).start()
     );
+  },
+
+  /**
+   * Init section
+   * @private
+   */
+  _initFormSynchronisationSection: function() {
+    const disabled = !this.options.edit;
 
     this.addElement(
       new DropdownComponent('#js-default-user-select', {
@@ -281,14 +289,31 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
       }).start(),
       new FeedbackComponent('#js-default-group-admin-user-select-feedback', {}).start()
     );
-  },
 
-  /**
-   * Init section
-   * @private
-   */
-  _initFormSynchronisationSection: function() {
-    const disabled = !this.options.edit;
+    this.addElement(
+      new TextboxComponent('#js-groups-parent-group-input', {
+        modelReference: 'UsersDirectorySettings.groups_parent_group',
+        state: {disabled}
+      }).start(),
+      new FeedbackComponent('#js-groups-parent-group-input-feedback', {}).start()
+    );
+
+    this.addElement(
+      new TextboxComponent('#js-users-parent-group-input', {
+        modelReference: 'UsersDirectorySettings.users_parent_group',
+        state: {disabled}
+      }).start(),
+      new FeedbackComponent('#js-users-parent-group-input-feedback', {}).start()
+    );
+
+    this.addElement(
+      new ToggleButtonComponent('#js-enabled-users-only-toggle-button', {
+        label: __('Only for AD. Synchronize only the users who are enabled'),
+        modelReference: 'UsersDirectorySettings.enabled_users_only',
+        state: {disabled},
+        value: true
+      }).start()
+    );
 
     this.addElement(
       new ToggleButtonComponent('#js-sync-users-create-toggle-button', {

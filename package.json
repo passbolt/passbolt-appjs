@@ -104,7 +104,7 @@
     "mocha": "^5.2.0",
     "moment": "^2.10.0",
     "moment-timezone": "^0.5.23",
-    "passbolt-mad": "^2.5.4",
+    "passbolt-mad": "^2.5.6",
     "react-view-model": "1.0.1",
     "sinon": "^1.16.1",
     "steal": "^1.12.4",

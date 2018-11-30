@@ -44,6 +44,9 @@ const UsersDirectorySettings = DefineMap.extend('passbolt.model.UsersDirectorySe
   user_object_class: 'string',
   default_user: 'string',
   default_group_admin_user: 'string',
+  groups_parent_group: 'string',
+  users_parent_group: 'string',
+  enabled_users_only: 'boolean',
   sync_users_create: 'boolean',
   sync_users_delete: 'boolean',
   sync_groups_create: 'boolean',
@@ -100,7 +103,13 @@ UsersDirectorySettings.validationRules = {
   default_group_admin_user: [
     {rule: 'required', message: __('A default group admin is required.')},
     {rule: 'uuid', message: __('The default group admin should be a valid uuid.')}
-  ]
+  ],
+  groups_parent_group: [
+    {rule: 'utf8', message: __('The users parent group should be a valid utf8 string.')}
+  ],
+  users_parent_group: [
+    {rule: 'utf8', message: __('The groups parent group should be a valid utf8 string.')}
+  ],
 };
 
 /**

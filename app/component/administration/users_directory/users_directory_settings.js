@@ -155,6 +155,8 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       .then(report => { 
         progressDialog.destroyAndRemove();
         this._showSynchronizeSimulationReport(report);
+      }, () => {
+        progressDialog.destroyAndRemove();
       });
   },
 
@@ -201,6 +203,8 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       .then(report => { 
         progressDialog.destroyAndRemove();
         this._showSynchronizeReport(report);
+      }, () => {
+        progressDialog.destroyAndRemove();
       });
   },
 
