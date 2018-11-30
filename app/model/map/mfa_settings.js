@@ -36,7 +36,7 @@ const MfaSettings = DefineMap.extend('passbolt.model.MfaSettings', {
   yubikey_client_id: 'string',
   yubikey_secret_key: 'string',
   duo_provider: 'boolean',
-  duo_hostname: 'string',
+  duo_host_name: 'string',
   duo_integration_key: 'string',
   duo_salt: 'string',
   duo_secret_key: 'string'
@@ -54,7 +54,7 @@ MfaSettings.validationRules = {
   yubikey_secret_key: [
     {rule: 'required', message: __('A secret key is required.')}
   ],
-  duo_hostname: [
+  duo_host_name: [
     {rule: 'required', message: __('A hostname is required.')}
   ],
   duo_integration_key: [
@@ -81,7 +81,7 @@ MfaSettings.mapFromApi = function(data) {
     yubikey_client_id: getObject(data, 'yubikey.clientId'),
     yubikey_secret_key: getObject(data, 'yubikey.secretKey'),
     duo_provider: data.providers.find(provider => provider == 'duo') != undefined,
-    duo_hostname: getObject(data, 'duo.hostname'),
+    duo_host_name: getObject(data, 'duo.hostName'),
     duo_integration_key: getObject(data, 'duo.integrationKey'),
     duo_salt: getObject(data, 'duo.salt'),
     duo_secret_key: getObject(data, 'duo.secretKey')
@@ -110,10 +110,10 @@ MfaSettings.mapToApi = function(data) {
   if (data.duo_provider) {
     result.providers.push('duo');
     result.duo = {
-      hostname: data.duo_hostname,
+      hostName: data.duo_host_name,
       integrationKey: data.duo_integration_key,
       salt: data.duo_salt,
-      secretKey: data.yubikey_secret_key
+      secretKey: data.duo_secret_key
     };
   }
   return result;

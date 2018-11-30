@@ -41,8 +41,8 @@
 	<div class="form-content">
 		<div class="input text js_form_element_wrapper">
 			<label>{{__('Hostname')}}</label>
-			<input id="js-duo-hostname-input" type="text" class="required fluid" placeholder="api-24zlkn4.duosecurity.com">
-			<div id="js-duo-hostname-input-feedback" class="message"></div>
+			<input id="js-duo-host-name-input" type="text" class="required fluid" placeholder="api-24zlkn4.duosecurity.com">
+			<div id="js-duo-host-name-input-feedback" class="message"></div>
 		</div>
 		<div class="input text js_form_element_wrapper">
 			<label>{{__('Integration key')}}</label>
