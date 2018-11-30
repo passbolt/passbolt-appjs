@@ -133,10 +133,11 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   /**
    * Show the progress dialog
    * 
+   * @param {string} title the dialog title
    * @return ProgressDialog
    */
-  _showProgressDialog: function() {
-    const label = __('Synchronize simulation');
+  _showProgressDialog: function(title) {
+    const label = title;
     const progressDialog = ProgressDialog.instantiate({label});
     progressDialog.start();
 
@@ -149,7 +150,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
    * @return Promise
    */
   _synchronizeSimulation: function() {
-    const progressDialog = this._showProgressDialog();
+    const progressDialog = this._showProgressDialog(__('Synchronize simulation'));
     return UsersDirectoryService.dryRunSynchronize()
       .then(report => { 
         progressDialog.destroyAndRemove();
@@ -177,19 +178,16 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
         setTimeout(() => this._synchronize(), 0);
       }
     });
-    const usersSynchronized = report.users.created.success.length + report.users.created.sync.length + report.users.deleted.success.length;
-    const usersError = report.users.created.error.length + report.users.deleted.error.length;
-    const groupsSynchronized = report.groups.created.success.length + report.groups.created.sync.length + report.groups.deleted.success.length;
-    const groupsError = report.groups.created.error.length + report.groups.deleted.error.length;
 
-    simulateReportDialog.setViewData('usersSynchronized', usersSynchronized);
-    simulateReportDialog.setViewData('usersError', usersError);
-    simulateReportDialog.setViewData('groupsSynchronized', groupsSynchronized);
-    simulateReportDialog.setViewData('groupsError', groupsError);
+    simulateReportDialog.setViewData('usersSynchronized', report.getUsersSynchronized().length);
+    simulateReportDialog.setViewData('usersError', report.getUsersError().length);
+    simulateReportDialog.setViewData('groupsSynchronized', report.getGroupsSynchronized().length);
+    simulateReportDialog.setViewData('groupsError', report.getGroupsError().length);
+    simulateReportDialog.setViewData('resourcesSynchronized', report.getUsersSynchronized().length + report.getGroupsSynchronized().length);
     simulateReportDialog.start();
     
     // Display the full report once the format is defined.
-    // $('textarea', simulateReportDialog.element).text(JSON.stringify(result, null, 4));
+    $('textarea', simulateReportDialog.element).text(report.toText());
   },
 
   /**
@@ -198,7 +196,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
    * @return Promise
    */
   _synchronize: function() {
-    const progressDialog = this._showProgressDialog();
+    const progressDialog = this._showProgressDialog(__('Synchronize'));
     return UsersDirectoryService.synchronize()
       .then(report => { 
         progressDialog.destroyAndRemove();
@@ -226,19 +224,16 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       },
       action: () => synchronizeReportDialog.destroyAndRemove()
     });
-    const usersSynchronized = report.users.created.success.length + report.users.created.sync.length + report.users.deleted.success.length;
-    const usersError = report.users.created.error.length + report.users.deleted.error.length;
-    const groupsSynchronized = report.groups.created.success.length + report.groups.created.sync.length + report.groups.deleted.success.length;
-    const groupsError = report.groups.created.error.length + report.groups.deleted.error.length;
 
-    synchronizeReportDialog.setViewData('usersSynchronized', usersSynchronized);
-    synchronizeReportDialog.setViewData('usersError', usersError);
-    synchronizeReportDialog.setViewData('groupsSynchronized', groupsSynchronized);
-    synchronizeReportDialog.setViewData('groupsError', groupsError);
+    synchronizeReportDialog.setViewData('usersSynchronized', report.getUsersSynchronized().length);
+    synchronizeReportDialog.setViewData('usersError', report.getUsersError().length);
+    synchronizeReportDialog.setViewData('groupsSynchronized', report.getGroupsSynchronized().length);
+    synchronizeReportDialog.setViewData('groupsError', report.getGroupsError().length);
+    synchronizeReportDialog.setViewData('resourcesSynchronized', report.getUsersSynchronized().length + report.getGroupsSynchronized().length);
     synchronizeReportDialog.start();
     
     // Display the full report once the format is defined.
-    // $('textarea', synchronizeReportDialog.element).text(JSON.stringify(result, null, 4));
+    $('textarea', synchronizeReportDialog.element).text(report.toText());
   },
 
   /**
