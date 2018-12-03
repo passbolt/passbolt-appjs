@@ -103,7 +103,7 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
    * @private
    */
   _initUsersDirectorySection: function() {
-    if (route.data.action != 'usersDirectory' && route.data.action != 'usersDirectory/edit') { return; }
+    if (route.data.action != 'usersDirectory') { return; }
     const section = new UsersDirectorySettings('#js_wk_administration_main');
     section.start();
   },

@@ -1,7 +1,7 @@
 <li>
-	<a id="js-ldap-settings-edit-button" class="button disabled" disabled="disabled">
-		<i class="fa fa-fw fa-edit"></i>
-		<span>{{__('edit')}}</span>
+	<a id="js-ldap-settings-save-button" class="button disabled" disabled="disabled">
+		<i class="fa fa-fw fa-save"></i>
+		<span>{{__('save settings')}}</span>
 	</a>
 </li>
 <li>

@@ -14,11 +14,10 @@
 import Button from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import template from 'app/view/template/component/administration/users_directory/primary_menu.stache!';
-import editTemplate from 'app/view/template/component/administration/users_directory/primary_menu_edit.stache!';
 
 const PrimaryMenu = Component.extend('passbolt.component.administration.ldap.PrimaryMenu', /** @static */ {
   defaults: {
-    edit: false,
+    template: template,
     settings: {}
   }
 
@@ -27,34 +26,14 @@ const PrimaryMenu = Component.extend('passbolt.component.administration.ldap.Pri
   /**
    * @inheritdoc
    */
-  beforeStart: function() {
-    const edit = this.options.edit;
-
-    if (!edit) {
-      this.options.template = template;
-    } else { 
-      this.options.template = editTemplate;
-    }
-  },
-
-  /**
-   * @inheritdoc
-   */
   afterStart: function() {
-      const edit = this.options.edit;
-      const settings = this.options.settings;
-      if (!edit) {
-        const editButton = new Button('#js-ldap-settings-edit-button', {state: {disabled: false}});
-        editButton.start();
-        const simulateButton = new Button('#js-ldap-settings-simulate-button', {
-          state: {disabled: !settings.isEnabled()}
-        });
-        simulateButton.start();
-        const synchronizeButton = new Button('#js-ldap-settings-synchronize-button', {
-          state: {disabled: !settings.isEnabled()} 
-        });
-        synchronizeButton.start();
-      }
+    const disabled = this.options.settings ? !this.options.settings.isEnabled() : true;
+    this.saveButton = new Button('#js-ldap-settings-save-button', {state: {disabled: true}});
+    this.saveButton.start();
+    this.simulateButton = new Button('#js-ldap-settings-simulate-button', {state: {disabled}});
+    this.simulateButton.start();
+    this.synchronizeButton = new Button('#js-ldap-settings-synchronize-button', {state: {disabled}});
+    this.synchronizeButton.start();
   }
 });
 

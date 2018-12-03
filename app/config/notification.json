@@ -96,6 +96,9 @@
 			},
 			"app_orgsettings_post_success": {
 				"msg": "The multi factor authentication settings for the organization were updated."
+			},
+			"app_directorysync_settings_update_success": {
+				"msg": "The users directory settings for the organization were updated."
 			}
 		}
 	}

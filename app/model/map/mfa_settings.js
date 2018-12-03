@@ -18,7 +18,6 @@ import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
 import connectStore from 'can-connect/constructor/store/store';
-import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineMap from 'passbolt-mad/model/map/map';
 import getObject from 'can-util/js/get/get';
 import 'urijs/src/punycode';

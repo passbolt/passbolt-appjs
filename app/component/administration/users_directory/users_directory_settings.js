@@ -15,6 +15,7 @@ import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
+import MadBus from 'passbolt-mad/control/bus';
 import UsersDirectoryService from 'app/model/service/users_directory';
 import UsersDirectorySettings from 'app/model/map/users_directory_settings';
 import UsersDirectorySettingsForm from 'app/form/administration/users_directory/settings';
@@ -26,6 +27,7 @@ import template from 'app/view/template/component/administration/users_directory
 import templateItemBreadcrumb from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
 import templateSynchronizeReport from 'app/view/template/component/administration/users_directory/synchronize_report.stache!';
 import templateSynchronizeSimulationReport from 'app/view/template/component/administration/users_directory/synchronize_simulation_report.stache!';
+import User from 'app/model/map/user';
 
 const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.administration.users_directory.UsersDirectorySettings', /** @static */ {
 
@@ -38,33 +40,39 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   /**
    * @inheritdoc
    */
+  init: function(el, options) {
+    this._super(el, options);
+    this.usersDirectorySettings = null;
+    this.users = null
+  },
+
+  /**
+   * @inheritdoc
+   */
   afterStart: function() {
-    const edit = route.data.action == 'usersDirectory/edit';
-    this._findUsersDirectorySettings()
-      .then(() => this._initPrimaryMenu(edit))
-      .then(() => this._initBreadcrumb(edit))
-      .then(() => this._initForm(edit));
+    this._initPrimaryMenu();
+    this._initBreadcrumb();
+    this._initForm();
+    this._getSettingsAndLoad();
   },
 
   /**
    * Init the primary menu
-   * @param {bool} edit Start the component in edit mode
    * @private
    */
-  _initPrimaryMenu: function(edit) {
+  _initPrimaryMenu: function() {
     const selector = $('#js_wsp_primary_menu_wrapper');
-    const menu = ComponentHelper.create(selector, 'inside_replace', PrimaryMenu, {
-      edit: edit,
+    this.primaryMenu = ComponentHelper.create(selector, 'inside_replace', PrimaryMenu, {
       settings: this.usersDirectorySettings
     });
-    menu.start();
+    this.primaryMenu.start();
   },
 
   /**
    * Init the breadcrumb
-   * @param {bool} edit Start the component in edit mode
+   * @private
    */
-  _initBreadcrumb: function(edit) {
+  _initBreadcrumb: function() {
     const breadcrumbWrapperSelector = '#js_wsp_administration_breadcrumb';
     const options = {
       itemTemplate: templateItemBreadcrumb
@@ -88,37 +96,38 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       action: () => this._goToSection('usersDirectory')
     });
     items.push(configurationAction);
-    if (edit) {
-      const UsersDirectoryEditAction = new Action({
-        label: __('edit'),
-        action: () => this._goToSection('usersDirectory/edit')
-      });
-      items.push(UsersDirectoryEditAction);
-    }
     breadcrumb.load(items);
   },
 
   /**
    * Init the form
-   * @param {bool} edit Start the component in edit mode
    * @private
    */
-  _initForm: function(edit) {
-    this.form = new UsersDirectorySettingsForm('#js-ldap-settings-form', {edit: edit});
+  _initForm: function() {
+    this.form = new UsersDirectorySettingsForm('#js-ldap-settings-form');
     this.addLoadedDependency(this.form);
-    this.form.loadAndStart(this.usersDirectorySettings);
+    this.form.start();
   },
 
   /**
-   * Find the settings
+   * Find and load the settings
    * @private
    */
-  _findUsersDirectorySettings: function() {
-    return UsersDirectorySettings.findOne()
+  _getSettingsAndLoad: function() {
+    if (!this.usersDirectorySettings) {
+      return UsersDirectorySettings.findOne()
       .then(usersDirectorySettings => {
         this.usersDirectorySettings = usersDirectorySettings;
-        return this.usersDirectorySettings
-      });
+      }).then(() => User.findAll({contain: {profile: 1}}))
+      .then(users => {
+        this.users = users;
+        this.form.loadForm(this.usersDirectorySettings, this.users);
+        this._initPrimaryMenu();
+      })
+    } else {
+      this.form.loadForm(this.usersDirectorySettings, this.users);
+      this._initPrimaryMenu();
+    }
   },
 
   /**
@@ -185,7 +194,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
     simulateReportDialog.setViewData('usersError', report.getUsersError().length);
     simulateReportDialog.setViewData('groupsSynchronized', report.getGroupsSynchronized().length);
     simulateReportDialog.setViewData('groupsError', report.getGroupsError().length);
-    simulateReportDialog.setViewData('resourcesSynchronized', report.getUsersSynchronized().length + report.getGroupsSynchronized().length);
+    simulateReportDialog.setViewData('resourcesSynchronized', (report.getUsersSynchronized().length + report.getGroupsSynchronized().length) == 0);
     simulateReportDialog.start();
     
     // Display the full report once the format is defined.
@@ -233,7 +242,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
     synchronizeReportDialog.setViewData('usersError', report.getUsersError().length);
     synchronizeReportDialog.setViewData('groupsSynchronized', report.getGroupsSynchronized().length);
     synchronizeReportDialog.setViewData('groupsError', report.getGroupsError().length);
-    synchronizeReportDialog.setViewData('resourcesSynchronized', report.getUsersSynchronized().length + report.getGroupsSynchronized().length);
+    synchronizeReportDialog.setViewData('resourcesSynchronized', (report.getUsersSynchronized().length + report.getGroupsSynchronized().length) == 0);
     synchronizeReportDialog.start();
     
     // Display the full report once the format is defined.
@@ -241,22 +250,22 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   },
 
   /**
-   * Listen when the user want to edit the settings.
+   * Listen when the form is updated.
+   * When the form is updated enable the save settings button
    */
-  '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-edit-button click': function() {
-    route.data.update({controller: 'Administration', action: 'usersDirectory/edit'});
-    this.refresh();
+  '#js-ldap-settings-form changed': function() {
+    this.primaryMenu.saveButton.state.disabled = false;
   },
 
   /**
-   * Listen when the user want to edit the settings.
+   * Listen when the user want to simulate a synchronization.
    */
   '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-simulate-button click': function() {
     this._synchronizeSimulation();
   },
 
   /**
-   * Listen when the user want to edit the settings.
+   * Listen when the user want to synchronize.
    */ 
   '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-synchronize-button click': function() {
     this._synchronize();
@@ -281,23 +290,20 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
           .then(() => {
             route.data.update({controller: 'Administration', action: 'usersDirectory'});
             this.refresh();
+            MadBus.trigger('passbolt_notify', {
+              title: 'app_directorysync_settings_update_success',
+              status: 'success',
+            });
           });
       }
     } else {
       this.usersDirectorySettings.destroy()
         .then(() =>  {
+          this.usersDirectorySettings = new UsersDirectorySettings({});
           route.data.update({controller: 'Administration', action: 'usersDirectory'});
           this.refresh();
         });
     }
-  },
-
-  /**
-   * Listen when the user want to cancel the edit.
-   */
-  '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-cancel-button click': function() {
-    route.data.update({controller: 'Administration', action: 'usersDirectory'});
-    this.refresh();
   }
 });
 

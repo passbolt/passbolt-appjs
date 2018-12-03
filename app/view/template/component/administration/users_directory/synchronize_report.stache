@@ -1,7 +1,7 @@
 <p>
     {{#if(usersSynchronized)}}{{ usersSynchronized }} user(s){{#if(groupsSynchronized)}} and{{/if}}{{/if}}
     {{#if(groupsSynchronized)}}{{ groupsSynchronized }} group(s){{/if}}
-    {{#if(resourcesSynchronized == 0)}}No resources{{/if}}
+    {{#if(!resourcesSynchronized)}}No resources{{/if}}
     were synchronized
 </p>
 {{#if(groupsError || usersError)}}
