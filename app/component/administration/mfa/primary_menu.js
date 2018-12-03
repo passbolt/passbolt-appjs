@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
+import Button from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import template from 'app/view/template/component/administration/mfa/primary_menu.stache!';
-import editTemplate from 'app/view/template/component/administration/mfa/primary_menu_edit.stache!';
 
 const PrimaryMenu = Component.extend('passbolt.component.administration.mfa.PrimaryMenu', /** @static */ {
   defaults: {
-    edit: false
+    template: template
   }
 
 }, /** @prototype */ {
@@ -25,14 +25,11 @@ const PrimaryMenu = Component.extend('passbolt.component.administration.mfa.Prim
   /**
    * @inheritdoc
    */
-  beforeStart: function() {
-    const edit = this.options.edit;
-    if (!edit) {
-      this.options.template = template;
-    } else {
-      this.options.template = editTemplate;
-    }
+  afterStart: function() {
+    this.saveButton = new Button('#js-mfa-settings-save-button', {state: {disabled: true}})
+    this.saveButton.start();
   }
+
 });
 
 export default PrimaryMenu;

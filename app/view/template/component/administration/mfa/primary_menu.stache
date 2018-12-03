@@ -1,6 +1,6 @@
 <li>
-	<a id="js-mfa-settings-edit-button" class="button">
-		<i class="fa fa-fw fa-edit"></i>
-		<span>{{__('edit')}}</span>
-	</a>
+    <a id="js-mfa-settings-save-button" class="button">
+        <i class="fa fa-fw fa-save"></i>
+        <span>{{__('save settings'}}</span>
+    </a>
 </li>

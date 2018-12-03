@@ -23,11 +23,7 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
   defaults: {
     template: template,
     silentLoading: false,
-    loadedOnStart: false,
-    state: {
-      hidden: true
-    },
-    edit: false
+    loadedOnStart: false
   }
 
 }, /** @prototype */ {
@@ -36,9 +32,9 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    * Load and start the form.
    * @param {MfaSettings} mfaSettings
    */
-  loadAndStart: function(mfaSettings) {
+  loadForm: function(mfaSettings) {
     this.options.mfaSettings = mfaSettings;
-    this.start();
+    this._enableForm();
   },
 
   /**
@@ -46,9 +42,6 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    */
   afterStart: function() {
     this._initForm();
-    this._initEditForm();
-    this.state.loaded = true;
-    this.state.hidden = false;
     this._super();
   },
 
@@ -64,19 +57,16 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    * Init the form.
    */
   _initForm: function() {
-    const mfaSettings = this.options.mfaSettings;
-    this._initFormTotpSection(mfaSettings);
-    this._initFormYubikeySection(mfaSettings);
-    this._initFormDuoSection(mfaSettings);
-    this.load({'MfaSettings': mfaSettings});
+    this._initFormTotpSection();
+    this._initFormYubikeySection();
+    this._initFormDuoSection();
   },
 
   /**
    * Init the Totp form section.
-   * @param {MfaSettings} mfaSettings The settings
    * @private
    */
-  _initFormTotpSection: function(mfaSettings) {
+  _initFormTotpSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-totp-provider-toggle-button', {
         label: null,
@@ -84,20 +74,13 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
         state: {disabled: true}
       }).start()
     );
-
-    if (mfaSettings.totp_provider) {
-      $('.provider-section.totp').addClass('enabled');
-    } else {
-      $('.provider-section.totp').removeClass('enabled');
-    }
   },
 
   /**
    * Init the Yubikey form section.
-   * @param {MfaSettings} mfaSettings The settings
    * @private
    */
-  _initFormYubikeySection: function(mfaSettings) {
+  _initFormYubikeySection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-yubikey-provider-toggle-button', {
         label: null,
@@ -123,20 +106,13 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
       }).start(),
       new FeedbackComponent('#js-yubikey-secret-key-input-feedback', {}).start()
     );
-
-    if (mfaSettings.yubikey_provider) {
-      $('.provider-section.yubikey').addClass('enabled');
-    } else {
-      $('.provider-section.yubikey').removeClass('enabled');
-    }
   },
 
   /**
    * Init the Duo form section.
-   * @param {MfaSettings} mfaSettings The settings
    * @private
    */
-  _initFormDuoSection: function(mfaSettings) {
+  _initFormDuoSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-duo-provider-toggle-button', {
         label: null,
@@ -180,26 +156,38 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
       }).start(),
       new FeedbackComponent('#js-duo-secret-key-input-feedback', {}).start()
     );
+  },
+
+  /**
+   * Enable the form
+   */
+  _enableForm: function() {
+    const mfaSettings = this.options.mfaSettings;
+    this.load({'MfaSettings': mfaSettings});
+
+    if (mfaSettings.totp_provider) {
+      $('.provider-section.totp').addClass('enabled');
+    } else {
+      $('.provider-section.totp').removeClass('enabled');
+    }
+
+    if (mfaSettings.yubikey_provider) {
+      $('.provider-section.yubikey').addClass('enabled');
+    } else {
+      $('.provider-section.yubikey').removeClass('enabled');
+    }
 
     if (mfaSettings.duo_provider) {
       $('.provider-section.duo').addClass('enabled');
     } else {
       $('.provider-section.duo').removeClass('enabled');
     }
-  },
-
-  /**
-   * Init the edit form.
-   */
-  _initEditForm: function() {
-    const edit = this.options.edit;
-    if (!edit) {
-      return;
-    }
 
     for (const i in this.elements) {
       this.elements[i].state.disabled = false;
     }
+
+    this.state.loaded = true;
   },
 
   /**
@@ -208,7 +196,6 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    * @param {HTMLEvent} ev The event which occured
    */
   '{element} #js-totp-provider-toggle-button changed': function(el, ev) {
-    if (!this.options.edit) { return; }
     const enabled = ev.data.value;
     if (enabled) {
       $('.provider-section.totp').addClass('enabled');
@@ -223,7 +210,6 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    * @param {HTMLEvent} ev The event which occured
    */
   '{element} #js-yubikey-provider-toggle-button changed': function(el, ev) {
-    if (!this.options.edit) { return; }
     const enabled = ev.data.value;
     if (enabled) {
       $('.provider-section.yubikey').addClass('enabled');
@@ -238,7 +224,6 @@ const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings',
    * @param {HTMLEvent} ev The event which occured
    */
   '{element} #js-duo-provider-toggle-button changed': function(el, ev) {
-    if (!this.options.edit) { return; }
     const enabled = ev.data.value;
     if (enabled) {
       $('.provider-section.duo').addClass('enabled');

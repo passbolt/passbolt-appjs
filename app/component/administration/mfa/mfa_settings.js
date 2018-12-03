@@ -25,7 +25,8 @@ import templateItemBreadcrumb from 'app/view/template/component/breadcrumb/bread
 const MfaSettingsAdmin = Component.extend('passbolt.component.administration.mfa.MfaSettings', /** @static */ {
 
   defaults: {
-    template: template
+    template: template,
+    silentLoading: false,
   }
 
 }, /** @prototype */ {
@@ -34,30 +35,26 @@ const MfaSettingsAdmin = Component.extend('passbolt.component.administration.mfa
    * @inheritdoc
    */
   afterStart: function() {
-    const edit = route.data.action == 'mfa/edit';
-    this._initPrimaryMenu(edit);
-    this._initBreadcrumb(edit);
-    this._initForm(edit);
+    this._initPrimaryMenu();
+    this._initBreadcrumb();
+    this._initForm();
   },
 
   /**
    * Init the primary menu
-   * @param {bool} edit Start the component in edit mode
    * @private
    */
-  _initPrimaryMenu: function(edit) {
+  _initPrimaryMenu: function() {
     const selector = $('#js_wsp_primary_menu_wrapper');
-    const menu = ComponentHelper.create(selector, 'inside_replace', PrimaryMenu, {
-      edit: edit
-    });
+    const menu = ComponentHelper.create(selector, 'inside_replace', PrimaryMenu);
     menu.start();
+    this.primaryMenu = menu;
   },
 
   /**
    * Init the breadcrumb
-   * @param {bool} edit Start the component in edit mode
    */
-  _initBreadcrumb: function(edit) {
+  _initBreadcrumb: function() {
     const breadcrumbWrapperSelector = '#js_wsp_administration_breadcrumb';
     const options = {
       itemTemplate: templateItemBreadcrumb
@@ -81,29 +78,26 @@ const MfaSettingsAdmin = Component.extend('passbolt.component.administration.mfa
       action: () => this._goToSection('mfa')
     });
     items.push(mfaSettingsAction);
-    if (edit) {
-      const mfaEditAction = new Action({
-        label: __('edit'),
-        action: () => this._goToSection('mfa/edit')
-      });
-      items.push(mfaEditAction);
-    }
     breadcrumb.load(items);
   },
 
   /**
    * Init the form
-   * @param {bool} edit Start the component in edit mode
    * @private
    */
-  _initForm: function(edit) {
-    this.form = new MfaSettingsForm('#js-mfa-settings-form', {edit: edit});
+  _initForm: function() {
+    this.form = new MfaSettingsForm('#js-mfa-settings-form');
     this.addLoadedDependency(this.form);
-    return MfaSettings.findOne()
-      .then(mfaSettings => {
-        this.mfaSettings = mfaSettings;
-        this.form.loadAndStart(mfaSettings);
-      });
+    this.form.start();
+    if (!this.mfaSettings) {
+      return MfaSettings.findOne()
+        .then(mfaSettings => {
+          this.mfaSettings = mfaSettings;
+          this.form.loadForm(mfaSettings);
+        });
+    } else {
+      this.form.loadForm(this.mfaSettings);
+    }
   },
 
   /**
@@ -116,11 +110,11 @@ const MfaSettingsAdmin = Component.extend('passbolt.component.administration.mfa
   },
 
   /**
-   * Listen when the user want to edit the settings.
+   * Listen when the form is updated.
+   * When the form is updated enable the save settings button
    */
-  '{window} #js_wsp_primary_menu_wrapper #js-mfa-settings-edit-button click': function() {
-    route.data.update({controller: 'Administration', action: 'mfa/edit'});
-    this.refresh();
+  '#js-mfa-settings-form changed': function() {
+    this.primaryMenu.saveButton.state.disabled = false;
   },
 
   /**
@@ -128,22 +122,15 @@ const MfaSettingsAdmin = Component.extend('passbolt.component.administration.mfa
    */
   '{window} #js_wsp_primary_menu_wrapper #js-mfa-settings-save-button click': function() {
     if (this.form.validate()) {
+      this.state.loaded = false;
       const data = this.form.getData();
       this.mfaSettings.assign(data.MfaSettings);
       this.mfaSettings.save()
         .then(() => {
-          route.data.update({controller: 'Administration', action: 'mfa'});
+          this.state.loaded = true;
           this.refresh();
         });
     }
-  },
-
-  /**
-   * Listen when the user want to cancel the edit.
-   */
-  '{window} #js_wsp_primary_menu_wrapper #js-mfa-settings-cancel-button click': function() {
-    route.data.update({controller: 'Administration', action: 'mfa'});
-    this.refresh();
   }
 });
 

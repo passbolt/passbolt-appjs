@@ -93,6 +93,9 @@
 			},
 			"export_passwords_success": {
 				"msg": "The passwords were exported successfully"
+			},
+			"app_orgsettings_post_success": {
+				"msg": "The multi factor authentication settings for the organization were updated."
 			}
 		}
 	}

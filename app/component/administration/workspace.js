@@ -93,7 +93,7 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
    * @private
    */
   _initMfaSection: function() {
-    if (route.data.action != 'mfa' && route.data.action != 'mfa/edit') { return; }
+    if (route.data.action != 'mfa') { return; }
     const section = new MfaSettings('#js_wk_administration_main');
     section.start();
   },

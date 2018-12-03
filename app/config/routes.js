@@ -16,7 +16,6 @@ route.urlData.root = appUrl.pathname;
 // Administration routes
 route.register('/app/administration/users-directory/edit', {controller: 'Administration', action: 'usersDirectory/edit'});
 route.register('/app/administration/users-directory', {controller: 'Administration', action: 'usersDirectory'});
-route.register('/app/administration/mfa/edit', {controller: 'Administration', action: 'mfa/edit'});
 route.register('/app/administration/mfa', {controller: 'Administration', action: 'mfa'});
 route.register('/app/administration', {controller: 'Administration', action: 'mfa'});
 
