@@ -49,22 +49,28 @@ DefineMap.setReference('MfaSettings', MfaSettings);
  */
 MfaSettings.validationRules = {
   yubikey_client_id: [
-    {rule: 'required', message: __('A client identifier is required.')}
+    {rule: 'required', message: __('A client identifier is required.')},
+    {rule: '/^[0-9]{1,64}$/', message: __('The client identifier should be an integer.')}
   ],
   yubikey_secret_key: [
-    {rule: 'required', message: __('A secret key is required.')}
+    {rule: 'required', message: __('A secret key is required.')},
+    {rule:'/^[a-zA-Z0-9\/=]{10,128}$/', message: __('This secret key is not valid.')}
   ],
   duo_host_name: [
-    {rule: 'required', message: __('A hostname is required.')}
+    {rule: 'required', message: __('A hostname is required.')},
+    {rule: '/^api-[a-fA-F0-9]{8,16}\.duosecurity\.com$/', message: __('This is not a valid hostname.')}
   ],
   duo_integration_key: [
-    {rule: 'required', message: __('An integration key is required.')}
+    {rule: 'required', message: __('An integration key is required.')},
+    {rule: '/^[a-zA-Z0-9]{16,32}$/', message: __('This is not a valid integration key.')}
   ],
   duo_salt: [
-    {rule: 'required', message: __('A salt is required.')}
+    {rule: 'required', message: __('A salt is required.')},
+    {rule: ['lengthBetween', 40, 128], message: __('The salt should be between 40 and 128 characters in length.')}
   ],
   duo_secret_key: [
-    {rule: 'required', message: __('A secret key is required.')}
+    {rule: 'required', message: __('A secret key is required.')},
+    {rule: '/^[a-zA-Z0-9]{32,128}$/', message: __('This is not a valid secret key.')}
   ]
 };
 
@@ -119,7 +125,7 @@ MfaSettings.mapToApi = function(data) {
   return result;
 };
 
-MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
+MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap], {
   Map: MfaSettings,
   url: {
     resource: '/',
