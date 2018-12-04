@@ -1,0 +1,123 @@
+<h3><span id="js-ldap-toggle-button" class="input toggle-switch"></span><label>Users Directory</label></h3>
+<p class="description enabled">
+	A Users Directory is configured. The users and groups of passbolt will synchronize with it.
+</p>
+<p class="description disabled">
+	No Users Directory is configured. Enable it to synchronise your users and groups with passbolt.
+</p>
+
+<div class="form-content">
+	<h3>{{__('Credentials')}}</h3>
+	<div class="radiolist required">
+		<label>{{__('Directory type')}}</label>
+		<div id="js-directory-type-radio" class="input radio"></div>
+	</div>
+	<div class="input text js_form_element_wrapper required">
+		<label>{{__('Domain')}}</label>
+		<input id="js-domain-name-input" type="text" class="required fluid" placeholder="domain.ext">
+		<div id="js-domain-name-input-feedback" class="message"></div>
+	</div>
+	<div class="singleline connection_info protocol_host_port clearfix js_form_element_wrapper required">
+		<label>{{__('Server url')}}</label>
+		<div class="input text field_protocol_host">
+			<div class="input text protocol">
+				<select id="js-connection-connection-type-input" class="required fluid" required="required"></select>
+			</div>
+			<div class="input text host">
+				<input id="js-server-input" type="text" class="required fluid" placeholder="host">
+				<div id="js-server-input-feedback" class="message"></div>
+			</div>
+		</div>
+		<div class="input text port">
+			<input id="js-port-input" type="text" class="required fluid" placeholder="port">
+			<div id="js-port-input-feedback" class="message"></div>
+		</div>
+	</div>
+
+	<div class="singleline clearfix">
+		<div class="input text first-field js_form_element_wrapper required">
+			<label>{{__('Username')}}</label>
+			<input id="js-username-input" type="text" class="required fluid" placeholder="username">
+			<div id="js-username-input-feedback" class="message"></div>
+		</div>
+		<div class="input text last-field js_form_element_wrapper required">
+			<label>{{__('Password')}}</label>
+			<input id="js-password-input" type="{{#if(edit}}text{{#else}}password{{/if}}" class="required fluid" placeholder="password">
+			<div id="js-password-input-feedback" class="message"></div>
+		</div>
+	</div>
+	<div class="input text js_form_element_wrapper required">
+		<label>{{__('Base DN')}}</label>
+		<input id="js-base-dn-input" type="text" class="required fluid" placeholder="OU=OrgUsers,DC=mydomain,DC=local">
+		<div id="js-base-dn-input-feedback" class="message"></div>
+		<div class="message">The base DN (default naming context) for the domain. If this is empty then it will be queried from the RootDSE.</div>
+	</div>
+
+	<h3>{{__('Directory configuration')}}</h3>
+	<div class="input text js_form_element_wrapper">
+		<label>{{__('Group path')}}</label>
+		<input id="js-group-path-input" type="text" class="required fluid" placeholder="Group Path">
+		<div class="message">{{__('Group path is used in addition to the base DN while searching groups.')}}</div>
+		<div id="js-group-path-input-feedback" class="message"></div>
+	</div>
+	<div class="input text js_form_element_wrapper">
+		<label>{{__('User path')}}</label>
+		<input id="js-user-path-input" type="text" class="required fluid" placeholder="User Path">
+		<div class="message">{{__('User path is used in addition to base DN while searching users.')}}</div>
+		<div id="js-user-path-input-feedback" class="message"></div>
+	</div>
+	<div class="input text js_form_element_wrapper">
+		<label>{{__('Group object class')}}</label>
+		<input id="js-group-object-class-input" type="text" class="required fluid" placeholder="GroupObjectClass">
+		<div class="message">{{__('For Openldap only. Defines which group object to use. (Default: posixGroup)')}}</div>
+		<div id="js-group-object-class-input-feedback" class="message"></div>
+	</div>
+	<div class="input text js_form_element_wrapper">
+		<label>{{__('User object class')}}</label>
+		<input id="js-user-object-class-input" type="text" class="required fluid" placeholder="UserObjectClass">
+		<div class="message">{{__('For Openldap only. Defines which user object to use. (Default: inetOrgPerson)')}}</div>
+		<div id="js-user-object-class-input-feedback" class="message"></div>
+	</div>
+
+	<h3>{{__('Synchronization options')}}</h3>
+	<div class="input select js_form_element_wrapper required">
+		<label>{{__('Default admin')}}</label>
+		<select id="js-default-user-select" class="required fluid" required="required"></select>
+		<div class="message">{{__('The default admin user is the admin user that will perform the operations for the the directory.')}}</div>
+		<div id="js-default-user-select-feedback" class="message"></div>
+	</div>
+	<div class="input select js_form_element_wrapper required">
+		<label>{{__('Default group admin')}}</label>
+		<select id="js-default-group-admin-user-select" class="required fluid" required="required"></select>
+		<div class="message">{{__('The default group admin user is the admin user that will be the group manager of newly created group.')}}</div>
+		<div id="js-default-group-admin-user-select-feedback" class="message"></div>
+	</div>
+	<div class="input text js_form_element_wrapper">
+		<label>{{__('Groups parent group')}}</label>
+		<input id="js-groups-parent-group-input" type="text" class="fluid" placeholder="Group name">
+		<div class="message">{{__('Synchronize only the groups which are member of this group.')}}</div>
+		<div id="js-groups-parent-group-input-feedback" class="message"></div>
+	</div>
+	<div class="input text js_form_element_wrapper">
+		<label>{{__('Users parent group')}}</label>
+		<input id="js-users-parent-group-input" type="text" class="fluid" placeholder="Group name">
+		<div class="message">{{__('Synchronize only the users which are member of this group.')}}</div>
+		<div id="js-users-parent-group-input-feedback" class="message"></div>
+	</div>
+	<div class="input text clearfix"> 
+		<label>{{__('Enabled users only')}}</label>
+		<div id="js-enabled-users-only-toggle-button" class="input toggle-switch"></div>
+    </div>
+	<div class="input text clearfix"> 
+		<label>{{__('Sync operations')}}</label>
+		<div class="col6">
+			<div id="js-sync-users-create-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-users-delete-toggle-button" class="input toggle-switch"></div>
+		</div>
+		<div class="col6 last">
+			<div id="js-sync-groups-create-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-groups-delete-toggle-button" class="input toggle-switch"></div>
+			<div id="js-sync-groups-update-toggle-button" class="input toggle-switch"></div>
+		</div>
+	</div>
+</div>

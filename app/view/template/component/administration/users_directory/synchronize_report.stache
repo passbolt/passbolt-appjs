@@ -1,0 +1,21 @@
+<p>
+    {{#if(usersSynchronized)}}{{ usersSynchronized }} user(s){{#if(groupsSynchronized)}} and{{/if}}{{/if}}
+    {{#if(groupsSynchronized)}}{{ groupsSynchronized }} group(s){{/if}}
+    {{#if(!resourcesSynchronized)}}No resources{{/if}}
+    were synchronized
+</p>
+{{#if(groupsError || usersError)}}
+<p class="error inline-error">Some resources were not synchronized and require your attention, see the full report.</p>
+{{/if}}
+
+<div class="accordion operation-details closed">
+    <div class="accordion-header">
+        <a role="link">{{__('Full report')}}</a>
+    </div>
+    <div class="accordion-content hidden" style="display: none;">
+        <div class="input text">
+            <label for="js_field_debug" class="visuallyhidden">{{__('Full report')}}</label>
+            <textarea></textarea>
+        </div>
+    </div>
+</div>

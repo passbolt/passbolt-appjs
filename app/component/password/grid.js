@@ -633,8 +633,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
         this.state.selectType = 'multiple-range';
         resources.push(item);
         return;
-      }
-      else if (resources.length && this.state.selectType != 'multiple-range') {
+      } else if (resources.length && this.state.selectType != 'multiple-range') {
         this._multiShiftSelectFirstElement = resources.get(resources.length - 1);
         this.state.selectType = 'multiple-range';
       }
@@ -712,7 +711,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     ev.stopPropagation();
     const id = ev.data;
     const resources = this.options.selectedResources;
-    const unselectedResources = resources.filter((resource) => resource.id == id);
+    const unselectedResources = resources.filter(resource => resource.id == id);
     if (unselectedResources.length) {
       const position = resources.indexOf(unselectedResources[0]);
       resources.splice(position, 1);

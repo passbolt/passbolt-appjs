@@ -11,3 +11,4 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import "test/case/app/model/map/resource";
+import "test/case/app/model/map/mfa_settings";

@@ -1,0 +1,17 @@
+<div class="grid grid-responsive-12">
+    <div class="row">
+        <div class="mfa-settings col8">
+            <form id="js-mfa-settings-form"></form>
+            <p>&nbsp;</p>
+        </div>
+
+        <div class="col4 last">
+            <h2>{{__('Need help?')}}</h2>
+            <p>{{__('Check out our Multi Factor Authentication configuration guide')}}</p>
+            <a class="button" href="https://help.passbolt.com/configure" target="_blank">
+                <i class="fa fa-fw fa-life-ring"></i>
+                <span>{{__('Read documentation')}}</span>
+            </a>
+        </div>
+    </div>
+</div>

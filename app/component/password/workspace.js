@@ -319,7 +319,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     const form = dialog.add(ResourceCreateForm, {
       data: resource,
       callbacks: {
-        submit: (data) => {
+        submit: data => {
           delete data['Resource']['id'];
           const resourceToSave = new Resource(data['Resource']);
           this._saveResource(resourceToSave, form, dialog);
@@ -700,9 +700,11 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     const selectedResources = this.options.selectedResources;
     const selectedResourcesIds = selectedResources.map(resource => resource.id).get();
 
-    // Unselect all the resources.
-    // The user could have lost his access to some of them.
-    // Retrieve the resources and then select the ones the user can still access.
+    /*
+     * Unselect all the resources.
+     * The user could have lost his access to some of them.
+     * Retrieve the resources and then select the ones the user can still access.
+     */
     selectedResources.splice(0);
     Resource.updateResourcesAfterShare(selectedResourcesIds)
       .then(resources => {
@@ -717,7 +719,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} passbolt.share.go-to-edit': function() {
     const resource = this.options.selectedResources.get(0);
-    MadBus.trigger('request_resource_edit', {resource});
+    MadBus.trigger('request_resource_edit', {resource: resource});
   },
 
   /**

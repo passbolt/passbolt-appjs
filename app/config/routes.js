@@ -13,6 +13,12 @@ route.urlData = new RoutePushstate();
 const appUrl = new URL($('base').attr('href'));
 route.urlData.root = appUrl.pathname;
 
+// Administration routes
+route.register('/app/administration/users-directory/edit', {controller: 'Administration', action: 'usersDirectory/edit'});
+route.register('/app/administration/users-directory', {controller: 'Administration', action: 'usersDirectory'});
+route.register('/app/administration/mfa', {controller: 'Administration', action: 'mfa'});
+route.register('/app/administration', {controller: 'Administration', action: 'mfa'});
+
 // Groups routes
 route.register('/app/groups/delete/{id}', {controller: 'User', action: 'groupDelete'});
 route.register('/app/groups/edit/{id}', {controller: 'User', action: 'groupEdit'});

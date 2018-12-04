@@ -21,7 +21,6 @@ import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
 import Plugin from 'app/util/plugin';
 import Resource from 'app/model/map/resource';
-import uuid from 'uuid/v4';
 
 import template from 'app/view/template/component/password/workspace_primary_menu.stache!';
 
@@ -191,7 +190,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   '{selectedResources} length': function() {
     const resources = this.options.selectedResources;
-    switch(resources.length) {
+    switch (resources.length) {
       case 0: {
         this.reset();
         break;
@@ -264,12 +263,10 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
     const moreButtonCopySecretItemId = 'js_wk_menu_copy_secret_action';
     const resources = this.options.selectedResources;
-    const {canDelete, canShare} = resources.reduce((carry, resource) => {
-      return {
-        canDelete: resource.permission.isAllowedTo(PermissionType.UPDATE) && carry.canDelete,
-        canShare: resource.permission.isAllowedTo(PermissionType.ADMIN) && carry.canShare
-      };
-    }, {canDelete: true, canShare: true});
+    const {canDelete, canShare} = resources.reduce((carry, resource) => ({
+      canDelete: resource.permission.isAllowedTo(PermissionType.UPDATE) && carry.canDelete,
+      canShare: resource.permission.isAllowedTo(PermissionType.ADMIN) && carry.canShare
+    }), {canDelete: true, canShare: true});
     if (canDelete) {
       this.moreButton.state.disabled = false;
       this.moreButton.disableItem(moreButtonCopyLoginItemId);
