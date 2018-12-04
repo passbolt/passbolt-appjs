@@ -1,4 +1,4 @@
-<h3><span id="js-ldap-toggle-button" class="input toggle-switch"></span><label for="toggle_button_js-ldap-switch-button">Users Directory</label></h3>
+<h3><span id="js-ldap-toggle-button" class="input toggle-switch"></span><label>Users Directory</label></h3>
 <p class="description enabled">
 	A Users Directory is configured. The users and groups of passbolt will synchronize with it.
 </p>
