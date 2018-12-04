@@ -77,8 +77,8 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
     });
     this.insertItem(usersItem);
 
-    // Administration
-    if (User.getCurrent().isAdmin) {
+    // Administration 
+    if (User.getCurrent().isAdmin()) {
       const plugins = Config.read('server.passbolt.plugins');
       if (plugins.directorySync || plugins.multiFactorAuthentication) {
         const helpItem = new Action({

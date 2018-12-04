@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.6.2] - 2018-12-04
+### Fixed
+- Only admin should see the admin panel navigation link
+
 ## [2.6.1] - 2018-12-04
 ### Fixed
 - Fix users directory form typo
@@ -98,7 +102,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.6.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.6.2...HEAD
+[2.6.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.3...v2.6.0
 [2.5.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.2...v2.5.3
