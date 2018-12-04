@@ -347,7 +347,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     this.addElement(
       new ToggleButtonComponent('#js-sync-groups-update-toggle-button', {
-        label: __('Create groups'),
+        label: __('Update groups'),
         modelReference: 'UsersDirectorySettings.sync_groups_update',
         state: {disabled: true},
         value: true
