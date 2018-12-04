@@ -302,7 +302,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     this.addElement(
       new ToggleButtonComponent('#js-enabled-users-only-toggle-button', {
-        label: __('Only for AD. Synchronize only the users who are enabled'),
+        label: __('Only for AD. Synchronize only the users that are enabled'),
         modelReference: 'UsersDirectorySettings.enabled_users_only',
         state: {disabled: true},
         value: true
@@ -329,7 +329,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     this.addElement(
       new ToggleButtonComponent('#js-sync-groups-create-toggle-button', {
-        label: __('Create users'),
+        label: __('Create groups'),
         modelReference: 'UsersDirectorySettings.sync_groups_create',
         state: {disabled: true},
         value: true
@@ -338,7 +338,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     this.addElement(
       new ToggleButtonComponent('#js-sync-groups-delete-toggle-button', {
-        label: __('Delete users'),
+        label: __('Delete groups'),
         modelReference: 'UsersDirectorySettings.sync_groups_delete',
         state: {disabled: true},
         value: true
@@ -347,7 +347,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     this.addElement(
       new ToggleButtonComponent('#js-sync-groups-update-toggle-button', {
-        label: __('Create users'),
+        label: __('Create groups'),
         modelReference: 'UsersDirectorySettings.sync_groups_update',
         state: {disabled: true},
         value: true
