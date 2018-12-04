@@ -3,10 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.6.0] - 2018-12-04
 ### Added
-- PASSBOLT-3130: As AD I can configure my user directory integration from the administration panel
+- PASSBOLT-3130: As AD I can configure my users directory integration from the administration panel
 - PASSBOLT-3121: As AD I can configure my multi factor authentication integrations from the administration panel
-- PASSBOLT-3235: As AD I can synchronize my user directory from the administration panel
+- PASSBOLT-3235: As AD I can synchronize my users directory from the administration panel
 
 ## [2.5.3] - 2018-11-17
 ### Improved
