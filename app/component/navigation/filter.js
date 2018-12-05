@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Button from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import FilterView from 'app/view/component/navigation/filter';
 import Form from 'passbolt-mad/form/form';
@@ -66,6 +67,10 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
     }));
     keywordsTextbox.start();
     this.options.keywordsTextbox = keywordsTextbox;
+
+    const searchButton = new Button('#js_app_filter_button');
+    searchButton.start();
+    this.options.searchButton = searchButton;
   },
 
   /**
@@ -98,26 +103,78 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
   },
 
   /**
-   * Update the search placeholder functions of the selected workspace.
-   * @param workspaceName
+   * Enable the component.
    */
-  _updateSearchPlaceholder: function(workspaceName) {
-    let placeholder = '';
+  enable: function() {
+    this.options.keywordsTextbox.state.disabled = false;
+    this.options.searchButton.state.disabled = false;
+  },
 
-    switch (workspaceName) {
+  /**
+   * Disable the component.
+   */
+  disable: function() {
+    this.options.keywordsTextbox.state.disabled = true;
+    this.options.searchButton.state.disabled = true;
+  },
+
+  /**
+   * Passwords workspace enabled handler.
+   */
+  _passwordsWorkspaceEnabled: function() {
+    const placeholder = __('search passwords');
+    $(this.options.keywordsTextbox.element).attr("placeholder", placeholder);
+    this.enable();
+  },
+
+  /**
+   * Users workspace enabled handler.
+   */
+  _usersWorkspaceEnabled: function() {
+    const placeholder = __('search users');
+    $(this.options.keywordsTextbox.element).attr("placeholder", placeholder);
+    this.enable();
+  },
+
+  /**
+   * Settings workspace enabled handler.
+   */
+  _settingsWorkspaceEnabled: function() {
+    this.reset();
+    const placeholder = __('search users');
+    $(this.options.keywordsTextbox.element).attr("placeholder", placeholder);
+    this.enable();
+  },
+
+  /**
+   * Administration workspace enabled handler.
+   */
+  _administrationWorkspaceEnabled: function() {
+    this.reset();
+    const placeholder = '';
+    $(this.options.keywordsTextbox.element).attr("placeholder", placeholder);
+  },
+
+  /**
+   * Adapt the filter for a given workspace.
+   * @param workspace
+   */
+  _workspaceEnabledHandler: function(workspace) {
+    this.disable();
+    switch (workspace.options.name) {
       case 'password_workspace':
-        placeholder = __('search passwords');
+        this._passwordsWorkspaceEnabled();
         break;
       case 'settings_workspace':
-        placeholder = __('search users');
-        this.reset();
+        this._settingsWorkspaceEnabled();
         break;
       case 'user_workspace':
-        placeholder = __('search users');
+        this._usersWorkspaceEnabled();
+        break;
+      case 'administration_workspace':
+        this._administrationWorkspaceEnabled();
         break;
     }
-
-    $(this.options.keywordsTextbox.element).attr("placeholder", placeholder);
   },
 
   /* ************************************************************** */
@@ -145,7 +202,7 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
   '{mad.bus.element} workspace_enabled': function(el, ev) {
     const workspace = ev.data.workspace;
     this.options.workspace = workspace;
-    this._updateSearchPlaceholder(workspace.options.name);
+    this._workspaceEnabledHandler(workspace);
   },
 
   /**

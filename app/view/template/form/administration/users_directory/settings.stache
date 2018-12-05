@@ -46,9 +46,9 @@
 			<div id="js-password-input-feedback" class="message"></div>
 		</div>
 	</div>
-	<div class="input text js_form_element_wrapper required">
+	<div class="input text js_form_element_wrapper">
 		<label>{{__('Base DN')}}</label>
-		<input id="js-base-dn-input" type="text" class="required fluid" placeholder="OU=OrgUsers,DC=mydomain,DC=local">
+		<input id="js-base-dn-input" type="text" class="fluid" placeholder="OU=OrgUsers,DC=mydomain,DC=local">
 		<div id="js-base-dn-input-feedback" class="message"></div>
 		<div class="message">The base DN (default naming context) for the domain. If this is empty then it will be queried from the RootDSE.</div>
 	</div>

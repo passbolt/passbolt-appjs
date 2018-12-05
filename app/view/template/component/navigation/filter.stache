@@ -3,7 +3,7 @@
         <label for="js_app_filter_keywords"> Search</label>
         <input id="js_app_filter_keywords" class="required" maxlength="50" type="search" placeholder="search" />
     </div>
-    <button value="search">
+    <button id="js_app_filter_button" value="search">
         <i class="fa fa-fw fa-search"></i>
         <span class="text visuallyhidden">search</span>
     </button>

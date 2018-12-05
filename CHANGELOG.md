@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fxed
+- PASSBOLT-3268: BaseDN should not be mandatory
+- PASSBOLT-3269: Search on administration screen should be disabled
 
 ## [2.6.2] - 2018-12-04
 ### Fixed
