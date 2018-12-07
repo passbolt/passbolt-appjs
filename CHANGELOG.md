@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Fxed
+### Added
+- PASSBOLT-2978: Open a paginated grid on a page containing a target item
+- PASSBOLT-3285: The url should be updated when the user is selecting a password
+- PASSBOLT-2995 As LU I should be able to copy the permalink of a password
+
+### Fixed
 - PASSBOLT-3268: BaseDN should not be mandatory
 - PASSBOLT-3269: Search on administration screen should be disabled
 
@@ -105,7 +110,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.6.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.2...v2.7.0
 [2.6.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.5.3...v2.6.0

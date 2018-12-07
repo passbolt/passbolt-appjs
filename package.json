@@ -1,6 +1,6 @@
 {
   "name": "passbolt-appjs",
-  "version": "2.6.2",
+  "version": "2.7.0",
   "author": "Passbolt SARL",
   "license": "AGPL-3.0",
   "description": "Passbolt javascript application for the open source password manager for teams",
