@@ -106,6 +106,15 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     });
     moreButtonMenuItems.push(deleteItem);
 
+    // Copy permalink
+    const copyPermalinkItem = new Action({
+      id: 'js_wk_menu_copy_permalink_action',
+      label: __('copy permalink to clipboard'),
+      cssClasses: [],
+      action: () => this._copyPermalink()
+    });
+    moreButtonMenuItems.push(copyPermalinkItem);
+
     const moreButton = new ButtonDropdownComponent('#js_wk_menu_more_button', {
       state: {disabled: true},
       items: moreButtonMenuItems,
@@ -147,6 +156,13 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   _copySecret: function() {
     const secret = this.options.selectedResources[0].secrets[0];
     Plugin.decryptAndCopyToClipboard(secret.data);
+  },
+
+  /**
+   * Copy permalink to clipboard
+   */
+  _copyPermalink: function() {
+    Clipboard.copy(this.options.selectedResources[0].getPermalink(), 'permalink');
   },
 
   /**
@@ -262,22 +278,45 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     const moreButtonDeleteItemId = 'js_wk_menu_delete_action';
     const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
     const moreButtonCopySecretItemId = 'js_wk_menu_copy_secret_action';
+    const moreButtonCopyPermalinkItemId = 'js_wk_menu_copy_permalink_action';
     const resources = this.options.selectedResources;
     const {canDelete, canShare} = resources.reduce((carry, resource) => ({
       canDelete: resource.permission.isAllowedTo(PermissionType.UPDATE) && carry.canDelete,
       canShare: resource.permission.isAllowedTo(PermissionType.ADMIN) && carry.canShare
     }), {canDelete: true, canShare: true});
-    if (canDelete) {
-      this.moreButton.state.disabled = false;
+
+    // Enable/disable single actions
+    if (resources.length > 1) {
       this.moreButton.disableItem(moreButtonCopyLoginItemId);
       this.moreButton.disableItem(moreButtonCopySecretItemId);
+      this.moreButton.disableItem(moreButtonCopyPermalinkItemId);
+    } else {
+      this.moreButton.enableItem(moreButtonCopyLoginItemId);
+      this.moreButton.enableItem(moreButtonCopySecretItemId);
+      this.moreButton.enableItem(moreButtonCopyPermalinkItemId);
+    }
+
+    // The user can delete the resources
+    if (canDelete) {
       this.moreButton.enableItem(moreButtonDeleteItemId);
     } else {
-      this.moreButton.state.disabled = true;
+      this.moreButton.disableItem(moreButtonDeleteItemId);
     }
+
+    // The user can share the resources
     if (canShare) {
       this.shareButton.state.disabled = false;
+    } else {
+      this.shareButton.state.disabled = true;
     }
+
+    // Disable the more button if there is no enabled action.
+    const enableMoreButtons = this.moreButton.options.items.reduce((carry, item) => {
+      console.log(item);
+      carry = item.enabled || carry;
+      return carry;
+    }, false);
+    this.moreButton.state.disabled = !enableMoreButtons;
   },
 
   /**
@@ -286,12 +325,14 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
   reset: function() {
     const moreButtonCopyLoginItemId = 'js_wk_menu_copy_login_action';
     const moreButtonCopySecretItemId = 'js_wk_menu_copy_secret_action';
+    const moreButtonCopyPermalinkItemId = 'js_wk_menu_copy_permalink_action';
     this.secretCopyButton.state.disabled = true;
     this.editButton.state.disabled = true;
     this.shareButton.state.disabled = true;
     this.moreButton.state.disabled = true;
     this.moreButton.enableItem(moreButtonCopyLoginItemId);
     this.moreButton.enableItem(moreButtonCopySecretItemId);
+    this.moreButton.enableItem(moreButtonCopyPermalinkItemId);
   }
 
 });

@@ -122,6 +122,14 @@ Resource.prototype.safeUrl = function() {
 };
 
 /**
+ * Get the resource permalink.
+ * @return {string}
+ */
+Resource.prototype.getPermalink = function() {
+  return `${APP_URL}app/passwords/view/${this.id}`;
+};
+
+/**
  * Sort the permissions alphabetically.
  */
 Resource.List.prototype.sortAlphabetically = function() {

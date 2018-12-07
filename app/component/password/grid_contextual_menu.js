@@ -62,6 +62,14 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     });
     items.push(copyUriItem);
 
+    // Add Copy permalink action.
+    const copyPermalinkItem = new Action({
+      id: 'js_password_browser_menu_copy_permalink',
+      label: __('Copy permalink'),
+      action: () => this._copyPermalink()
+    });
+    items.push(copyPermalinkItem);
+
     // Add Open URI in a new tab action.
     const openUriItem = new Action({
       id: 'js_password_browser_menu_open_uri',
@@ -125,6 +133,14 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    */
   _copyUri: function() {
     Clipboard.copy(this.options.resource.uri, 'URL');
+    this.remove();
+  },
+
+  /**
+   * Copy permalink to clipboard
+   */
+  _copyPermalink: function() {
+    Clipboard.copy(this.options.resource.getPermalink(), 'permalink');
     this.remove();
   },
 

@@ -21,6 +21,7 @@ import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/password/grid_contextual_menu';
+import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PasswordGridView from 'app/view/component/password/grid';
 import Plugin from 'app/util/plugin';
@@ -500,8 +501,15 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     }
     if (filter.viewResourceId) {
       const resource = this.options.items.filter(resource => resource.id == filter.viewResourceId).get(0);
-      this.options.selectedResources.push(resource);
-      this.scrollToItem(resource);
+      if (resource) {
+        this.options.selectedResources.push(resource);
+        this.scrollToItem(resource);
+      } else {
+        MadBus.trigger('passbolt_notify', {
+          status: 'error',
+          title: `app_passwords_view_error_not_found`
+        });
+      }
     }
   },
 

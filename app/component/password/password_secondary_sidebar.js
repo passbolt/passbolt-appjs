@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Clipboard from 'app/util/clipboard';
 import CommentsSection from 'app/component/comment/comments_sidebar_section';
 import Config from 'passbolt-mad/config/config';
 import DescriptionSection from 'app/component/password/description_sidebar_section';
@@ -116,6 +117,13 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    */
   '{resource} updated': function(resource) {
     this.setTitle(resource.name);
+  },
+
+  /**
+   * Observe when the user want to copy the permalink of the resource in the clipboard
+   */
+  '{element} .title-link click': function() {
+    Clipboard.copy(this.options.resource.getPermalink(), 'permalink');
   }
 });
 
