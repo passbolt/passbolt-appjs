@@ -73,65 +73,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   /**
    * @inheritdoc
    */
-  init: function(el, options) {
-    this._super(el, options);
-    this._firstLoad = true;
-  },
-
-  /**
-   * Dispatch route
-   * @private
-   */
-  _dispatchRoute: function() {
-    const action = route.data.action;
-    switch (action) {
-      case 'commentsView':
-      case 'view': {
-        const id = route.data.id;
-        const resource = Resource.connection.instanceStore.get(id);
-        if (resource) {
-          this.options.selectedResources.push(resource);
-        } else {
-          MadBus.trigger('passbolt_notify', {
-            status: 'error',
-            title: `app_passwords_view_error_not_found`
-          });
-        }
-        break;
-      }
-      case 'edit': {
-        const id = route.data.id;
-        const resource = Resource.connection.instanceStore.get(id);
-        if (resource) {
-          this.openEditResourceDialog(resource);
-        } else {
-          MadBus.trigger('passbolt_notify', {
-            status: 'error',
-            title: `app_passwords_edit_error_not_found`
-          });
-        }
-        break;
-      }
-    }
-  },
-
-  /**
-   * Observer when the component is loaded / loading
-   * @param {boolean} loaded True if loaded, false otherwise
-   */
-  onLoadedChange: function(loaded) {
-    if (loaded) {
-      if (this._firstLoad) {
-        this._firstLoad = false;
-        this._dispatchRoute();
-      }
-    }
-    this._super(loaded);
-  },
-
-  /**
-   * @inheritdoc
-   */
   afterStart: function() {
     const primaryMenu = this._initPrimaryMenu();
     const secondaryMenu = this._initSecondaryMenu();
@@ -152,11 +93,30 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     grid.start();
 
     // Filter the workspace
-    const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+    const filter = this.getFilter();
     MadBus.trigger('filter_workspace', {filter: filter});
 
     this.on();
     this._super();
+  },
+
+  /**
+   * Get the filter to apply to the workspace.
+   * @return {Filter}
+   */
+  getFilter: function() {
+    let filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+    filter.viewResourceId = null;
+
+    const action = route.data.action;
+    switch (action) {
+      case 'commentsView':
+      case 'view': {
+        filter.viewResourceId = route.data.id;
+      }
+    }
+
+    return filter;
   },
 
   /**
@@ -508,14 +468,16 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLElement} el The element the event occurred on
    */
   '{selectedResources} length': function() {
-    const init = this.options.selectedResources.length === 1;
-    if (init) {
+    const selectedResources = this.options.selectedResources;
+    if (selectedResources.length == 1) {
       const component = this._initSecondarySidebar();
       if (component) {
         component.start();
       }
+      route.data.update({controller: 'Password', action: 'view', id: selectedResources[0].id});
     } else {
       this._destroySecondarySidebar();
+      route.data.update({controller: 'Password', action: 'index'});
     }
   },
 

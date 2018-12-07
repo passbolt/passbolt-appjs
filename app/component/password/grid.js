@@ -320,7 +320,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     }
     const checkbox = this._selectCheckboxComponents[item.id];
     checkbox.setValue([item.id]);
-    this.view.selectItem(item);
+    this.selectItem(item);
   },
 
   /**
@@ -333,7 +333,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     }
     const checkbox = this._selectCheckboxComponents[item.id];
     checkbox.reset();
-    this.view.unselectItem(item);
+    this.unselectItem(item);
   },
 
   /**
@@ -358,7 +358,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       .then(() => this._selectResourceBySettings(filter))
       .then(() => {
         this._applyingFilter = false;
-      });
+      }); 
   },
 
   /**
@@ -427,6 +427,10 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       };
     }
 
+    if (filter.viewResourceId) {
+      loadOptions.visibleItemId = filter.viewResourceId;
+    }
+
     return this.load(resources, loadOptions);
   },
 
@@ -489,8 +493,15 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       return Promise.resolve();
     }
 
+    // @todo check if still in use.
     if (filter.resource) {
+      console.log('passwordsGrid::_selectResourceBySettings() filter.resource in use.');
       this.select(filter.resource);
+    }
+    if (filter.viewResourceId) {
+      const resource = this.options.items.filter(resource => resource.id == filter.viewResourceId).get(0);
+      this.options.selectedResources.push(resource);
+      this.scrollToItem(resource);
     }
   },
 

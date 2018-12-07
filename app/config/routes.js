@@ -26,17 +26,17 @@ route.register('/app/groups/view/{id}', {controller: 'User', action: 'groupView'
 route.register('/app/groups/view/{id}/membership', {controller: 'User', action: 'groupViewMembership'});
 
 // Passwords routes
-route.register('/app/passwords', {controller: 'Password', action: 'index'});
-route.register('/app/passwords/edit/{id}', {controller: 'Password', action: 'edit'});
+//route.register('/app/passwords/view/{id}/comments', {controller: 'Password', action: 'commentsView'});
 route.register('/app/passwords/view/{id}', {controller: 'Password', action: 'view'});
-route.register('/app/passwords/view/{id}/comments', {controller: 'Password', action: 'commentsView'});
+//route.register('/app/passwords/edit/{id}', {controller: 'Password', action: 'edit'});
+route.register('/app/passwords', {controller: 'Password', action: 'index'});
 
 // Users routes
-route.register('/app/users', {controller: 'User', action: 'index'});
 route.register('/app/users/add', {controller: 'User', action: 'add'});
 route.register('/app/users/edit/{id}', {controller: 'User', action: 'edit'});
 route.register('/app/users/delete/{id}', {controller: 'User', action: 'delete'});
 route.register('/app/users/view/{id}', {controller: 'User', action: 'view'});
+route.register('/app/users', {controller: 'User', action: 'index'});
 
 // User settings routes
 route.register('/app/settings/keys', {controller: 'Settings', action: 'keys'});
