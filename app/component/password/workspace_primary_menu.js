@@ -312,7 +312,6 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
 
     // Disable the more button if there is no enabled action.
     const enableMoreButtons = this.moreButton.options.items.reduce((carry, item) => {
-      console.log(item);
       carry = item.enabled || carry;
       return carry;
     }, false);

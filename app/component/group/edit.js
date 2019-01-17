@@ -384,7 +384,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
    * The user request the form to be saved.
    */
   '{saveChangesButton.element} click': function() {
-    if (this.state.loaded) {
+    if (this.options.saveChangesButton.state.loaded) {
       // Validate form.
       const validate = this.formGroup.validate();
 
@@ -393,11 +393,10 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         const formData = this.formGroup.getData();
         const groupJson = {name: formData['Group']['name']};
 
-        MadBus.trigger('passbolt_loading');
+        MadBus.trigger('passbolt_loading'); 
         Plugin.groupEditIframeSave(groupJson);
 
         this.state.loaded = false;
-        this.options.saveChangesButton.loaded = false;
       }
     }
   },
@@ -513,10 +512,9 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
    */
   '{mad.bus.element} group_edit_save_error': function(el, ev) {
     const errorResponse = ev.data;
-    if (errorResponse.header.status_code == 400) {
+    if (errorResponse.header.code == 400) {
       // If it' an error with the group name, display validation error.
-      if (errorResponse.body.Group != undefined
-                && errorResponse.body.Group['name'] != undefined) {
+      if (errorResponse.body.Group != undefined && errorResponse.body.Group['name'] != undefined) {
         const errorGroup = errorResponse.body;
         this.formGroup.showErrors(errorGroup);
       } else {
@@ -525,7 +523,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
       }
     } else {
       // If error with something else, log it in console.
-      console.error('Unknown error while saving group', errorResponse);
+      console.error('Unknown error while saving group', errorResponse); 
     }
 
     // Complete loading bar.
@@ -533,11 +531,11 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
     MadBus.trigger('passbolt_notify', {
       status: 'error',
       title: 'app_groups_add_error',
+      message: errorResponse.header.message, 
       data: errorResponse
     });
 
     this.state.loaded = true;
-    this.options.saveChangesButton.loaded = true;
   },
 
   /* ************************************************************** */

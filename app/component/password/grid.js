@@ -496,7 +496,6 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
 
     // @todo check if still in use.
     if (filter.resource) {
-      console.log('passwordsGrid::_selectResourceBySettings() filter.resource in use.');
       this.select(filter.resource);
     }
     if (filter.viewResourceId) {
