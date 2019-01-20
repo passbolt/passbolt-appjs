@@ -89,6 +89,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     this._initSessionCheck();
     this._dispatchRoute();
     this._super();
+    $('html').removeClass('launching');
   },
 
   /**
@@ -97,10 +98,6 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   onLoadedChange: function(loaded) {
     if (loaded) {
-      if (this._firstLoad) {
-        this._firstLoad = false;
-        $('html').removeClass('launching');
-      }
       $('html').removeClass('loading').addClass('loaded');
     } else {
       $('html').removeClass('loaded').addClass('loading');
