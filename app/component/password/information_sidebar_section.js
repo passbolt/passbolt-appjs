@@ -46,8 +46,8 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * The password has been clicked.
    */
   '{element} li.password .secret-copy > a click': function() {
-    const secret = this.options.resource.secrets[0];
-    Plugin.decryptAndCopyToClipboard(secret.data);
+    const resource = this.options.resource;
+    Plugin.decryptSecretAndCopyToClipboard(resource.id);
   },
 
   /**

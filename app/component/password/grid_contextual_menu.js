@@ -123,8 +123,8 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    * Copy secret to clipboard
    */
   _copySecret: function() {
-    const secret = this.options.resource.secrets[0];
-    Plugin.decryptAndCopyToClipboard(secret.data);
+    const resourceId = this.options.resource.id;
+    Plugin.decryptSecretAndCopyToClipboard(resourceId);
     this.remove();
   },
 

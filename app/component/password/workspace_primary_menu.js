@@ -154,8 +154,8 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    * Decrypt and copy secret to clipboard
    */
   _copySecret: function() {
-    const secret = this.options.selectedResources[0].secrets[0];
-    Plugin.decryptAndCopyToClipboard(secret.data);
+    const resource = this.options.selectedResources[0];
+    Plugin.decryptSecretAndCopyToClipboard(resource.id);
   },
 
   /**

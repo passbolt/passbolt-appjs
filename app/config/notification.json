@@ -80,14 +80,14 @@
 				"msg": "The group has been deleted"
 			},
 			"secret_decrypt_error": {
-				"msg": "The secret cannot be decrypted"
+				"msg": "The secret cannot be decrypted. %message%"
 			},
 			"app_passwords_edit_error_not_found": {
 				"msg": "The password does not exist"
 			},
 			"app_passwords_delete_error_not_found": {
 				"msg": "The password does not exist"
-			},
+			}, 
 			"app_passwords_view_error_not_found": {
 				"msg": "The password does not exist"
 			},

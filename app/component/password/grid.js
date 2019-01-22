@@ -695,9 +695,8 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @param {HTMLEvent} ev The event which occurred
    */
   '{element} password_clicked': function(el, ev) {
-    const item = ev.data.item;
-    const secret = item.secrets[0];
-    Plugin.decryptAndCopyToClipboard(secret.data);
+    const resource = ev.data.item;
+    Plugin.decryptSecretAndCopyToClipboard(resource.id);
   },
 
   /**

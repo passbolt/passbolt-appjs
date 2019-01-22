@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3285: The url should be updated when the user is selecting a password
 - PASSBOLT-2995 As LU I should be able to copy the permalink of a password
 - PASSBOLT-3312: As GM adding a user to a group I should see a relevant feedback in case of network/proxy errors
+- PASSBOLT-3318: As LU I should retrieve a secret when I'm copying it
 
 ### Fixed
 - PASSBOLT-3268: BaseDN should not be mandatory

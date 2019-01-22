@@ -14,11 +14,11 @@
 
 class Plugin {
   /**
-   * Decrypt and copy to clipboard a secret
-   * @param {sting} secret The secret to decrypt and copy to clipboard
+   * Decrypt a secret and copy it to clipboard
+   * @param {string} resourceId The resource id to decrypt and copy the secret for
    */
-  static decryptAndCopyToClipboard(secret) {
-    this.send('passbolt.secret.decrypt', secret);
+  static decryptSecretAndCopyToClipboard(resourceId) {
+    this.send('passbolt.plugin.decrypt_secret_and_copy_to_clipboard', resourceId);
   }
 
   /**
