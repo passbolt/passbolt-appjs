@@ -22,6 +22,14 @@ class Plugin {
   }
 
   /**
+   * Request the plugin to insert the resource edit iframe
+   * @param {string} resource The target resource id
+   */
+  static insertResourceEditframe(resourceId) {
+    this.send('passbolt.plugin.resource_edit', resourceId);
+  }
+
+  /**
    * Request the plugin to insert the group edit iframe
    * @param {string} groupId The target group id
    * @param {boolean} canAddGroupUsers Is the current user can add members to this group

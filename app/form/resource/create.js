@@ -15,6 +15,7 @@ import domEvents from 'can-dom-events';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import MadBus from 'passbolt-mad/control/bus';
+import Plugin from 'app/util/plugin';
 import SecretCreateForm from 'app/form/secret/create';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 import User from 'app/model/map/user';
@@ -110,8 +111,8 @@ const CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
       });
     }
 
-    // Notify the plugin that the resource is ready to be edited.
-    MadBus.trigger('passbolt.plugin.resource_edition');
+    // Request the plugin to insert the secret iframe
+    Plugin.insertResourceEditframe(this.options.data.id);
 
     // Force focus on first element.
     setTimeout(() => {
