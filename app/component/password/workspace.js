@@ -610,29 +610,10 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Listen to the workspace request_export
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_export': function(el, ev) {
-    const type = ev.data.type;
-    const resources = this.options.grid.options.items;
-    const resourcesFormated = resources.reduce((carry, resource) =>  {
-      carry.push({
-        id: resource.id,
-        name: resource.name,
-        uri: resource.uri,
-        username: resource.username,
-        description: resource.description,
-        secrets: [{data: resource.secrets[0].data}]
-      });
-      return carry;
-    }, []);
-
-    const data = {
-      format: type,
-      resources: resourcesFormated
-    };
-    Plugin.send('passbolt.export-passwords', data);
+  '{mad.bus.element} request_export': function() {
+    const resourcesIds = this.options.selectedResources.reduce((carry, resource) =>  [...carry, resource.id], []);
+    Plugin.send('passbolt.plugin.export_resources', resourcesIds);
   },
 
   /**
