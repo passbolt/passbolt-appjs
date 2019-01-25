@@ -133,12 +133,13 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
       const exportButtonSelector = '#js_wk_menu_export_button';
       $(exportButtonSelector).removeClass('hidden');
       const exportButton = new Button(exportButtonSelector, {
+        state: {disabled: true},
         events: {
           click: () => this._export()
         }
       });
       exportButton.start();
-      this.options.exportButton = exportButton;
+      this.exportButton = exportButton;
     }
   },
 
@@ -258,6 +259,9 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     this.secretCopyButton.state.disabled = false;
     this.editButton.state.disabled = !canEdit;
     this.shareButton.state.disabled = !canAdmin;
+    if (Config.read('server.passbolt.plugins.export')) {
+      this.exportButton.state.disabled = false;
+    }
     this.moreButton.state.disabled = false;
     if (canEdit) {
       this.moreButton.enableItem(moreButtonDeleteItemId);
@@ -296,6 +300,11 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
       this.moreButton.enableItem(moreButtonCopyPermalinkItemId);
     }
 
+    // Enable the export button if it can be.
+    if (Config.read('server.passbolt.plugins.export')) {
+      this.exportButton.state.disabled = false;
+    }
+
     // The user can delete the resources
     if (canDelete) {
       this.moreButton.enableItem(moreButtonDeleteItemId);
@@ -329,6 +338,10 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
     this.editButton.state.disabled = true;
     this.shareButton.state.disabled = true;
     this.moreButton.state.disabled = true;
+    // Enable the export button if it can be.
+    if (Config.read('server.passbolt.plugins.export')) {
+      this.exportButton.state.disabled = true;
+    }
     this.moreButton.enableItem(moreButtonCopyLoginItemId);
     this.moreButton.enableItem(moreButtonCopySecretItemId);
     this.moreButton.enableItem(moreButtonCopyPermalinkItemId);
