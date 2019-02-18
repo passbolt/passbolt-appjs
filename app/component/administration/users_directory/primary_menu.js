@@ -30,6 +30,8 @@ const PrimaryMenu = Component.extend('passbolt.component.administration.ldap.Pri
     const disabled = this.options.settings ? !this.options.settings.isEnabled() : true;
     this.saveButton = new Button('#js-ldap-settings-save-button', {state: {disabled: true}});
     this.saveButton.start();
+    this.testButton = new Button('#js-ldap-settings-test-button', {state: {disabled: disabled}});
+    this.testButton.start();
     this.simulateButton = new Button('#js-ldap-settings-simulate-button', {state: {disabled}});
     this.simulateButton.start();
     this.synchronizeButton = new Button('#js-ldap-settings-synchronize-button', {state: {disabled}});

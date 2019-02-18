@@ -1,0 +1,93 @@
+{{<displayUserHtml}}
+    {{user.profile.first_name}} {{user.profile.last_name}} <em>({{user.username}})</em>
+{{/displayUserHtml}}
+
+{{<displayGroupHtml}}
+    {{group.name}}
+{{/displayGroupHtml}}
+
+{{<displayGroupObject}}
+<li class="group">{{>displayGroupHtml}}
+    <ul>
+    {{#each(group.users)}}
+        {{>displayUserObject}}
+    {{/each}}
+    {{#each(group.groups)}}
+        {{>displayGroupObject}}
+    {{/each}}
+    </ul>
+</li>
+{{/displayGroupObject}}
+
+{{<displayUserObject}}
+<li class="user">{{>displayUserHtml}}</li>
+{{/displayUserObject}}
+
+{{<displayEntity}}
+    {{#if(user)}}
+        {{>displayUserObject}}
+    {{/if}}
+    {{#if(group)}}
+        {{>displayGroupObject}}
+    {{/if}}
+{{/displayEntity}}
+
+<div class="ldap-test-settings-report">
+    <p>
+        {{#if(usersCount)}}{{ usersCount }} user(s){{#if(groupsCount)}} and{{/if}}{{/if}}
+        {{#if(groupsCount)}}{{ groupsCount }} group(s){{/if}}
+        {{# eq(totalCount, 0)}}No results{{/eq}}
+        have been found.
+    </p>
+
+    {{#if(totalCount)}}
+    <div class="accordion entities-list closed">
+        <div class="accordion-header">
+            <a role="link">{{__('See list')}}</a>
+        </div>
+        <div class="accordion-content hidden" style="display: none;">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>{{__('Groups')}}</td>
+                        <td>{{__('Users')}}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        {{#each(groups)}}
+                            {{>displayGroupHtml}}<br>
+                        {{/each}}
+                        </td>
+                        <td>
+                        {{#each(users)}}
+                            {{>displayUserHtml}}<br>
+                        {{/each}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="accordion entities-structure closed">
+        <div class="accordion-header">
+            <a role="link">{{__('See structure')}}</a>
+        </div>
+        <div class="accordion-content hidden" style="display: none;">
+            <div class="directory-structure">
+                <ul>
+                    <li class="group">
+                        {{__('Root')}}
+                        <ul>
+                            {{#each(tree)}}
+                                {{>displayEntity}}
+                            {{/each}}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>
+

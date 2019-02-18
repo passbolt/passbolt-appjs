@@ -118,6 +118,18 @@ UsersDirectorySettings.prototype.isEnabled = function() {
   if (this.domain_name) {
     return true;
   }
+  return false;
+};
+
+/**
+ * Test settings and return retrieved objects.
+ */
+UsersDirectorySettings.prototype.testSettings = function(params) {
+  return Ajax.request({
+    url: 'directorysync/settings/test.json?api-version=v2',
+    type: 'POST',
+    params: params
+  });
 };
 
 UsersDirectorySettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {

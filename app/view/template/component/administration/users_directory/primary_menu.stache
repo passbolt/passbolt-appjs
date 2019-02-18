@@ -5,6 +5,12 @@
 	</a>
 </li>
 <li>
+	<a id="js-ldap-settings-test-button" class="button disabled" disabled="disabled">
+		<i class="fa fa-fw fa-plug"></i>
+		<span>{{__('test settings')}}</span>
+	</a>
+</li>
+<li>
 	<a id="js-ldap-settings-simulate-button" class="button disabled" disabled="disabled">
 		<i class="fa fa-fw fa-magic"></i>
 		<span>{{__('simulate synchronize')}}</span>

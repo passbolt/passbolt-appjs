@@ -26,7 +26,9 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
   defaults: {
     template: template,
     silentLoading: false,
-    loadedOnStart: false
+    loadedOnStart: false,
+    defaultAdmin: null,
+    defaultGroupAdmin: null,
   }
 
 }, /** @prototype */ {
@@ -46,6 +48,14 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
   afterStart: function() {
     this._initForm(this.usersDirectorySettings);
     this._super();
+  },
+
+  /**
+   * Check if the form is enabled.
+   * @return {boolean|*}
+   */
+  isEnabled: function() {
+    return this.enabled;
   },
 
   /**
@@ -71,6 +81,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     this._enableFormFields();
     this._initChoosenFields();
     this.state.loaded = true;
+    this.enabled = usersDirectorySettings.isEnabled();
   },
 
   /**
@@ -99,9 +110,13 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
    * After the form is loaded
    */
   _initChoosenFields: function() {
-    $('#js-connection-connection-type-input').chosen({width: '100%', disable_search: true}).change(() => {
-      const value = $('#js-connection-connection-type-input').val();
-      domEvents.dispatch($('#js-connection-connection-type-input')[0], {type: 'changed', data: {value}});
+    const $connectionChosenField = $('#js-connection-connection-type-input');
+    const $adminChosenField = $('#js-default-user-select');
+    const $groupAdminChosenField = $('#js-default-group-admin-user-select');
+
+    $connectionChosenField.chosen({width: '100%', disable_search: true}).change(() => {
+      const value = $connectionChosenField.val();
+      domEvents.dispatch($connectionChosenField[0], {type: 'changed', data: {value}});
     });
 
     const admins = this.users.filter(user => user.role.name == 'admin').reduce((carry, user) => {
@@ -109,22 +124,26 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
       return carry;
     }, {});
     this.defaultUserDropdown.setAvailableValues(admins);
-    this.defaultUserDropdown.setValue(this.usersDirectorySettings.default_user); // @dirty, the dropdown refresh function removes the value of the element
-    $('#js-default-user-select').chosen({width: '80%'}).change(() => {
-      const value = $('#js-default-user-select').val();
-      domEvents.dispatch($('#js-default-user-select')[0], {type: 'changed', data: {value}});
+    const defaultAdmin = (this.usersDirectorySettings.default_user ? this.usersDirectorySettings.default_user : this.options.defaultAdmin);
+    this.defaultUserDropdown.setValue(defaultAdmin);
+    $adminChosenField.chosen({width: '80%'}).change(() => {
+      const value = $adminChosenField.val();
+      domEvents.dispatch($adminChosenField[0], {type: 'changed', data: {value}});
     });
+    $adminChosenField.val(defaultAdmin).trigger('chosen:updated');
 
     const users = this.users.reduce((carry, user) => {
       carry[user.id] = `${user.profile.fullName()} (${user.username})`;
       return carry;
     }, {});
     this.defaultGroupAdminUserDropdown.setAvailableValues(users);
-    this.defaultGroupAdminUserDropdown.setValue(this.usersDirectorySettings.default_group_admin_user); // @dirty, the dropdown refresh function removes the value of the element
-    $('#js-default-group-admin-user-select').chosen({width: '80%'}).change(() => {
-      const value = $('#js-default-group-admin-user-select').val();
-      domEvents.dispatch($('#js-default-group-admin-user-select')[0], {type: 'changed', data: {value}});
+    const defaultGroupAdmin = (this.usersDirectorySettings.default_group_admin_user ? this.usersDirectorySettings.default_group_admin_user : this.options.defaultGroupAdmin);
+    this.defaultGroupAdminUserDropdown.setValue(defaultGroupAdmin); // @dirty, the dropdown refresh function removes the value of the element
+    $groupAdminChosenField.chosen({width: '80%'}).change(() => {
+      const value = $groupAdminChosenField.val();
+      domEvents.dispatch($groupAdminChosenField[0], {type: 'changed', data: {value}});
     });
+    $groupAdminChosenField.val(defaultGroupAdmin).trigger('chosen:updated');
   },
 
   /**
@@ -355,6 +374,17 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     );
   },
 
+  showFieldsForDirectoryType: function(directoryType) {
+    $('.section-directory-configuration .accordion-content div.input, .section-sync-options .accordion-content div.input')
+    .each(function(i, elt) {
+      if (!$(elt).hasClass(directoryType)) {
+        $(elt).hide();
+      } else {
+        $(elt).show();
+      }
+    });
+  },
+
   /**
    * Listen when the user enable the users directory.
    * @param {HTMLElement} el The element the event occurred on
@@ -367,6 +397,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     } else {
       $('.ldap-settings').removeClass('enabled');
     }
+    this.enabled = enabled;
   }
 
 });

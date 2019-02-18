@@ -27,6 +27,7 @@ import template from 'app/view/template/component/administration/users_directory
 import templateItemBreadcrumb from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
 import templateSynchronizeReport from 'app/view/template/component/administration/users_directory/synchronize_report.stache!';
 import templateSynchronizeSimulationReport from 'app/view/template/component/administration/users_directory/synchronize_simulation_report.stache!';
+import templateTestSettingsReport from 'app/view/template/component/administration/users_directory/test_settings_report.stache!';
 import User from 'app/model/map/user';
 
 const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.administration.users_directory.UsersDirectorySettings', /** @static */ {
@@ -104,7 +105,22 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
    * @private
    */
   _initForm: function() {
-    this.form = new UsersDirectorySettingsForm('#js-ldap-settings-form');
+    // Default values for admin and group admin fields.
+    const currentUser = User.getCurrent();
+    let defaultAdmin = null;
+    let defaultGroupAdmin = null;
+    if (currentUser.isAdmin()) {
+      defaultAdmin = currentUser.id;
+      defaultGroupAdmin = currentUser.id;
+    }
+
+    this.form = new UsersDirectorySettingsForm(
+      '#js-ldap-settings-form',
+      {
+        defaultAdmin: defaultAdmin,
+        defaultGroupAdmin: defaultGroupAdmin
+      }
+    );
     this.addLoadedDependency(this.form);
     this.form.start();
   },
@@ -123,11 +139,37 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
         this.users = users;
         this.form.loadForm(this.usersDirectorySettings, this.users);
         this._initPrimaryMenu();
+        this._afterLoading();
       })
     } else {
       this.form.loadForm(this.usersDirectorySettings, this.users);
       this._initPrimaryMenu();
+      this._afterLoading();
     }
+  },
+
+  /**
+   * After loading actions.
+   * Must be executed last, once everything else is loaded.
+   * @private
+   */
+  _afterLoading: function() {
+    const self = this;
+
+    // Close the accordion that have to be closed.
+    // This has to be done once everything is loaded to avoid issues with other components (mainly chosen.js).
+    $('.accordion.default-closed', this.element).addClass('closed');
+
+    // Display / hide corresponding fields for directory type.
+    // self.form.showFieldsForDirectoryType(self.form.directoryTypeRadio.element);
+    const selectedDirectory = ($('input[checked=checked]', self.form.directoryTypeRadio.element).val());
+    self.form.showFieldsForDirectoryType(selectedDirectory);
+
+    // Listen on the on change event on directory type.
+    // When it changes, hide / show corresponding fields.
+    $(self.form.directoryTypeRadio.element).on('change', function(elt) {
+      self.form.showFieldsForDirectoryType(elt.target.value);
+    });
   },
 
   /**
@@ -217,6 +259,27 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       });
   },
 
+  /**
+   * Scroll page until the first error.
+   * @private
+   */
+  _scrollToFirstError: function() {
+    const errorEltSelector = 'div.error';
+
+    // In case of errors in an accordion, open it so the user can see it.
+    $('.accordion-content:hidden').each(function(i, $elt){
+      if($(errorEltSelector, $elt).length) {
+        $($elt).toggle();
+      }
+    });
+
+    // Scroll down to first visible error.
+    const $firstError = $(errorEltSelector + ':first');
+    if($firstError.length) {
+      $('.workspace-main > .grid').animate({scrollTop: $firstError.position().top}, 500, 'swing');
+    }
+  },
+
  /**
    * Display the synchronize simulation report
    * 
@@ -226,7 +289,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   {
     const synchronizeReportDialog = ConfirmDialogComponent.instantiate({
       label: __('Synchronize report'),
-      subtitle: __('The operation was successfull.'),
+      subtitle: __('The operation was successful.'),
       content: templateSynchronizeReport,
       submitButton: {
         label: 'OK',
@@ -250,11 +313,57 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   },
 
   /**
+   * Toggle accordion element.
+   * @param elt top accordion element
+   * @private
+   */
+  _toggleAccordion: function(elt) {
+    const isClosed = elt.hasClass('closed');
+    $('.accordion-content', elt).toggle();
+    if (isClosed) {
+      elt.removeClass('closed');
+    } else {
+      elt.addClass('closed');
+    }
+  },
+
+  /**
+   * Display the test settings report
+   *
+   * @param {object} report The report
+   */
+  _showTestSettingsReport: function(data)
+  {
+    const testSettingsReportDialog = ConfirmDialogComponent.instantiate({
+      label: __('Test settings report'),
+      subtitle: __('A connection could be established. Well done!'),
+      content: templateTestSettingsReport,
+      submitButton: {
+        label: 'OK',
+        cssClasses: ['primary']
+      },
+      cancelButton: {
+        cssClasses: ['hidden']
+      },
+      action: () => testSettingsReportDialog.destroyAndRemove()
+    });
+
+    testSettingsReportDialog.setViewData('users', data.users);
+    testSettingsReportDialog.setViewData('usersCount', data.users.length);
+    testSettingsReportDialog.setViewData('groups', data.groups);
+    testSettingsReportDialog.setViewData('groupsCount', data.groups.length);
+    testSettingsReportDialog.setViewData('totalCount', data.groups.length + data.groups.length);
+    testSettingsReportDialog.setViewData('tree', data.tree);
+    testSettingsReportDialog.start();
+  },
+
+  /**
    * Listen when the form is updated.
-   * When the form is updated enable the save settings button
+   * When the form is updated enable the save settings and test settings button
    */
   '#js-ldap-settings-form changed': function() {
     this.primaryMenu.saveButton.state.disabled = false;
+    this.primaryMenu.testButton.state.disabled = !this.form.isEnabled();
   },
 
   /**
@@ -273,9 +382,10 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
 
   /**
    * Observe when accordion-header is clicked.
+   * Toggle element accordingly.
    */
-  '{window} .operation-details .accordion-header click': function() {
-    $('.operation-details .accordion-content').toggle();
+  '{window} .accordion-header click': function(elt) {
+    this._toggleAccordion($(elt).parent('.accordion'));
   },
 
   /**
@@ -295,6 +405,8 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
               status: 'success',
             });
           });
+      } else {
+        this._scrollToFirstError();
       }
     } else {
       this.usersDirectorySettings.destroy()
@@ -304,7 +416,27 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
           this.refresh();
         });
     }
+  },
+
+  /**
+   * Listen when the user want to save the changes.
+   */
+  '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-test-button click': function() {
+    const data = this.form.getData();
+    if (data.UsersDirectorySettings.enabled) {
+      if (this.form.validate()) {
+        this.usersDirectorySettings.assign(data.UsersDirectorySettings);
+        this.usersDirectorySettings.testSettings(data.UsersDirectorySettings)
+        .then((data) => {
+          this._showTestSettingsReport(data);
+        });
+      }
+      else {
+        this._scrollToFirstError();
+      }
+    }
   }
+
 });
 
 export default UsersDirectorySettingsAdmin;
