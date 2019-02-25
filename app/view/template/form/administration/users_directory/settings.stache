@@ -31,14 +31,14 @@
                 </div>
             </div>
             <div class="singleline clearfix">
-                <div class="input text first-field js_form_element_wrapper required ad openldap">
+                <div class="input text first-field js_form_element_wrapper ad openldap">
                     <label>{{__('Username')}}</label>
-                    <input id="js-username-input" type="text" class="required fluid" placeholder="username">
+                    <input id="js-username-input" type="text" class="fluid" placeholder="username">
                     <div id="js-username-input-feedback" class="message"></div>
                 </div>
-                <div class="input text last-field js_form_element_wrapper required ad openldap">
+                <div class="input text last-field js_form_element_wrapper ad openldap">
                     <label>{{__('Password')}}</label>
-                    <input id="js-password-input" type="{{#if(edit}}text{{#else}}password{{/if}}" class="required fluid" placeholder="password">
+                    <input id="js-password-input" type="{{#if(edit}}text{{#else}}password{{/if}}" class="fluid" placeholder="password">
                     <div id="js-password-input-feedback" class="message"></div>
                 </div>
             </div>

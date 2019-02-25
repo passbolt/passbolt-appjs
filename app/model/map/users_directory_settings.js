@@ -73,11 +73,9 @@ UsersDirectorySettings.validationRules = {
     {rule: 'num', message: __('The port should be a valid integer.')}
   ],
   username: [
-    {rule: 'required', message: __('A username is required.')},
     {rule: 'utf8', message: __('The username should be a valid utf8 string.')}
   ],
   password: [
-    {rule: 'required', message: __('A password is required.')},
     {rule: 'utf8', message: __('The password should be a valid utf8 string.')}
   ],
   base_dn: [
