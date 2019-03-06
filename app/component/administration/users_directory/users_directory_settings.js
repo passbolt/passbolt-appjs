@@ -44,7 +44,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   init: function(el, options) {
     this._super(el, options);
     this.usersDirectorySettings = null;
-    this.users = null
+    this.users = null;
   },
 
   /**
@@ -132,15 +132,15 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   _getSettingsAndLoad: function() {
     if (!this.usersDirectorySettings) {
       return UsersDirectorySettings.findOne()
-      .then(usersDirectorySettings => {
-        this.usersDirectorySettings = usersDirectorySettings;
-      }).then(() => User.findAll({contain: {profile: 1}}))
-      .then(users => {
-        this.users = users;
-        this.form.loadForm(this.usersDirectorySettings, this.users);
-        this._initPrimaryMenu();
-        this._afterLoading();
-      })
+        .then(usersDirectorySettings => {
+          this.usersDirectorySettings = usersDirectorySettings;
+        }).then(() => User.findAll({contain: {profile: 1}}))
+        .then(users => {
+          this.users = users;
+          this.form.loadForm(this.usersDirectorySettings, this.users);
+          this._initPrimaryMenu();
+          this._afterLoading();
+        });
     } else {
       this.form.loadForm(this.usersDirectorySettings, this.users);
       this._initPrimaryMenu();
@@ -156,18 +156,24 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   _afterLoading: function() {
     const self = this;
 
-    // Close the accordion that have to be closed.
-    // This has to be done once everything is loaded to avoid issues with other components (mainly chosen.js).
+    /*
+     * Close the accordion that have to be closed.
+     * This has to be done once everything is loaded to avoid issues with other components (mainly chosen.js).
+     */
     $('.accordion.default-closed', this.element).addClass('closed');
 
-    // Display / hide corresponding fields for directory type.
-    // self.form.showFieldsForDirectoryType(self.form.directoryTypeRadio.element);
+    /*
+     * Display / hide corresponding fields for directory type.
+     * self.form.showFieldsForDirectoryType(self.form.directoryTypeRadio.element);
+     */
     const selectedDirectory = ($('input[checked=checked]', self.form.directoryTypeRadio.element).val());
     self.form.showFieldsForDirectoryType(selectedDirectory);
 
-    // Listen on the on change event on directory type.
-    // When it changes, hide / show corresponding fields.
-    $(self.form.directoryTypeRadio.element).on('change', function(elt) {
+    /*
+     * Listen on the on change event on directory type.
+     * When it changes, hide / show corresponding fields.
+     */
+    $(self.form.directoryTypeRadio.element).on('change', elt => {
       self.form.showFieldsForDirectoryType(elt.target.value);
     });
   },
@@ -183,13 +189,13 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
 
   /**
    * Show the progress dialog
-   * 
+   *
    * @param {string} title the dialog title
    * @return ProgressDialog
    */
   _showProgressDialog: function(title) {
     const label = title;
-    const progressDialog = ProgressDialog.instantiate({label});
+    const progressDialog = ProgressDialog.instantiate({label: label});
     progressDialog.start();
 
     return progressDialog;
@@ -197,13 +203,13 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
 
   /**
    * Synchronize simulation.
-   * 
+   *
    * @return Promise
    */
   _synchronizeSimulation: function() {
     const progressDialog = this._showProgressDialog(__('Synchronize simulation'));
     return UsersDirectoryService.dryRunSynchronize()
-      .then(report => { 
+      .then(report => {
         progressDialog.destroyAndRemove();
         this._showSynchronizeSimulationReport(report);
       }, () => {
@@ -213,11 +219,10 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
 
   /**
    * Display the synchronize simulation report
-   * 
+   *
    * @param {object} report The report
    */
-  _showSynchronizeSimulationReport: function(report)
-  {
+  _showSynchronizeSimulationReport: function(report) {
     const simulateReportDialog = ConfirmDialogComponent.instantiate({
       label: __('Synchronize simulation report'),
       subtitle: __('The operation was successfull.'),
@@ -238,20 +243,20 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
     simulateReportDialog.setViewData('groupsError', report.getGroupsError().length);
     simulateReportDialog.setViewData('resourcesSynchronized', (report.getUsersSynchronized().length + report.getGroupsSynchronized().length) == 0);
     simulateReportDialog.start();
-    
+
     // Display the full report once the format is defined.
     $('textarea', simulateReportDialog.element).text(report.toText());
   },
 
   /**
    * Synchronize simulation.
-   * 
+   *
    * @return Promise
    */
   _synchronize: function() {
     const progressDialog = this._showProgressDialog(__('Synchronize'));
     return UsersDirectoryService.synchronize()
-      .then(report => { 
+      .then(report => {
         progressDialog.destroyAndRemove();
         this._showSynchronizeReport(report);
       }, () => {
@@ -267,26 +272,25 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
     const errorEltSelector = 'div.error';
 
     // In case of errors in an accordion, open it so the user can see it.
-    $('.accordion-content:hidden').each(function(i, $elt){
-      if($(errorEltSelector, $elt).length) {
+    $('.accordion-content:hidden').each((i, $elt) => {
+      if ($(errorEltSelector, $elt).length) {
         $($elt).toggle();
       }
     });
 
     // Scroll down to first visible error.
-    const $firstError = $(errorEltSelector + ':first');
-    if($firstError.length) {
+    const $firstError = $(`${errorEltSelector}:first`);
+    if ($firstError.length) {
       $('.workspace-main > .grid').animate({scrollTop: $firstError.position().top}, 500, 'swing');
     }
   },
 
- /**
+  /**
    * Display the synchronize simulation report
-   * 
+   *
    * @param {object} report The report
    */
-  _showSynchronizeReport: function(report)
-  {
+  _showSynchronizeReport: function(report) {
     const synchronizeReportDialog = ConfirmDialogComponent.instantiate({
       label: __('Synchronize report'),
       subtitle: __('The operation was successful.'),
@@ -307,7 +311,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
     synchronizeReportDialog.setViewData('groupsError', report.getGroupsError().length);
     synchronizeReportDialog.setViewData('resourcesSynchronized', (report.getUsersSynchronized().length + report.getGroupsSynchronized().length) == 0);
     synchronizeReportDialog.start();
-    
+
     // Display the full report once the format is defined.
     $('textarea', synchronizeReportDialog.element).text(report.toText());
   },
@@ -332,8 +336,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
    *
    * @param {object} report The report
    */
-  _showTestSettingsReport: function(data)
-  {
+  _showTestSettingsReport: function(data) {
     const testSettingsReportDialog = ConfirmDialogComponent.instantiate({
       label: __('Test settings report'),
       subtitle: __('A connection could be established. Well done!'),
@@ -375,7 +378,7 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
 
   /**
    * Listen when the user want to synchronize.
-   */ 
+   */
   '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-synchronize-button click': function() {
     this._synchronize();
   },
@@ -427,11 +430,10 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       if (this.form.validate()) {
         this.usersDirectorySettings.assign(data.UsersDirectorySettings);
         this.usersDirectorySettings.testSettings(data.UsersDirectorySettings)
-        .then((data) => {
-          this._showTestSettingsReport(data);
-        });
-      }
-      else {
+          .then(data => {
+            this._showTestSettingsReport(data);
+          });
+      } else {
         this._scrollToFirstError();
       }
     }

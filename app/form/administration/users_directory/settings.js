@@ -116,7 +116,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     $connectionChosenField.chosen({width: '100%', disable_search: true}).change(() => {
       const value = $connectionChosenField.val();
-      domEvents.dispatch($connectionChosenField[0], {type: 'changed', data: {value}});
+      domEvents.dispatch($connectionChosenField[0], {type: 'changed', data: {value: value}});
     });
 
     const admins = this.users.filter(user => user.role.name == 'admin').reduce((carry, user) => {
@@ -128,7 +128,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     this.defaultUserDropdown.setValue(defaultAdmin);
     $adminChosenField.chosen({width: '80%'}).change(() => {
       const value = $adminChosenField.val();
-      domEvents.dispatch($adminChosenField[0], {type: 'changed', data: {value}});
+      domEvents.dispatch($adminChosenField[0], {type: 'changed', data: {value: value}});
     });
     $adminChosenField.val(defaultAdmin).trigger('chosen:updated');
 
@@ -141,7 +141,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     this.defaultGroupAdminUserDropdown.setValue(defaultGroupAdmin); // @dirty, the dropdown refresh function removes the value of the element
     $groupAdminChosenField.chosen({width: '80%'}).change(() => {
       const value = $groupAdminChosenField.val();
-      domEvents.dispatch($groupAdminChosenField[0], {type: 'changed', data: {value}});
+      domEvents.dispatch($groupAdminChosenField[0], {type: 'changed', data: {value: value}});
     });
     $groupAdminChosenField.val(defaultGroupAdmin).trigger('chosen:updated');
   },
@@ -376,13 +376,13 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
   showFieldsForDirectoryType: function(directoryType) {
     $('.section-directory-configuration .accordion-content div.input, .section-sync-options .accordion-content div.input')
-    .each(function(i, elt) {
-      if (!$(elt).hasClass(directoryType)) {
-        $(elt).hide();
-      } else {
-        $(elt).show();
-      }
-    });
+      .each((i, elt) => {
+        if (!$(elt).hasClass(directoryType)) {
+          $(elt).hide();
+        } else {
+          $(elt).show();
+        }
+      });
   },
 
   /**

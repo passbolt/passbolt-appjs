@@ -26,7 +26,7 @@ const PrimaryMenu = Component.extend('passbolt.component.administration.mfa.Prim
    * @inheritdoc
    */
   afterStart: function() {
-    this.saveButton = new Button('#js-mfa-settings-save-button', {state: {disabled: true}})
+    this.saveButton = new Button('#js-mfa-settings-save-button', {state: {disabled: true}});
     this.saveButton.start();
   }
 

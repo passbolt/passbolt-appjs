@@ -393,7 +393,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         const formData = this.formGroup.getData();
         const groupJson = {name: formData['Group']['name']};
 
-        MadBus.trigger('passbolt_loading'); 
+        MadBus.trigger('passbolt_loading');
         Plugin.groupEditIframeSave(groupJson);
 
         this.state.loaded = false;
@@ -523,7 +523,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
       }
     } else {
       // If error with something else, log it in console.
-      console.error('Unknown error while saving group', errorResponse); 
+      console.error('Unknown error while saving group', errorResponse);
     }
 
     // Complete loading bar.
@@ -531,7 +531,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
     MadBus.trigger('passbolt_notify', {
       status: 'error',
       title: 'app_groups_add_error',
-      message: errorResponse.header.message, 
+      message: errorResponse.header.message,
       data: errorResponse
     });
 

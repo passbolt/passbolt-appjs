@@ -105,7 +105,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Filter}
    */
   getFilter: function() {
-    let filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+    const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
     filter.viewResourceId = null;
 
     const action = route.data.action;

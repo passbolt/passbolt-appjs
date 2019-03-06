@@ -25,8 +25,10 @@ route.register('/app/groups/edit/{id}', {controller: 'User', action: 'groupEdit'
 route.register('/app/groups/view/{id}', {controller: 'User', action: 'groupView'});
 route.register('/app/groups/view/{id}/membership', {controller: 'User', action: 'groupViewMembership'});
 
-// Passwords routes
-//route.register('/app/passwords/view/{id}/comments', {controller: 'Password', action: 'commentsView'});
+/*
+ * Passwords routes
+ *route.register('/app/passwords/view/{id}/comments', {controller: 'Password', action: 'commentsView'});
+ */
 route.register('/app/passwords/view/{id}', {controller: 'Password', action: 'view'});
 //route.register('/app/passwords/edit/{id}', {controller: 'Password', action: 'edit'});
 route.register('/app/passwords', {controller: 'Password', action: 'index'});

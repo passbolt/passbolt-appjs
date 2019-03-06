@@ -85,7 +85,7 @@ UsersDirectoryReport.prototype.hasError = function() {
 
 /**
  * To text
- * 
+ *
  * @return {string}
  */
 UsersDirectoryReport.prototype.toText = function() {
@@ -104,21 +104,21 @@ UsersDirectoryReport.prototype.toText = function() {
     text += '\n';
     text += 'Synchronized:\n';
     usersSynchronized.forEach(user => {
-      text += '- ' + user.message + '\n';
+      text += `- ${user.message}\n`;
     });
   }
   if (usersError.length) {
     text += '\n';
     text += 'Errors:\n';
     usersError.forEach(user => {
-      text += '- ' + user.message + '\n';
+      text += `- ${user.message}\n`;
     });
   }
   if (usersIgnored.length) {
     text += '\n';
     text += 'Ignored:\n';
     usersIgnored.forEach(user => {
-      text += '- ' + user.message + '\n';
+      text += `- ${user.message}\n`;
     });
   }
   if (!usersSynchronized.length && !usersError.length && !usersIgnored.length) {
@@ -134,21 +134,21 @@ UsersDirectoryReport.prototype.toText = function() {
     text += '\n';
     text += 'Synchronized:\n';
     groupsSynchronized.forEach(group => {
-      text += '- ' + group.message + '\n';
+      text += `- ${group.message}\n`;
     });
   }
   if (groupsError.length) {
     text += '\n';
     text += 'Errors:\n';
     groupsError.forEach(group => {
-      text += '- ' + group.message + '\n';
+      text += `- ${group.message}\n`;
     });
   }
   if (groupsIgnored.length) {
     text += '\n';
     text += 'Ignored:\n';
     groupsIgnored.forEach(group => {
-      text += '- ' + group.message + '\n';
+      text += `- ${group.message}\n`;
     });
   }
   if (!groupsSynchronized.length && !groupsError.length && !groupsIgnored.length) {

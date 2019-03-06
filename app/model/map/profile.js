@@ -45,7 +45,7 @@ DefineMap.setReference('Profile', Profile);
  * @return {string}
  */
 Profile.fullName = function(profile) {
-  const fullName = profile.first_name + ' ' + profile.last_name;
+  const fullName = `${profile.first_name} ${profile.last_name}`;
   return fullName;
 };
 

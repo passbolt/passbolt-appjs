@@ -359,7 +359,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       .then(() => this._selectResourceBySettings(filter))
       .then(() => {
         this._applyingFilter = false;
-      }); 
+      });
   },
 
   /**

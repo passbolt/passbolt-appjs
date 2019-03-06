@@ -44,7 +44,7 @@ const UsersDirectorySettings = DefineMap.extend('passbolt.model.UsersDirectorySe
   user_object_class: 'string',
   default_user: 'string',
   default_group_admin_user: 'string',
-  groups_parent_group: 'string', 
+  groups_parent_group: 'string',
   users_parent_group: 'string',
   enabled_users_only: 'boolean',
   sync_users_create: 'boolean',

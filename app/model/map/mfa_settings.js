@@ -53,7 +53,7 @@ MfaSettings.validationRules = {
   ],
   yubikey_secret_key: [
     {rule: 'required', message: __('A secret key is required.')},
-    {rule:'/^[a-zA-Z0-9\/=]{10,128}$/', message: __('This secret key is not valid.')}
+    {rule: '/^[a-zA-Z0-9\/=]{10,128}$/', message: __('This secret key is not valid.')}
   ],
   duo_host_name: [
     {rule: 'required', message: __('A hostname is required.')},

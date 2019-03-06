@@ -13,10 +13,8 @@
  */
 
 import ActionLogDetail from 'app/model/action_log_detail/action_log_detail';
-import User from "../map/user";
 import Group from "../map/group";
 import Profile from "../map/profile";
-import Permission from "../map/permission";
 import PermissionType from "../map/permission_type";
 
 class PermissionUpdatedDetail extends ActionLogDetail {
@@ -49,10 +47,9 @@ class PermissionUpdatedDetail extends ActionLogDetail {
       } else if (permission.group) {
         return Group.avatarPath(permission.group);
       }
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
-
   }
 
   /**
@@ -75,7 +72,7 @@ class PermissionUpdatedDetail extends ActionLogDetail {
    * @param permission
    */
   mapPermission(permission) {
-    let res = {};
+    const res = {};
 
     if (permission.user) {
       res['user'] = permission.user;
@@ -91,8 +88,8 @@ class PermissionUpdatedDetail extends ActionLogDetail {
     res['full_name'] = this.getPermissionFullName(res);
 
     if (permission.type === PermissionType.READ || permission.type === PermissionType.UPDATE) {
-      res['type_human_readable'] = __('can') + ' ' + PermissionType.PERMISSION_TYPES[permission.type];
-    } else if(permission.type === PermissionType.ADMIN) {
+      res['type_human_readable'] = `${__('can')} ${PermissionType.PERMISSION_TYPES[permission.type]}`;
+    } else if (permission.type === PermissionType.ADMIN) {
       res['type_human_readable'] = __('is admin');
     } else {
       res['type_human_readable'] = __('unknown');
@@ -107,19 +104,19 @@ class PermissionUpdatedDetail extends ActionLogDetail {
    */
   mapPermissions(permissions) {
     try {
-      let self = this;
-      permissions.added.forEach(function(added) {
-        let perm = self.mapPermission(added);
+      const self = this;
+      permissions.added.forEach(added => {
+        const perm = self.mapPermission(added);
         perm['action_type'] = 'created';
         self.added.push(perm);
       });
-      permissions.updated.forEach(function(updated) {
-        let perm = self.mapPermission(updated);
+      permissions.updated.forEach(updated => {
+        const perm = self.mapPermission(updated);
         perm['action_type'] = 'updated';
         self.updated.push(perm);
       });
-      permissions.removed.forEach(function(removed) {
-        let perm = self.mapPermission(removed);
+      permissions.removed.forEach(removed => {
+        const perm = self.mapPermission(removed);
         perm['action_type'] = 'removed';
         self.removed.push(perm);
       });

@@ -56,7 +56,7 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
   /**
    * Init the primary sidebar.
    */
-  _initPrimarySidebar: function () {
+  _initPrimarySidebar: function() {
     const plugins = Config.read('server.passbolt.plugins');
     const menu = new MenuComponent('#js_wk_administration_menu', {});
     menu.start();

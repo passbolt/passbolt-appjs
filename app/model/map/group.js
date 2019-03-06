@@ -129,7 +129,7 @@ Group.findView = function(id) {
  * @param group
  * @return {string}
  */
-Group.avatarPath = function(group) {
+Group.avatarPath = function() {
   return 'img/avatar/group_default.png';
 };
 
