@@ -25,7 +25,7 @@ const Profile = DefineMap.extend('passbolt.model.Profile', {
    * @return {string}
    */
   fullName: function() {
-    return `${this.first_name} ${this.last_name}`;
+    return Profile.fullName(this);
   },
 
   /**
@@ -34,14 +34,34 @@ const Profile = DefineMap.extend('passbolt.model.Profile', {
    * @return {string} The image path
    */
   avatarPath: function(version) {
-    if (typeof this.avatar != 'undefined' && this.avatar.url != undefined) {
-      return this.avatar.imagePath(version);
-    } else {
-      return 'img/avatar/user.png';
-    }
+    return Profile.avatarPath(this, version);
   }
 });
 DefineMap.setReference('Profile', Profile);
+
+/**
+ * Get full name.
+ * @param profile
+ * @return {string}
+ */
+Profile.fullName = function(profile) {
+  const fullName = profile.first_name + ' ' + profile.last_name;
+  return fullName;
+};
+
+/**
+ * Get avatar path.
+ * @param profile
+ * @param version
+ * @return {*}
+ */
+Profile.avatarPath = function(profile, version) {
+  if (typeof profile.avatar != 'undefined' && profile.avatar.url != undefined) {
+    return profile.avatar.imagePath(version);
+  } else {
+    return 'img/avatar/user.png';
+  }
+};
 
 /*
  * Default validation rules.

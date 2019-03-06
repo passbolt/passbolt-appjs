@@ -1,0 +1,61 @@
+{{<displayUserAction}}
+    <div class="name"><a href="">{{ mappedItem.creatorName }}</a> {{mappedItem.label}} <a href="{{mappedItem.resource.permalink}}">{{mappedItem.resource.name}}</a></div>
+    <div class="subinfo">{{ getTimeAgo(mappedItem.created) }}</div>
+{{/displayUserAction}}
+
+{{<displayDetails}}
+{{#switch(mappedItem.type)}}
+    {{#case('Permissions.updated')}}
+        {{>displayPermissionsDetails}}
+    {{/case}}
+{{/switch}}
+{{/displayDetails}}
+
+{{<displayPermissionsDetails}}
+    <ul class="permissions-list">
+    {{#each(mappedItem.data.added)}}
+        <li class="clearfix">{{>displayPermission}}</li>
+    {{/each}}
+    {{#each(mappedItem.data.updated)}}
+        <li class="clearfix">{{>displayPermission}}</li>
+    {{/each}}
+    {{#each(mappedItem.data.removed)}}
+        <li class="clearfix">{{>displayPermission}}</li>
+    {{/each}}
+    </ul>
+{{/displayPermissionsDetails}}
+
+{{<displayPermission}}
+    <div class="avatar">
+        <img src="{{aro_avatar_path}}">
+    </div>
+    <div class="name{{# eq(action_type, 'removed') }} crossed {{/eq}}">
+    {{full_name}}
+    <span class="permission-type"> - {{type_human_readable}}</span>
+    </div>
+    <div class="type"><span class="{{action_type}}">
+    {{#switch(action_type)}}
+        {{#case('created')}}
+            new
+        {{/case}}
+        {{#case('updated')}}
+            updated
+        {{/case}}
+        {{#case('removed')}}
+            deleted
+        {{/case}}
+    {{/switch}}
+    </span></div>
+{{/displayPermission}}
+
+<li class="action-log-wrapper usercard-detailed-col-2" id="{{ mappedItem.id }}">
+	<div class="content-wrapper action-log">
+        <div class="content">
+            {{>displayUserAction}}
+            {{>displayDetails}}
+        </div>
+	</div>
+	<div class="avatar">
+        <img src="{{ mappedItem.creatorAvatarPath }}" alt="activity author picture" />
+    </div>
+</li>

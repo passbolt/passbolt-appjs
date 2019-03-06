@@ -125,6 +125,15 @@ Group.findView = function(id) {
 };
 
 /**
+ * Return group avatar path.
+ * @param group
+ * @return {string}
+ */
+Group.avatarPath = function(group) {
+  return 'img/avatar/group_default.png';
+};
+
+/**
  * Delete a group.
  * Use this function instead of the standard destroy function. The destroy function of the can layer does not get
  * extra parameters, however a http DELETE request can get a body we use to pass the transfer data.

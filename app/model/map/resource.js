@@ -123,10 +123,19 @@ Resource.prototype.safeUrl = function() {
 
 /**
  * Get the resource permalink.
+ * @param resource
+ * @return {string}
+ */
+Resource.getPermalink = function(resource) {
+  return APP_URL + `app/passwords/view/` + resource.id;
+};
+
+/**
+ * Get the resource permalink.
  * @return {string}
  */
 Resource.prototype.getPermalink = function() {
-  return `${APP_URL}app/passwords/view/${this.id}`;
+  return Resource.getPermalink(this.id);
 };
 
 /**

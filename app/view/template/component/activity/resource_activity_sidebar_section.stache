@@ -1,0 +1,7 @@
+<div class="accordion-header">
+    <h4><a class="accordion-trigger" role="button">{{ __('Activity') }}</a></h4>
+</div>
+
+<div class="accordion-content">
+    <ul id="js_rs_details_activity_list"></ul>
+</div>

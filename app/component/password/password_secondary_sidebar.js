@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import ActivitySection from 'app/component/activity/resource_activity_sidebar_section';
 import Clipboard from 'app/util/clipboard';
 import CommentsSection from 'app/component/comment/comments_sidebar_section';
 import Config from 'passbolt-mad/config/config';
@@ -49,6 +50,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
     this._initTagsSection();
     this._initPermissionsSection();
     this._initCommentsSection();
+    this._initActivitySection();
     this._super();
   },
 
@@ -109,6 +111,19 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
       cssClasses: ['closed']
     });
     commentsComponent.start();
+  },
+
+  /**
+   * Initialize the activity section
+   */
+  _initActivitySection: function() {
+    const activityComponent = new ActivitySection('#js_rs_details_activity', {
+      resource: this.options.resource,
+      foreignModel: 'Resource',
+      foreignKey: this.options.resource.id,
+      cssClasses: ['closed']
+    });
+    activityComponent.start();
   },
 
   /**
