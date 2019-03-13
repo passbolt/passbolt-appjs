@@ -32,7 +32,6 @@ class PermissionUpdatedDetail extends ActionLogDetail {
 
     // Transform data in our own format.
     this.mapPermissions(permissions);
-    console.log('added', this.added);
   }
 
   /**

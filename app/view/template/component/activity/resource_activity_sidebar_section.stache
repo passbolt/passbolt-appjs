@@ -3,5 +3,11 @@
 </div>
 
 <div class="accordion-content">
-    <ul id="js_rs_details_activity_list"></ul>
+    <em class="empty-content hidden">{{ __('There is no activity yet.') }}</em>
+    <div class="activity-details-content">
+        <ul id="js_rs_details_activity_list"></ul>
+        <div id="js_rs_details_activity_actions" class="activity-list-actions actions">
+            <a id="js_action_logs_more" class="button load-more processing" role="button"><span>{{ __('more') }}</span></a>
+        </div>
+    </div>
 </div>

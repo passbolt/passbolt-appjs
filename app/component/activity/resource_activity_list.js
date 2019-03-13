@@ -63,6 +63,7 @@ const ResourceActivityListComponent = Tree.extend('passbolt.component.activity.R
       'Resources.created': __('created item'),
       'Resources.updated': __('updated item'),
       'Resource.Secrets.read': __('accessed secret of item'),
+      'Resource.Secrets.updated': __('updated secret of item'),
       'Permissions.updated': __('changed permissions of item'),
     };
 

@@ -29,7 +29,7 @@ const ActionLog = DefineMap.extend('passbolt.model.ActionLog', {
   creator: User,
   created: 'string'
 });
-DefineMap.setReference('ActionLog', Comment);
+DefineMap.setReference('ActionLog', ActionLog);
 ActionLog.List = DefineList.extend({'#': {Type: ActionLog}});
 
 ActionLog.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap], {

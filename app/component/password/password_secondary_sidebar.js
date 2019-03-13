@@ -117,13 +117,16 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    * Initialize the activity section
    */
   _initActivitySection: function() {
-    const activityComponent = new ActivitySection('#js_rs_details_activity', {
-      resource: this.options.resource,
-      foreignModel: 'Resource',
-      foreignKey: this.options.resource.id,
-      cssClasses: ['closed']
-    });
-    activityComponent.start();
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins && plugins.audit_log) {
+      const activityComponent = new ActivitySection('#js_rs_details_activity', {
+        resource: this.options.resource,
+        foreignModel: 'Resource',
+        foreignKey: this.options.resource.id,
+        cssClasses: ['closed']
+      });
+      activityComponent.start();
+    }
   },
 
   /**

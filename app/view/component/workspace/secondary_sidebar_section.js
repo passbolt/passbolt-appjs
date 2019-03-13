@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import View from 'passbolt-mad/view/view';
+import domEvents from "can-dom-events";
 
 const SecondarySidebarSectionView = View.extend('passbolt.view.component.SecondarySidebarSection', /** @static */ {
 
@@ -39,8 +40,10 @@ const SecondarySidebarSectionView = View.extend('passbolt.view.component.Seconda
   '{element} a.accordion-trigger click': function() {
     if ($(this.element).hasClass('closed')) {
       this.open();
+      domEvents.dispatch(this.element, {type: 'section_opened', data: {item: this.element, srcEv: null}});
     } else {
       this.close();
+      domEvents.dispatch(this.element, {type: 'section_closed', data: {item: this.element, srcEv: null}});
     }
   }
 
