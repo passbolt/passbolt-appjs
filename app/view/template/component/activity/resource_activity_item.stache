@@ -1,5 +1,5 @@
 {{<displayUserAction}}
-    <div class="name"><a href="">{{ mappedItem.creatorName }}</a> {{mappedItem.label}} <a href="{{mappedItem.resource.permalink}}">{{mappedItem.resource.name}}</a></div>
+    <div class="name"><span class="creator">{{ mappedItem.creatorName }}</span> {{mappedItem.label}} <a href="{{mappedItem.resource.permalink}}">{{mappedItem.resource.name}}</a></div>
     <div class="subinfo">{{ getTimeAgo(mappedItem.created) }}</div>
 {{/displayUserAction}}
 
@@ -30,7 +30,7 @@
         <img src="{{aro_avatar_path}}">
     </div>
     <div class="name{{# eq(action_type, 'removed') }} crossed {{/eq}}">
-    {{full_name}}
+    <span class="creator">{{full_name}}</span>
     <span class="permission-type"> - {{type_human_readable}}</span>
     </div>
     <div class="type"><span class="{{action_type}}">
