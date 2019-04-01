@@ -4,6 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.0] - 2019-04-01
+### Added
+- PB-1: Audit Logs - Browse the resources and see the activity logs to see who is doing what on them
+
+### Improved
+- PASSBOLT-3443: LDAP: Fix "in settings, username and password should not be compulsory fields"
+- PASSBOLT-3327: LDAP: Improve administration UI
+- PASSBOLT-3328: LDAP: Add test connection option
+
 ## [2.7.0] - 2019-02-06
 ### Added
 - PASSBOLT-2978: Open a paginated grid on a page containing a target item
