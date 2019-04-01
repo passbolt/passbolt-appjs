@@ -59,6 +59,7 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
     });
     component.start();
     this.resourceActivityList = component;
+    this.options.pagination.page = 1;
   },
 
   /**
@@ -66,8 +67,10 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
    * @private
    */
   _loadContent: function() {
-    this._findActionLog()
-    .then(actionLogs => this._loadActionLogs(actionLogs));
+    if (this.resourceActivityList.options.items.length === 0) {
+      this._findActionLog()
+      .then(actionLogs => this._loadActionLogs(actionLogs));
+    }
   },
 
   /**
