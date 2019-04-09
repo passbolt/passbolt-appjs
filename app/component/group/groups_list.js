@@ -15,6 +15,8 @@ import Filter from 'app/model/filter';
 import getObject from 'can-util/js/get/get';
 import Group from 'app/model/map/group';
 import GroupListView from 'app/view/component/group/groups_list';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import TreeComponent from 'passbolt-mad/component/tree';

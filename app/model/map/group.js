@@ -26,6 +26,8 @@ import connectMap from 'can-connect/can/map/map';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import GroupUser from 'app/model/map/group_user';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import User from 'app/model/map/user';
 import uuid from 'uuid/v4';
 

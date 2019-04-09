@@ -14,6 +14,8 @@
 import Action from 'passbolt-mad/model/map/action';
 import Config from 'passbolt-mad/config/config';
 import DomData from 'can-dom-data';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MenuComponent from 'passbolt-mad/component/menu';
 import route from 'can-route';
 import String from 'can-string';

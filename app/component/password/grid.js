@@ -21,6 +21,8 @@ import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/password/grid_contextual_menu';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PasswordGridView from 'app/view/component/password/grid';

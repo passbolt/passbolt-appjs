@@ -15,6 +15,8 @@ import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import UsersDirectoryService from 'app/model/service/users_directory';
 import UsersDirectorySettings from 'app/model/map/users_directory_settings';

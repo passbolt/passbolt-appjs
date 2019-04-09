@@ -18,6 +18,8 @@ import EditView from 'app/view/component/group/edit';
 import Group from 'app/model/map/group';
 import GroupCreateForm from 'app/form/group/create';
 import GroupUser from 'app/model/map/group_user';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import Plugin from 'app/util/plugin';

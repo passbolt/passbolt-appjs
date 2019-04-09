@@ -12,6 +12,8 @@
  * @since         2.0.0
  */
 import ActionLog from 'app/model/map/action_log';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadMap from 'passbolt-mad/util/map/map';
 import Tree from 'passbolt-mad/component/tree';
 import Resource from 'app/model/map/resource';

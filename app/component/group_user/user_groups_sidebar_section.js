@@ -12,6 +12,8 @@
  * @since         2.0.0
  */
 import Group from 'app/model/map/group';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadMap from 'passbolt-mad/util/map/map';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 import Tree from 'passbolt-mad/component/tree';

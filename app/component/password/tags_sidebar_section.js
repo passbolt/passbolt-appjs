@@ -13,6 +13,8 @@
  */
 import DomData from 'can-dom-data';
 import Filter from 'app/model/filter';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PermissionType from 'app/model/map/permission_type';

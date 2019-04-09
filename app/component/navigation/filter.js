@@ -16,6 +16,8 @@ import Component from 'passbolt-mad/component/component';
 import FilterView from 'app/view/component/navigation/filter';
 import Form from 'passbolt-mad/form/form';
 import getObject from 'can-util/js/get/get';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import SettingsWorkspaceComponent from 'app/component/settings/workspace';
 import Textbox from 'passbolt-mad/form/element/textbox';

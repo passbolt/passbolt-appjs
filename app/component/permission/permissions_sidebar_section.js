@@ -11,6 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import Permission from 'app/model/map/permission';

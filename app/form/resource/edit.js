@@ -13,6 +13,8 @@
  */
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import CreateForm from 'app/form/resource/create';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 
 import createTemplatetemplate from 'app/view/template/form/resource/create.stache!';

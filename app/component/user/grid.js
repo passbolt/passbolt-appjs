@@ -19,6 +19,8 @@ import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/user/grid_contextual_menu';
 import Group from 'app/model/map/group';
 import GroupUser from 'app/model/map/group_user';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadMap from 'passbolt-mad/util/map/map';
 import User from 'app/model/map/user';
 import UserGridView from 'app/view/component/user/grid';

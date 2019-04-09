@@ -13,6 +13,8 @@
  */
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MenuComponent from 'passbolt-mad/component/menu';
 import route from 'can-route';
 import User from 'app/model/map/user';

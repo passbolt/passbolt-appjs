@@ -20,6 +20,8 @@ import connectMap from 'can-connect/can/map/map';
 import connectStore from 'can-connect/constructor/store/store';
 import DefineMap from 'passbolt-mad/model/map/map';
 import getObject from 'can-util/js/get/get';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';
 import 'urijs/src/IPv6';

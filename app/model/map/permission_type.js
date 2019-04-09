@@ -12,6 +12,8 @@
  * @since         2.0.0
  */
 import DefineMap from 'passbolt-mad/model/map/map';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 
 const PermissionType = DefineMap.extend('passbolt.model.PermissionType', {
   serial: 'string',

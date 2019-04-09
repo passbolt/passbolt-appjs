@@ -17,6 +17,8 @@ import Clipboard from 'app/util/clipboard';
 import Config from 'passbolt-mad/config/config';
 import Button from 'passbolt-mad/component/button';
 import ButtonDropdownComponent from 'passbolt-mad/component/button_dropdown';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
 import Plugin from 'app/util/plugin';

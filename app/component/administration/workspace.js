@@ -14,6 +14,8 @@
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import UsersDirectorySettings from 'app/component/administration/users_directory/users_directory_settings';
 import MenuComponent from 'passbolt-mad/component/menu';
 import MfaSettings from 'app/component/administration/mfa/mfa_settings';

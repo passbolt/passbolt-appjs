@@ -23,6 +23,8 @@ import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/const
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import Favorite from 'app/model/map/favorite';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import Permission from 'app/model/map/permission';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';

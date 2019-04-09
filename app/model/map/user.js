@@ -22,6 +22,8 @@ import connectStore from 'can-connect/constructor/store/store';
 import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import Profile from 'app/model/map/profile';
 import Role from 'app/model/map/role';
 import uuid from 'uuid/v4';

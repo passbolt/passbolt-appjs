@@ -15,6 +15,8 @@ import Filter from 'app/model/filter';
 import Group from 'app/model/map/group';
 import GroupsListComponent from 'app/component/group/groups_list';
 import GroupsListView from 'app/view/component/group/groups_list';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 
 import itemTemplate from 'app/view/template/component/group/group_item.stache!';

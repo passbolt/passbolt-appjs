@@ -14,6 +14,8 @@
 import Action from 'passbolt-mad/model/map/action';
 import ButtonDropdown from 'passbolt-mad/component/button_dropdown';
 import Config from 'passbolt-mad/config/config';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import route from 'can-route';
 import uuid from 'uuid/v4';
 

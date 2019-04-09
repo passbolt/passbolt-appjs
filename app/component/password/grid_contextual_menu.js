@@ -14,6 +14,8 @@
 import Action from 'passbolt-mad/model/map/action';
 import Clipboard from 'app/util/clipboard';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
 import Plugin from 'app/util/plugin';

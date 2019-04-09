@@ -26,6 +26,8 @@ import GroupDelete from 'app/model/map/group_delete';
 import GroupDeleteTransferPermissionForm from 'app/form/group/delete_transfer_permission';
 import GroupEditComponent from 'app/component/group/edit';
 import GroupSecondarySidebarComponent from 'app/component/group/group_secondary_sidebar';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import PrimaryMenuComponent from 'app/component/user/workspace_primary_menu';
 import PrimarySidebarComponent from 'app/component/user/primary_sidebar';

@@ -13,6 +13,8 @@
  */
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import RadioComponent from 'passbolt-mad/form/element/radio';
 import domEvents from 'can-dom-events';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';

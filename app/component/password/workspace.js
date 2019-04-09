@@ -19,6 +19,8 @@ import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import GridComponent from 'app/component/password/grid';
+// eslint-disable-next-line no-unused-vars
+import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
 import Plugin from 'app/util/plugin';
