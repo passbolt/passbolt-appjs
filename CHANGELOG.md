@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.1] - 2019-04-09
+### Fixed
+- GITHUB-315: Fix the permalink of the passwords
+
 ## [2.8.0] - 2019-04-01
 ### Added
 - PB-1: Audit Logs - Browse the resources and see the activity logs to see who is doing what on them
@@ -126,7 +130,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.8.1...HEAD
+[2.8.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.0...v2.8.1
+[2.8.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.2...v2.7.0
 [2.6.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.1...v2.6.2
 [2.6.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.6.0...v2.6.1

@@ -134,7 +134,7 @@ Resource.getPermalink = function(resource) {
  * @return {string}
  */
 Resource.prototype.getPermalink = function() {
-  return Resource.getPermalink(this.id);
+  return Resource.getPermalink(this); 
 };
 
 /**
