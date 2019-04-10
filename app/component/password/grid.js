@@ -67,7 +67,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   /**
    * The array of select checkbox components.
    */
-  _selectCheckboxComponents: {},
+  _selectCheckboxComponents: {},  
 
   /**
    * Multi select initial element reference.
@@ -533,6 +533,9 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @param {boolean} empty True if empty, false otherwise
    */
   onEmptyChange: function(empty) {
+    if (this.state.destroyed) {
+      return;
+    }
     this._super(empty);
     // Remove the empty feedback before the grid is loaded, otherwise the rows are inserted under the feedback.
     if (this.state.filtering && !empty) {
@@ -639,7 +642,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       this._uncheckSelectAllCheckbox();
     }
 
-    if (srcEv.metaKey) {
+    if (srcEv.metaKey) { 
       this.state.selectType = 'multiple';
       if (this.isSelected(item)) {
         const position = resources.indexOf(item);
@@ -742,7 +745,10 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} filter_workspace': function(el, ev) {
+  '{mad.bus.element} filter_grid': function(el, ev) {
+    if (this.state.destroyed) {
+      return;
+    }
     const filter = ev.data.filter;
     this.filterBySettings(filter);
   },

@@ -73,7 +73,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         this.showFeedback();
         this.on();
       }, error => {
-        console.log('something happened', error);
+        console.error('something happened', error);
       });
   },
 

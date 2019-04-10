@@ -224,8 +224,13 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Component}
    */
   _initGrid: function() {
+    if (this.options.grid) {
+      $(this.options.grid.element).empty().removeClass();
+      this.options.grid.destroy(); 
+    }
     const component = new GridComponent('#js_wsp_pwd_browser', {
-      selectedResources: this.options.selectedResources
+      selectedResources: this.options.selectedResources,
+      cssClasses: ['tableview']
     });
     this.options.grid = component;
     this.addLoadedDependency(component);
@@ -521,13 +526,32 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
     const filter = ev.data.filter;
+
     // When filtering the resources browser, unselect all the resources.
     this.options.selectedResources.splice(0, this.options.selectedResources.length);
+
     // Unselect all group if the filter does not target a group (dirty).
     if (!filter.rules['is-shared-with-group']) {
       this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
     }
-  },
+
+    // Rebuild the grid each time the workspace is filtered except if: 
+    // - The user is searching on all items.
+    // - The user empty the search on all items.
+    // If no filterSettings, it means that the grid had never been filtered, no need to reinit it.
+    if (this.options.grid.filterSettings) {
+      const wasSearchingAllItems = filter.id == "default" && this.options.grid.filterSettings.id == "search";
+      const isSearchingAllItems = filter.id == "search" && this.options.grid.filterSettings.id == "default";
+      const isUpdatingSearch = filter.id == "search" && this.options.grid.filterSettings.id == "search";
+      if (!wasSearchingAllItems && !isSearchingAllItems && !isUpdatingSearch) {
+        const grid = this._initGrid();
+        grid.start();
+      }
+    }
+
+
+    MadBus.trigger('filter_grid', { filter: filter });
+  }, 
 
   /**
    * Observe when the user requests a resource creation

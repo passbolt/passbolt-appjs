@@ -49,7 +49,7 @@ class PermissionUpdatedDetail extends ActionLogDetail {
         return Group.avatarPath(permission.group);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
