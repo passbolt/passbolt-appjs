@@ -134,7 +134,7 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
    * @param {Resource} resource The updated item
    */
   '{resource} updated': function(resource) {
-    this.setTitle(resource.name);
+    $(".sidebar-header-title-text", this.element).text(resource.name);
   },
 
   /**

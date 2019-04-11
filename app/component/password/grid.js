@@ -393,7 +393,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
     }
 
     const findOptions = {
-      contain: {creator: 1, favorite: 1, modifier: 1, permission: 1, tag: 1},
+      contain: {favorite: 1, permission: 1, tag: 1},
       filter: filter.getRules(['keywords']),
       order: filter.getOrders(),
       silentLoading: false

@@ -65,7 +65,7 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
     const findOptions = {
       id: this.id,
       silentLoading: false,
-      contain: {creator: 1, favorite: 1, modifier: 1, secret: 1, permission: 1}
+      contain: {favorite: 1, secret: 1, permission: 1}
     };
     Resource.findOne(findOptions)
       .then(null, () => {

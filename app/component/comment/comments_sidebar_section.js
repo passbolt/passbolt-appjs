@@ -34,39 +34,14 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
     Comment: Comment
   },
 
-  // Consume the route only once
-  _routeConsumed: false
-
 }, /** @prototype */ {
-
-  /**
-   * @inheritdoc
-   */
-  init: function(el, options) {
-    this._super(el, options);
-  },
 
   /**
    * @inheritdoc
    */
   afterStart: function() {
     this._initCommentsList();
-    this._findComments()
-      .then(comments => this._loadComments(comments));
     this._super();
-    this._dispatchRoute();
-  },
-
-  /**
-   * Dispatch the route
-   */
-  _dispatchRoute: function() {
-    if (route.data.controller == 'Password' && route.data.action == 'commentsView') {
-      if (!CommentsSidebarSectionComponent._routeConsumed) {
-        this.view.open();
-        CommentsSidebarSectionComponent._routeConsumed = true;
-      }
-    }
   },
 
   /**
@@ -104,6 +79,7 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
     if (this.state.destroyed) {
       return;
     }
+    this.commentsList.reset();
     if (comments.length) {
       this.commentsList.load(comments);
     } else {
@@ -146,8 +122,19 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
     const comment = new Comment(formData['Comment']);
     comment.save()
       .then(() => {
+        $(this.form.destroyAndRemove());
         this.form = null;
       });
+  },
+
+  /**
+   * Section has been opened
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{element} section_opened': function() {
+    this._findComments()
+      .then(comments => this._loadComments(comments));
   },
 
   /**
@@ -159,9 +146,9 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
   '{Comment} created': function(model, ev, comment) {
     // If the new comment belongs to the displayed resource, refresh the component.
     if (comment.foreign_key == this.options.resource.id) {
-      // @todo Starter/loaded ? What to do with it here. Refresh should take care of the mechanism
       this.state.loaded = false;
-      this.refresh();
+      this._findComments()
+        .then(comments => this._loadComments(comments));
     }
   },
 

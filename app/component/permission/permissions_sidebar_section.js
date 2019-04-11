@@ -56,7 +56,6 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    */
   afterStart: function() {
     this._initPermissionsList();
-    this._loadPermissions();
     this._super();
   },
 
@@ -153,7 +152,19 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * Observe when the item is updated
    */
   '{acoInstance} updated': function() {
-    this.refresh();
+    if ($(this.element).hasClass('closed')) {
+      return;
+    }
+    this._loadPermissions(); 
+  },
+
+  /**
+   * Section has been opened
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{element} section_opened': function() {
+    this._loadPermissions();
   },
 
   /**

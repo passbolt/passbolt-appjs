@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.4] - 2019-04-12
+### Improved
+- PB-48: Performance - remove the creator/modifier from the resources workspace grid query
+
 ## [2.8.3] - 2019-04-10
 ### Fixed
 - GITHUB-299: Fix - Passwords are shown twice in workspace list
@@ -138,7 +142,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.8.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.8.4...HEAD
+[2.8.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.3...v2.8.4
 [2.8.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.2...v2.8.3
 [2.8.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.1...v2.8.2
 [2.8.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.0...v2.8.1

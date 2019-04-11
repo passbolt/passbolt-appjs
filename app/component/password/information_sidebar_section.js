@@ -13,6 +13,7 @@
  */
 import Clipboard from 'app/util/clipboard';
 import Plugin from 'app/util/plugin';
+import Resource from 'app/model/map/resource';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 
 import template from 'app/view/template/component/password/information_sidebar_section.stache!';
@@ -27,6 +28,12 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
 }, /** @prototype */ {
 
+  init: function(el, options) {
+    this._super(el, options);
+    // Find missing information on resource.
+    this._findResource();
+  },
+
   /**
    * @inheritdoc
    */
@@ -35,6 +42,21 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     this.setViewData('resource', this.options.resource);
   },
 
+  /**
+   * Find the resource missing information (creator & modifier).
+   */
+  _findResource: function() {
+    const _this = this;
+    const findOptions = {
+      id: this.options.resource.id,
+      silentLoading: false,
+      contain: {creator: 1, modifier: 1}
+    };
+    Resource.findOne(findOptions).then(function(resource) {
+      _this.options.resource.assign(resource);
+    });
+  },
+  
   /**
    * Observe when the item is updated
    */
