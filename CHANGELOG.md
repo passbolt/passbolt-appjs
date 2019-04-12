@@ -4,9 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [2.8.4] - 2019-04-12
 ### Improved
 - PB-48: Performance - remove the creator/modifier from the resources workspace grid query
+- PB-159: Remove the usage of canjs connect-hydrate module
+
+### Fixed
+- GITHUB-10: Selecting a group on the users workspace should not reset the grid "Last Logged In" column to "Never"
 
 ## [2.8.3] - 2019-04-10
 ### Fixed
