@@ -130,7 +130,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   _initPrimaryMenu: function() {
     const $el = $('#js_wsp_primary_menu_wrapper');
-    const options =  {selectedResources: this.options.selectedResources};
+    const options = {selectedResources: this.options.selectedResources};
     const component = ComponentHelper.create($el, 'last', PrimaryMenuComponent, options);
     this.addLoadedDependency(component);
     return component;
@@ -226,7 +226,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   _initGrid: function() {
     if (this.options.grid) {
       $(this.options.grid.element).empty().removeClass();
-      this.options.grid.destroy(); 
+      this.options.grid.destroy();
     }
     const component = new GridComponent('#js_wsp_pwd_browser', {
       selectedResources: this.options.selectedResources,
@@ -252,12 +252,10 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     const options = {
       id: 'js_pwd_details',
       resource: resource,
-      silentLoading: false,
       cssClasses: ['panel', 'aside', 'js_wsp_pwd_sidebar_second']
     };
     const component = ComponentHelper.create(this.element, 'last', PasswordSecondarySidebarComponent, options);
     this.options.passwordSecondarySidebar = component;
-    this.addLoadedDependency(component);
     return component;
   },
 
@@ -282,7 +280,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       cssClasses: ['create-password-dialog', 'dialog-wrapper']
     }).start();
 
-    // Attach the form to the dialog
+      // Attach the form to the dialog
     const form = dialog.add(ResourceCreateForm, {
       data: resource,
       callbacks: {
@@ -327,7 +325,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       cssClasses: ['edit-password-dialog', 'dialog-wrapper']
     }).start();
 
-    // Attach the form to the dialog
+      // Attach the form to the dialog
     dialog.add(ResourceEditForm, {
       id: 'js_rs_edit',
       label: __('Edit'),
@@ -335,15 +333,17 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       data: resource,
       callbacks: {
         submit: data => {
-          const resourceData = data['Resource'];
+          const resourceToUpdate = new Resource(data['Resource']);
           // If not secrets present, no need to add them to the API request.
-          if (resourceData.secrets.length > 0) {
-            resourceData['__FILTER_CASE__'] = 'edit_with_secrets';
+          if (data['Resource'].secrets.length > 0) {
+            resourceToUpdate['__FILTER_CASE__'] = 'edit_with_secrets';
           } else {
-            resourceData['__FILTER_CASE__'] = 'edit';
+            resourceToUpdate['__FILTER_CASE__'] = 'edit';
           }
-          resource.assign(resourceData);
-          resource.save();
+          resourceToUpdate.save()
+            .then(savedResource => {
+              resource.assign(savedResource);
+            });
           dialog.remove();
         }
       }
@@ -390,7 +390,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     this.options.selectedResources.splice(0, this.options.selectedResources.length);
     if (multipleDelete) {
       Resource.deleteAll(resources)
-        .then(() =>  {
+        .then(() => {
           MadBus.trigger('passbolt_notify', {
             title: 'app_resources_delete_all_success',
             status: 'success'
@@ -458,6 +458,20 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   /* ************************************************************** */
   /* LISTEN TO THE MODEL EVENTS */
   /* ************************************************************** */
+
+  /**
+   * Observe when a resource is updated.
+   * If the resource is currently selected, update the instance instance in selectedResources array
+   * @param {DefineMap.prototype} model The model reference
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Resource} resource The updated resource
+   */
+  '{Resource} updated': function(model, ev, resource) {
+    const resourceSelectedIndex = this.options.selectedResources.indexOf(resource);
+    if (resourceSelectedIndex != -1) {
+      this.options.selectedResources[resourceSelectedIndex].assign(resource);
+    }
+  },
 
   /**
    * Observe when a resource is destroyed.
@@ -535,10 +549,12 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
     }
 
-    // Rebuild the grid each time the workspace is filtered except if: 
-    // - The user is searching on all items.
-    // - The user empty the search on all items.
-    // If no filterSettings, it means that the grid had never been filtered, no need to reinit it.
+    /*
+     * Rebuild the grid each time the workspace is filtered except if:
+     * - The user is searching on all items.
+     * - The user empty the search on all items.
+     * If no filterSettings, it means that the grid had never been filtered, no need to reinit it.
+     */
     if (this.options.grid.filterSettings) {
       const wasSearchingAllItems = filter.id == "default" && this.options.grid.filterSettings.id == "search";
       const isSearchingAllItems = filter.id == "search" && this.options.grid.filterSettings.id == "default";
@@ -550,8 +566,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     }
 
 
-    MadBus.trigger('filter_grid', { filter: filter });
-  }, 
+    MadBus.trigger('filter_grid', {filter: filter});
+  },
 
   /**
    * Observe when the user requests a resource creation
@@ -638,7 +654,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * Listen to the workspace request_export
    */
   '{mad.bus.element} request_export': function() {
-    const resourcesIds = this.options.selectedResources.reduce((carry, resource) =>  [...carry, resource.id], []);
+    const resourcesIds = this.options.selectedResources.reduce((carry, resource) => [...carry, resource.id], []);
     Plugin.send('passbolt.plugin.export_resources', resourcesIds);
   },
 
@@ -674,12 +690,34 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
      * The user could have lost his access to some of them.
      * Retrieve the resources and then select the ones the user can still access.
      */
-    selectedResources.splice(0);
-    Resource.updateResourcesAfterShare(selectedResourcesIds)
+    // selectedResources.splice(0);
+    this.updateResourcesAfterShare(selectedResourcesIds)
+      .then(updatedResources => selectedResources.replace(updatedResources));
+  },
+
+  /**
+   * Update resources after they have been shared.
+   * - Update the permission of the current user locally
+   * - Destroy them locally if the user has not access to them
+   * @param resourcesIds
+   * @return {Promise}
+   */
+  updateResourcesAfterShare: function(updatedResourcesIds) {
+    const originalResources = this.options.grid.options.items;
+    return Resource.findAllByIds(updatedResourcesIds)
       .then(resources => {
-        if (resources.length) {
-          selectedResources.replace(resources);
-        }
+        // Destroy the resources the user could have lost access to.
+        const deletedResourcesIds = updatedResourcesIds.filter(updatedResourceId => resources.indexOf({id: updatedResourceId}) === -1);
+        originalResources
+          .filter(originalResource => deletedResourcesIds.indexOf(originalResource.id) !== -1)
+          .forEach(deletedResource => {
+            Resource.dispatch('destroyed', deletedResource);
+          });
+
+        // Update all the retrieved resources.
+        Resource.dispatch('updated', resources);
+
+        return resources;
       });
   },
 

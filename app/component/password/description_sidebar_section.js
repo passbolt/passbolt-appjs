@@ -159,13 +159,6 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     resource.__FILTER_CASE__ = 'edit_description';
     resource.save();
     this.disableEditMode();
-  },
-
-  /**
-   * Observe when the item is updated
-   */
-  '{resource} updated': function() {
-    this.refresh();
   }
 });
 

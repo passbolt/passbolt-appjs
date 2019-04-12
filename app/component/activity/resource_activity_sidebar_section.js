@@ -44,6 +44,17 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
    */
   afterStart: function() {
     this._initResourceActivityList();
+    if (this.state.opened) {
+      this.open();
+    }
+    this._super();
+  },
+
+  /**
+   * @inheritdoc
+   */
+  open: function() {
+    this._loadContent();
     this._super();
   },
 
@@ -69,7 +80,7 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
   _loadContent: function() {
     if (this.resourceActivityList.options.items.length === 0) {
       this._findActionLog()
-      .then(actionLogs => this._loadActionLogs(actionLogs));
+        .then(actionLogs => this._loadActionLogs(actionLogs));
     }
   },
 
@@ -136,7 +147,7 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
     const self = this;
     this.options.pagination.page += 1;
     this._findActionLog()
-    .then(actionLogs => self._appendActionLogs(actionLogs));
+      .then(actionLogs => self._appendActionLogs(actionLogs));
   },
 
   /**
@@ -159,33 +170,10 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
    */
   _appendActionLogs: function(actionLogs) {
     const self = this;
-    actionLogs.forEach(function(obj) {
+    actionLogs.forEach(obj => {
       self.resourceActivityList.insertItem(obj, null, 'last');
     });
     self._manageCallToAction(actionLogs);
-  },
-
-  /**
-   * Prepend action logs.
-   * @param actionLogs
-   * @private
-   */
-  _prependActionLogs: function(actionLogs) {
-    const self = this;
-    actionLogs = actionLogs.reverse();
-    actionLogs.forEach(actionLog => {
-      self.resourceActivityList.insertItem(actionLog, null, 'first');
-    });
-
-    // Highlight new items in the list. (animation is done in css).
-    $('.activity-details-content > ul > li').each((i, el) => {
-      const liId = $(el).attr('id');
-      actionLogs.forEach(actionLog => {
-        if (liId == actionLog.id) {
-          $(el).addClass('highlight');
-        }
-      });
-    });
   },
 
   /**
@@ -200,52 +188,6 @@ const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent
       // We hide the call to actions.
       $('.activity-list-actions').addClass('hidden');
     }
-  },
-
-  /**
-   * On update.
-   * @private
-   */
-  _onUpdate: function() {
-    if (!this.state.loaded) {
-      return;
-    }
-
-    const rememberPage = this.options.page;
-    const self = this;
-    this.options.page = 1;
-
-    const firstItemId = self.resourceActivityList.options.items[0].id;
-
-    this._findActionLog()
-    .then(actionLogs => {
-      const actionLogsToPrepend = [];
-      actionLogs = Array.from(actionLogs);
-      for(const i in actionLogs) {
-        if (actionLogs[i].id === firstItemId) {
-          break;
-        }
-        actionLogsToPrepend.push(actionLogs[i]);
-      }
-      self._prependActionLogs(actionLogsToPrepend);
-    });
-    this.options.page = rememberPage;
-  },
-
-  /**
-   * Section has been opened
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occured
-   */
-  '{element} section_opened': function() {
-    this._loadContent();
-  },
-
-  /**
-   * Observe when the item is updated
-   */
-  '{resource} updated': function() {
-    this._onUpdate();
   }
 });
 

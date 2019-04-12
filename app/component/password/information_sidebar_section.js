@@ -28,9 +28,12 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
 }, /** @prototype */ {
 
+  /**
+   * @inheritdoc
+   */
   init: function(el, options) {
     this._super(el, options);
-    // Find missing information on resource.
+    // Find complementary resource data (creator/modifier).
     this._findResource();
   },
 
@@ -49,19 +52,14 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     const _this = this;
     const findOptions = {
       id: this.options.resource.id,
-      silentLoading: false,
       contain: {creator: 1, modifier: 1}
     };
-    Resource.findOne(findOptions).then(function(resource) {
-      _this.options.resource.assign(resource);
+    Resource.findOne(findOptions).then(resource => {
+      _this.options.resource = resource;
+      _this.refresh();
+    }, () => {
+      console.error(`Resource not found ${this.options.resource.id}`);
     });
-  },
-  
-  /**
-   * Observe when the item is updated
-   */
-  '{resource} updated': function() {
-    this.refresh();
   },
 
   /**

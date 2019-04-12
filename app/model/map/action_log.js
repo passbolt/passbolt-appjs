@@ -17,7 +17,6 @@ import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
-import connectStore from 'can-connect/constructor/store/store';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import User from 'app/model/map/user';
@@ -32,7 +31,7 @@ const ActionLog = DefineMap.extend('passbolt.model.ActionLog', {
 DefineMap.setReference('ActionLog', ActionLog);
 ActionLog.List = DefineList.extend({'#': {Type: ActionLog}});
 
-ActionLog.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap], {
+ActionLog.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: ActionLog,
   List: ActionLog.List,
   url: {

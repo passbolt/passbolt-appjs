@@ -31,13 +31,6 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
   beforeRender: function() {
     this._super();
     this.setViewData('user', this.options.user);
-  },
-
-  /**
-   * Observer when the user is updated
-   */
-  '{user} updated': function() {
-    this.refresh();
   }
 
 });

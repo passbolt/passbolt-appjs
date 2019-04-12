@@ -17,8 +17,6 @@ import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
-import connectStore from 'can-connect/constructor/store/store';
-import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 // eslint-disable-next-line no-unused-vars
@@ -55,7 +53,7 @@ Comment.validationRules = {
   ]
 };
 
-Comment.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
+Comment.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: Comment,
   List: Comment.List,
   url: {

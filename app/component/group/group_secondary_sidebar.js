@@ -105,12 +105,8 @@ const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbol
    * @param {Group} group The created group
    */
   '{Group} updated': function(Constructor, ev, group) {
-    if (this.options.group.id != group.id) {
-      return;
-    }
-    const isGroupUpdated = this._latestGroupModified != group.modified;
-    if (isGroupUpdated) {
-      this._latestGroupModified = group.modified;
+    if (this.options.group.id == group.id) {
+      this.options.group = group;
       this.refresh();
     }
   }

@@ -15,6 +15,7 @@ import Clipboard from 'app/util/clipboard';
 import GpgkeySectionComponent from 'app/component/gpgkey/gpgkey_sidebar_section';
 import InformationSectionComponent from 'app/component/user/information_sidebar_section';
 import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
+import User from 'app/model/map/user';
 import UserGroupsSidebarSectionComponent from 'app/component/group_user/user_groups_sidebar_section';
 
 import template from 'app/view/template/component/user/user_secondary_sidebar.stache!';
@@ -24,7 +25,8 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
   defaults: {
     label: 'User Details Controller',
     template: template,
-    user: null
+    user: null,
+    User: User
   }
 
 }, /** @prototype */ {
@@ -90,11 +92,16 @@ const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt
   },
 
   /**
-   * Observe when the user is updated.
+   * Observe when a user is updated, if this is the currently displayed user, refresh the component.
+   * @param {DefineMap.prototype} model The model reference
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {User} user The updated user
    */
-  '{user} updated': function() {
-    this.setTitle(this.options.user.profile.fullName());
-    this.setSubtitle(this.options.user.username);
+  '{User} updated': function(model, ev, user) {
+    if (user.id == this.options.user.id) {
+      this.options.user = user;
+      this.refresh();
+    }
   },
 
   /**

@@ -18,6 +18,7 @@ import Config from 'passbolt-mad/config/config';
 import DescriptionSection from 'app/component/password/description_sidebar_section';
 import InformationSection from 'app/component/password/information_sidebar_section';
 import PermissionsSection from 'app/component/permission/permissions_sidebar_section';
+import Resource from 'app/model/map/resource';
 import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
 import TagsSection from 'app/component/password/tags_sidebar_section';
 
@@ -28,10 +29,25 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
   defaults: {
     label: 'Resource Details',
     resource: null,
-    template: template
+    template: template,
+    Resource: Resource
   }
 
 }, /** @prototype */ {
+
+  /**
+   * @inheritdoc
+   */
+  init: function(el, options) {
+    this._super(el, options);
+    this.sectionsOpenedState = {
+      description: false,
+      tags: false,
+      permissions: false,
+      comments: false,
+      activity: false
+    };
+  },
 
   /**
    * @inheritdoc
@@ -70,9 +86,15 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
   _initDescriptionSection: function() {
     const descriptionComponent = new DescriptionSection('#js_rs_details_description', {
       resource: this.options.resource,
-      cssClasses: ['closed']
+      cssClasses: !this.sectionsOpenedState.description ? ['closed'] : [],
+      state: {
+        opened: this.sectionsOpenedState.description
+      }
     });
     descriptionComponent.start();
+    descriptionComponent.state.on('opened', (ev, opened) => {
+      this.sectionsOpenedState.description = opened;
+    });
   },
 
   /**
@@ -83,9 +105,15 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
     if (plugins && plugins.tags) {
       const tagsComponent = new TagsSection('#js_rs_details_tags', {
         resource: this.options.resource,
-        cssClasses: ['closed']
+        cssClasses: !this.sectionsOpenedState.tags ? ['closed'] : [],
+        state: {
+          opened: this.sectionsOpenedState.tags
+        }
       });
       tagsComponent.start();
+      tagsComponent.state.on('opened', (ev, opened) => {
+        this.sectionsOpenedState.tags = opened;
+      });
     }
   },
 
@@ -95,9 +123,15 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
   _initPermissionsSection: function() {
     const permissionsComponent = new PermissionsSection('#js_rs_details_permissions', {
       acoInstance: this.options.resource,
-      cssClasses: ['closed']
+      cssClasses: !this.sectionsOpenedState.permissions ? ['closed'] : [],
+      state: {
+        opened: this.sectionsOpenedState.permissions
+      }
     });
     permissionsComponent.start();
+    permissionsComponent.state.on('opened', (ev, opened) => {
+      this.sectionsOpenedState.permissions = opened;
+    });
   },
 
   /**
@@ -108,9 +142,15 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
       resource: this.options.resource,
       foreignModel: 'Resource',
       foreignKey: this.options.resource.id,
-      cssClasses: ['closed']
+      cssClasses: !this.sectionsOpenedState.comments ? ['closed'] : [],
+      state: {
+        opened: this.sectionsOpenedState.comments
+      }
     });
     commentsComponent.start();
+    commentsComponent.state.on('opened', (ev, opened) => {
+      this.sectionsOpenedState.comments = opened;
+    });
   },
 
   /**
@@ -123,18 +163,29 @@ const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('pass
         resource: this.options.resource,
         foreignModel: 'Resource',
         foreignKey: this.options.resource.id,
-        cssClasses: ['closed']
+        cssClasses: !this.sectionsOpenedState.activity ? ['closed'] : [],
+        state: {
+          opened: this.sectionsOpenedState.activity
+        }
       });
       activityComponent.start();
+      activityComponent.state.on('opened', (ev, opened) => {
+        this.sectionsOpenedState.activity = opened;
+      });
     }
   },
 
   /**
-   * Observe when the item is updated
-   * @param {Resource} resource The updated item
+   * Observe when a resource is updated, if this is the currently displayed resource, refresh the component.
+   * @param {DefineMap.prototype} model The model reference
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Resource} resource The updated resource
    */
-  '{resource} updated': function(resource) {
-    $(".sidebar-header-title-text", this.element).text(resource.name);
+  '{Resource} updated': function(model, ev, resource) {
+    if (resource.id == this.options.resource.id) {
+      this.options.resource = resource;
+      this.refresh();
+    }
   },
 
   /**

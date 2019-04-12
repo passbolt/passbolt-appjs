@@ -18,11 +18,6 @@ import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
-/*
- * @todo had to disable these features. When removing a user from the list of members, the groups_users attribute was well upgraded.
- *import connectStore from 'can-connect/constructor/store/store';
- *import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
- */
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import GroupUser from 'app/model/map/group_user';

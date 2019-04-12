@@ -67,7 +67,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
   /**
    * The array of select checkbox components.
    */
-  _selectCheckboxComponents: {},  
+  _selectCheckboxComponents: {},
 
   /**
    * Multi select initial element reference.
@@ -642,7 +642,7 @@ const PasswordGridComponent = GridComponent.extend('passbolt.component.password.
       this._uncheckSelectAllCheckbox();
     }
 
-    if (srcEv.metaKey) { 
+    if (srcEv.metaKey) {
       this.state.selectType = 'multiple';
       if (this.isSelected(item)) {
         const position = resources.indexOf(item);

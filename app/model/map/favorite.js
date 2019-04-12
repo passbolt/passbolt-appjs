@@ -17,8 +17,6 @@ import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
-import connectStore from 'can-connect/constructor/store/store';
-import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineMap from 'passbolt-mad/model/map/map';
 
 const Favorite = DefineMap.extend('passbolt.model.Favorite', {
@@ -29,7 +27,7 @@ const Favorite = DefineMap.extend('passbolt.model.Favorite', {
 });
 DefineMap.setReference('Favorite', Favorite);
 
-Favorite.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
+Favorite.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: Favorite,
   List: Favorite.List,
   url: {

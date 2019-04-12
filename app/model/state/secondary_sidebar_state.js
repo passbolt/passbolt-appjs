@@ -9,14 +9,14 @@
  * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.0.0
  */
-import SecondarySidebarSectionView from 'app/view/component/workspace/secondary_sidebar_section';
+import ComponentState from 'passbolt-mad/model/state/componentState';
 
-const CommentsSidebarSectionView = SecondarySidebarSectionView.extend('passbolt.view.component.comment.CommentsSidebarSection', /** @static */ {
-
-}, /** @prototype */ {
-
+const SecondarySidebarState = ComponentState.extend({
+  opened: {
+    type: 'boolean',
+    default: false
+  }
 });
 
-export default CommentsSidebarSectionView;
+export default SecondarySidebarState;

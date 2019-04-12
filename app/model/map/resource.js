@@ -18,8 +18,6 @@ import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
-import connectStore from 'can-connect/constructor/store/store';
-import connectConstructorHydrate from 'can-connect/can/constructor-hydrate/constructor-hydrate';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 import Favorite from 'app/model/map/favorite';
@@ -54,27 +52,6 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
    */
   isFavorite: function() {
     return this.favorite && this.favorite.id;
-  },
-  /**
-   * Find the resource that may have change.
-   * If the resource is found, canjs will throw an event to notify about the changes.
-   * If the resource cannot be found, notify about its destruction.
-   * @private
-   */
-  _reloadResource: function() {
-    const findOptions = {
-      id: this.id,
-      silentLoading: false,
-      contain: {favorite: 1, secret: 1, permission: 1}
-    };
-    Resource.findOne(findOptions)
-      .then(null, () => {
-      /*
-       * If there is an error, it means the user does not have anymore access to the resource.
-       * Notify other components about it.
-       */
-        Resource.dispatch('destroyed', [this]);
-      });
   }
 });
 DefineMap.setReference('Resource', Resource);
@@ -136,7 +113,7 @@ Resource.getPermalink = function(resource) {
  * @return {string}
  */
 Resource.prototype.getPermalink = function() {
-  return Resource.getPermalink(this); 
+  return Resource.getPermalink(this);
 };
 
 /**
@@ -235,40 +212,28 @@ Resource.deleteAll = function(resources) {
 
 /**
  * Update resources after they have been shared.
- * - Update the permission of the current user locally
- * - Destroy them locally if the user has not access to them
  * @param resourcesIds
  * @return {Promise}
  */
-Resource.updateResourcesAfterShare = function(resourcesIds) {
+Resource.findAllByIds = function(resourcesIds) {
   // Retrieve the resources by batch of 100 to avoid any 414 response.
   const batchSize = 100;
   if (resourcesIds.length > batchSize) {
     const resourcesIdsParts = chunk(resourcesIds, batchSize);
-    return resourcesIdsParts.reduce((promise, resourcesIdsPart) => promise.then(carry => Resource.updateResourcesAfterShare(resourcesIdsPart)
+    return resourcesIdsParts.reduce((promise, resourcesIdsPart) => promise.then(carry => Resource.findAllByIds(resourcesIdsPart)
       .then(resources => carry.concat(resources))), Promise.resolve(new Resource.List()));
   }
 
   const findOptions = {
-    contain: {permission: 1},
+    contain: {favorite: 1, permission: 1, tag: 1},
     filter: {
       'has-id': resourcesIds
     }
   };
-  return Resource.findAll(findOptions)
-    .then(resources => {
-      // Delete locally the resources that are not returned by the API request, it means the user does not have access to it anymore.
-      const updatedResourcesIds = resources.map(resource => resource.id).get();
-      const deletedResourcesIds = resourcesIds.filter(item => !updatedResourcesIds.includes(item));
-      deletedResourcesIds.forEach(deletedResourceId => {
-        const resource = Resource.connection.instanceStore.get(deletedResourceId);
-        Resource.dispatch('destroyed', [resource]);
-      });
-      return resources;
-    });
+  return Resource.findAll(findOptions);
 };
 
-Resource.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap, connectConstructorHydrate], {
+Resource.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: Resource,
   List: Resource.List,
   url: {

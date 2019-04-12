@@ -17,7 +17,6 @@ import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
 import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
-import connectStore from 'can-connect/constructor/store/store';
 import DefineMap from 'passbolt-mad/model/map/map';
 import getObject from 'can-util/js/get/get';
 // eslint-disable-next-line no-unused-vars
@@ -126,7 +125,7 @@ MfaSettings.mapToApi = function(data) {
   return result;
 };
 
-MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectStore, connectMap], {
+MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: MfaSettings,
   url: {
     resource: '/',

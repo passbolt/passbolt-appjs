@@ -14,9 +14,7 @@
 import Comment from 'app/model/map/comment';
 import CommentCreateForm from 'app/form/comment/create';
 import CommentsListComponent from 'app/component/comment/comments_list';
-import CommentsSidebarSectionView from 'app/view/component/comment/comments_sidebar_section';
 import ComponentHelper from 'passbolt-mad/helper/component';
-import route from 'can-route';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 
 import template from 'app/view/template/component/comment/comments_sidebar_section.stache!';
@@ -25,7 +23,6 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
 
   defaults: {
     label: 'Comments Controller',
-    viewClass: CommentsSidebarSectionView,
     loadedOnStart: false,
     resource: null,
     foreignModel: null,
@@ -41,6 +38,9 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
    */
   afterStart: function() {
     this._initCommentsList();
+    if (this.state.opened) {
+      this.open();
+    }
     this._super();
   },
 
@@ -56,6 +56,15 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
     });
     component.start();
     this.commentsList = component;
+  },
+
+  /**
+   * @inheritdoc
+   */
+  open: function() {
+    this._findComments()
+      .then(comments => this._loadComments(comments));
+    this._super();
   },
 
   /**
@@ -125,16 +134,6 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
         $(this.form.destroyAndRemove());
         this.form = null;
       });
-  },
-
-  /**
-   * Section has been opened
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occured
-   */
-  '{element} section_opened': function() {
-    this._findComments()
-      .then(comments => this._loadComments(comments));
   },
 
   /**

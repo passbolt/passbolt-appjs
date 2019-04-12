@@ -101,7 +101,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     switch (action) {
       case 'view': {
         const id = route.data.id;
-        const user = User.connection.instanceStore.get(id);
+        const user = this.options.grid.options.items.filter({id: id}).pop();
         if (user) {
           this.options.selectedUsers.push(user);
         } else {
@@ -114,7 +114,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       }
       case 'delete': {
         const id = route.data.id;
-        const user = User.connection.instanceStore.get(id);
+        const user = this.options.grid.options.items.filter({id: id}).pop();
         if (user) {
           this.deleteUser(user);
         } else {
@@ -461,7 +461,8 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    */
   _saveUser: function(user, form, dialog) {
     return user.save()
-      .then(() => {
+      .then(savedUser => {
+        user.assign(savedUser);
         dialog.remove();
       }, response => {
         form.showErrors({User: response.body});
@@ -706,6 +707,20 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    */
   '{selectedGroups} remove': function() {
     this._destroyGroupSecondarySidebar();
+  },
+
+  /**
+   * Observe when a user is updated.
+   * If the user is currently selected, update the instance instance in selectedUsers array
+   * @param {DefineMap.prototype} model The model reference
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {User} user The updated user
+   */
+  '{User} updated': function(model, ev, user) {
+    const userSelectedIndex = this.options.selectedUsers.indexOf(user);
+    if (userSelectedIndex != -1) {
+      this.options.selectedUsers[userSelectedIndex].assign(user);
+    }
   },
 
   /**

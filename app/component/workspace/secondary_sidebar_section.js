@@ -12,16 +12,45 @@
  * @since         2.0.0
  */
 import Component from 'passbolt-mad/component/component';
-import SecondarySidebarView from 'app/view/component/workspace/secondary_sidebar_section';
+import SecondarySidebarState from 'app/model/state/secondary_sidebar_state';
 
 const SecondarySidebarSection = Component.extend('passbolt.component.workspace.SecondarySidebarSection', /** @static */ {
 
   defaults: {
     label: 'SecondarySidebar Component',
-    viewClass: SecondarySidebarView
+    stateClass: SecondarySidebarState
   }
 
 }, /** @prototype */ {
+
+  /**
+   * Open the section.
+   */
+  open: function() {
+    $('.accordion-content', this.element).slideDown(50);
+    $(this.element).removeClass('closed');
+    this.state.opened = true;
+  },
+
+  /**
+   * Close the section
+   */
+  close: function() {
+    $('.accordion-content', this.element).slideUp(50);
+    $(this.element).addClass('closed');
+    this.state.opened = false;
+  },
+
+  /**
+   * Observe when accordion-header is clicked.
+   */
+  '{element} a.accordion-trigger click': function() {
+    if (!this.state.opened) {
+      this.open();
+    } else {
+      this.close();
+    }
+  }
 
 });
 

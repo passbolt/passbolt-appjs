@@ -16,7 +16,6 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import Permission from 'app/model/map/permission';
-import PermissionsSidebarSectionView from 'app/view/component/permission/permissions_sidebar_section';
 import PermissionType from 'app/model/map/permission_type';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 import TreeComponent from 'passbolt-mad/component/tree';
@@ -29,7 +28,6 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
   defaults: {
     label: 'Sidebar Section Permissions Component',
-    viewClass: PermissionsSidebarSectionView,
     template: template,
     acoInstance: null
   }
@@ -56,6 +54,17 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    */
   afterStart: function() {
     this._initPermissionsList();
+    if (this.state.opened) {
+      this.open();
+    }
+    this._super();
+  },
+
+  /**
+   * @inheritdoc
+   */
+  open: function() {
+    this._loadPermissions();
     this._super();
   },
 
@@ -155,15 +164,6 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     if ($(this.element).hasClass('closed')) {
       return;
     }
-    this._loadPermissions(); 
-  },
-
-  /**
-   * Section has been opened
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occured
-   */
-  '{element} section_opened': function() {
     this._loadPermissions();
   },
 
