@@ -62,8 +62,13 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
    * @inheritdoc
    */
   open: function() {
+    $('.processing-wrapper', this.element).show();
+    this.commentsList.reset();
     this._findComments()
-      .then(comments => this._loadComments(comments));
+      .then(comments => {
+        $('.processing-wrapper', this.element).hide();
+        this._loadComments(comments);
+      });
     this._super();
   },
 

@@ -64,6 +64,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * @inheritdoc
    */
   open: function() {
+    this._showLoading();
     this._loadPermissions();
     this._super();
   },
@@ -137,6 +138,13 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
   },
 
   /**
+   * Show the loading.
+   */
+  _showLoading: function() {
+    
+  },
+
+  /**
    * Retrieve and load permissions in the list.
    * @return {promise}
    */
@@ -144,6 +152,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
     const self = this;
     const aco_name = 'resource';
     const aco_foreign_key = this.options.acoInstance.id;
+    $('.processing-wrapper', this.element).show();
 
     this.state.loaded = false;
     this.permissionsList.reset();
@@ -152,6 +161,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
       aco_foreign_key: aco_foreign_key,
       contain: {group: 1, user: 1, 'user.profile': 1}
     }).then(permissions => {
+      $('.processing-wrapper', this.element).hide();
       self.permissionsList.load(permissions);
       this.state.loaded = true;
     });

@@ -10,5 +10,9 @@
 	</a>
 	{{/if}}
 
+	<div class="processing-wrapper">
+		<span class="processing-text">Retrieving permissions </span>
+	</div>
+	
 	<ul id="js_rs_details_permissions_list" class="shared-with"></ul>
 </div>
