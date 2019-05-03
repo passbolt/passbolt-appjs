@@ -34,16 +34,14 @@ Favorite.connection = connect([connectParse, connectDataUrl, connectConstructor,
     resource: '/',
     destroyData: function(params) {
       return Ajax.request({
-        url: 'favorites/{id}.json?api-version=v2',
-        type: 'DELETE',
-        params: params
+        url: `favorites/${params.id}.json?api-version=v2`,
+        type: 'DELETE'
       });
     },
     createData: function(params) {
       return Ajax.request({
-        url: 'favorites/resource/{foreign_key}.json?api-version=v2',
-        type: 'POST',
-        params: params
+        url: `favorites/resource/${params.foreign_key}.json?api-version=v2`,
+        type: 'POST'
       });
     }
   }

@@ -265,6 +265,7 @@ const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings
    * @param {Dialog} dialog The dialog object
    */
   _saveUser: function(user, form, dialog) {
+    user['__FILTER_CASE__'] = 'edit_profile';
     user.save()
       .then(() => {
         dialog.remove();

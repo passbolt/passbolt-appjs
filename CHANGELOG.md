@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PB-195: Ensure the requests to the API are made in v2
 
 ## [2.8.4] - 2019-04-15
 ### Improved

@@ -71,6 +71,25 @@ User.validationRules = {
 };
 
 /**
+ * @inherited-doc
+ */
+User.getFilteredFields = function(filteredCase) {
+  let filteredFields = false;
+
+  switch (filteredCase) {
+    case 'edit_profile':
+      filteredFields = [
+        'id',
+        'profile.first_name',
+        'profile.last_name'
+      ];
+      break;
+  }
+
+  return filteredFields;
+}; 
+
+/**
  * The current logged-in user
  * @type {User}
  */
@@ -194,8 +213,9 @@ User.connection = connect([connectParse, connectDataUrl, connectConstructor, con
     },
     getData: function(params) {
       params = params || {};
+      params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'users/{id}.json?api-version=v2',
+        url: 'users/{id}.json',
         type: 'GET',
         params: params
       });

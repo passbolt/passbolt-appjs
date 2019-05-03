@@ -62,8 +62,10 @@ Role.connection = connect([connectParse, connectDataUrl, connectConstructor, con
   url: {
     resource: '/',
     getListData: function(params) {
+      params = params || {};
+      params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'roles.json?api-version=v2',
+        url: 'roles.json',
         type: 'GET',
         params: params
       });

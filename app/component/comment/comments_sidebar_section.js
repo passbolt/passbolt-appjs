@@ -77,7 +77,6 @@ const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend(
    */
   _findComments: function() {
     const findOptions = {
-      foreignModel: this.options.foreignModel,
       foreignKey: this.options.foreignKey,
       contain: {creator: 1}
     };

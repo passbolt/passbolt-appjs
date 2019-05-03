@@ -75,9 +75,8 @@ const Group = DefineMap.extend('passbolt.model.Group', {
    */
   deleteDryRun: function() {
     return Ajax.request({
-      url: 'groups/{id}/dry-run.json?api-version=2',
+      url: `groups/${this.id}/dry-run.json?api-version=2`,
       type: 'DELETE',
-      params: {id: this.id},
       silentNotify: true
     });
   }
@@ -177,13 +176,16 @@ Group.connection = connect([connectParse, connectDataUrl, connectConstructor, co
       return Promise.resolve({});
     },
     getData: function(params) {
+      params = params || {};
+      params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'groups/{id}.json?api-version=v2',
+        url: 'groups/{id}.json',
         type: 'GET',
         params: params
       });
     },
     getListData: function(params) {
+      params = params || {};
       params['api-version'] = 'v2';
       return Ajax.request({
         url: 'groups.json',

@@ -21,10 +21,13 @@ class UsersDirectoryService {}
  * @return {Promise}
  * @static
  */
-UsersDirectoryService.dryRunSynchronize = function() {
+UsersDirectoryService.dryRunSynchronize = function(params) {
+  params = params || {};
+  params['api-version'] = 'v2';
   return AppAjax.request({
-    url: `${APP_URL}directorysync/synchronize/dry-run.json`,
-    type: 'GET'
+    url: 'directorysync/synchronize/dry-run.json',
+    type: 'GET',
+    params: params
   }).then(data => new UsersDirectoryReport(data));
 };
 
@@ -33,10 +36,13 @@ UsersDirectoryService.dryRunSynchronize = function() {
  * @return {Promise}
  * @static
  */
-UsersDirectoryService.synchronize = function() {
+UsersDirectoryService.synchronize = function(params) {
+  params = params || {};
+  params['api-version'] = 'v2';
   return AppAjax.request({
-    url: `${APP_URL}directorysync/synchronize.json`,
-    type: 'GET'
+    url: 'directorysync/synchronize.json',
+    type: 'GET',
+    params: params
   }).then(data => new UsersDirectoryReport(data));
 };
 

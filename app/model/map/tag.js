@@ -48,8 +48,10 @@ Tag.connection = connect([connectParse, connectDataUrl, connectConstructor, conn
   url: {
     resource: '/',
     getListData: function(params) {
+      params = params || {};
+      params['api-version'] = 'v2';
       return Ajax.request({
-        url: 'tags.json?api-version=v2',
+        url: 'tags.json',
         type: 'GET',
         params: params
       });

@@ -239,6 +239,7 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
   url: {
     resource: '/',
     getData: function(params) {
+      params = params || {};
       params['api-version'] = 'v2';
       return Ajax.request({
         url: 'resources/{id}.json',
@@ -247,6 +248,7 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
       });
     },
     getListData: function(params) {
+      params = params || {};
       params['api-version'] = 'v2';
       return Ajax.request({
         url: 'resources.json',
@@ -255,15 +257,10 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
       });
     },
     destroyData: function(params) {
-      const _params = {
-        id: params.id,
-        'api-version': 'v2'
-      };
       return Ajax.request({
-        url: 'resources/{id}.json?api-version=v2',
+        url: `resources/${params.id}.json?api-version=v2`,
         type: 'DELETE',
-        silentNotify: params.__SILENT_NOTIFY__ ? params.__SILENT_NOTIFY__ : false,
-        params: _params
+        silentNotify: params.__SILENT_NOTIFY__ ? params.__SILENT_NOTIFY__ : false
       });
     },
     createData: function(params) {

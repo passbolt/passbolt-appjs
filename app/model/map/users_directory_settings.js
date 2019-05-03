@@ -134,8 +134,8 @@ UsersDirectorySettings.connection = connect([connectParse, connectDataUrl, conne
   Map: UsersDirectorySettings,
   url: {
     resource: '/',
-    getData: function() {
-      const params = {};
+    getData: function(params) {
+      params = params || {};
       params['api-version'] = 'v2';
       return Ajax.request({
         url: 'directorysync/settings.json',

@@ -47,13 +47,6 @@ const CreateForm = Form.extend('passbolt.form.comment.Create', /** @static */ {
       }).start()
     );
 
-    // foreign_model hidden field
-    this.addElement(
-      new TextboxComponent(`#${this.element.id} .js_comment_foreign_model`, {
-        modelReference: 'Comment.foreign_model'
-      }).start().setValue('Resource')
-    );
-
     // foreign_key hidden field
     this.addElement(
       new TextboxComponent(`#${this.element.id} .js_comment_foreign_key`, {
