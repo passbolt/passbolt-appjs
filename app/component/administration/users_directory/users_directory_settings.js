@@ -334,6 +334,25 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
   },
 
   /**
+   * Test settings and display report.
+   * @private
+   */
+  _testSettings: function() {
+    const data = this.form.getData();
+    if (data.UsersDirectorySettings.enabled) {
+      if (this.form.validate()) {
+        this.usersDirectorySettings.assign(data.UsersDirectorySettings);
+        this.usersDirectorySettings.testSettings(data.UsersDirectorySettings)
+        .then(data => {
+          this._showTestSettingsReport(data);
+        });
+      } else {
+        this._scrollToFirstError();
+      }
+    }
+  },
+
+  /**
    * Display the test settings report
    *
    * @param {object} report The report
@@ -357,9 +376,42 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
     testSettingsReportDialog.setViewData('usersCount', data.users.length);
     testSettingsReportDialog.setViewData('groups', data.groups);
     testSettingsReportDialog.setViewData('groupsCount', data.groups.length);
-    testSettingsReportDialog.setViewData('totalCount', data.groups.length + data.groups.length);
+    testSettingsReportDialog.setViewData('totalCount', data.users.length + data.groups.length);
     testSettingsReportDialog.setViewData('tree', data.tree);
+    testSettingsReportDialog.setViewData('errorsCount', data.errors.length);
+    testSettingsReportDialog.setViewData('errors', JSON.stringify(data.errors, null, 2));
     testSettingsReportDialog.start();
+  },
+
+  /**
+   * Save form settings.
+   * @private
+   */
+  _saveSettings: function() {
+    const data = this.form.getData();
+    if (data.UsersDirectorySettings.enabled) {
+      if (this.form.validate()) {
+        this.usersDirectorySettings.assign(data.UsersDirectorySettings);
+        this.usersDirectorySettings.save()
+        .then(() => {
+          route.data.update({controller: 'Administration', action: 'usersDirectory'});
+          this.refresh();
+          MadBus.trigger('passbolt_notify', {
+            title: 'app_directorysync_settings_update_success',
+            status: 'success',
+          });
+        });
+      } else {
+        this._scrollToFirstError();
+      }
+    } else {
+      this.usersDirectorySettings.destroy()
+      .then(() =>  {
+        this.usersDirectorySettings = new UsersDirectorySettings({});
+        route.data.update({controller: 'Administration', action: 'usersDirectory'});
+        this.refresh();
+      });
+    }
   },
 
   /**
@@ -397,48 +449,14 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
    * Listen when the user want to save the changes.
    */
   '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-save-button click': function() {
-    const data = this.form.getData();
-    if (data.UsersDirectorySettings.enabled) {
-      if (this.form.validate()) {
-        this.usersDirectorySettings.assign(data.UsersDirectorySettings);
-        this.usersDirectorySettings.save()
-          .then(() => {
-            route.data.update({controller: 'Administration', action: 'usersDirectory'});
-            this.refresh();
-            MadBus.trigger('passbolt_notify', {
-              title: 'app_directorysync_settings_update_success',
-              status: 'success',
-            });
-          });
-      } else {
-        this._scrollToFirstError();
-      }
-    } else {
-      this.usersDirectorySettings.destroy()
-        .then(() =>  {
-          this.usersDirectorySettings = new UsersDirectorySettings({});
-          route.data.update({controller: 'Administration', action: 'usersDirectory'});
-          this.refresh();
-        });
-    }
+    this._saveSettings();
   },
 
   /**
    * Listen when the user want to save the changes.
    */
   '{window} #js_wsp_primary_menu_wrapper #js-ldap-settings-test-button click': function() {
-    const data = this.form.getData();
-    if (data.UsersDirectorySettings.enabled) {
-      if (this.form.validate()) {
-        this.usersDirectorySettings.assign(data.UsersDirectorySettings);
-        this.usersDirectorySettings.testSettings(data.UsersDirectorySettings)
-          .then(data => {
-            this._showTestSettingsReport(data);
-          });
-      } else {
-        this._scrollToFirstError();
-      }
-    }
+    this._testSettings();
   }
 
 });

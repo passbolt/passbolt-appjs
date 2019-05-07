@@ -62,7 +62,7 @@
             <div class="input text js_form_element_wrapper ad openldap">
                 <label>{{__('Group path')}}</label>
                 <input id="js-group-path-input" type="text" class="required fluid" placeholder="Group Path">
-                <div class="message">{{__('Group path is used in addition to the base DN while searching groups.')}}</div>
+                <div class="message">{{__('Group path is used in addition to the base DN while searching groups. Leave empty if users and groups are in the same DN.')}}</div>
                 <div id="js-group-path-input-feedback" class="message"></div>
             </div>
             <div class="input text js_form_element_wrapper ad openldap">
@@ -83,6 +83,25 @@
                 <div class="message">{{__('For Openldap only. Defines which user object to use. (Default: inetOrgPerson)')}}</div>
                 <div id="js-user-object-class-input-feedback" class="message"></div>
             </div>
+            <div class="input text js_form_element_wrapper openldap">
+                <label>{{__('Use email prefix / suffix?')}}</label>
+                <div id="js-use-email-prefix-suffix-toggle-button" class="input toggle-switch openldap"></div>
+                <div class="message">{{__("Use this option when user entries don't include an email address by default")}}</div>
+            </div>
+             <div class="singleline clearfix hidden" id="use-email-prefix-suffix-options">
+                <div class="input text first-field js_form_element_wrapper openldap">
+                    <label>{{__('Email prefix')}}</label>
+                    <input id="js-email-prefix-input" type="text" class="required fluid" placeholder="username">
+                    <div class="message">{{__('The attribute you would like to use for the first part of the email (usually username).')}}</div>
+                    <div id="js-email-prefix-input-feedback" class="message"></div>
+                </div>
+                <div class="input text last-field js_form_element_wrapper openldap">
+                    <label>{{__('Email suffix')}}</label>
+                    <input id="js-email-suffix-input" type="text" class="required fluid" placeholder="@your-domain.com">
+                    <div class="message">{{__('The domain name part of the email (@your-domain-name).')}}</div>
+                    <div id="js-email-suffix-input-feedback" class="message"></div>
+                </div>
+             </div>
         </div>
     </div>
 
