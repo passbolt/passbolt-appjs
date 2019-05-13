@@ -1,12 +1,12 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
@@ -19,6 +19,7 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import UsersDirectorySettings from 'app/component/administration/users_directory/users_directory_settings';
 import MenuComponent from 'passbolt-mad/component/menu';
 import MfaSettings from 'app/component/administration/mfa/mfa_settings';
+import EmailNotificationSettingsComponent from 'app/component/administration/email_notification/email_notification_settings';
 import route from 'can-route';
 import template from 'app/view/template/component/administration/workspace.stache!';
 import uuid from 'uuid/v4';
@@ -53,6 +54,7 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
     this._initPrimarySidebar();
     this._initMfaSection();
     this._initUsersDirectorySection();
+    this._initEmailNotificationSection();
   },
 
   /**
@@ -88,6 +90,20 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
         menu.selectItem(usersDirectorySettingsItem);
       }
     }
+
+
+    if (plugins.emailNotificationSettings) {
+      const emailNotificationSettingsItem = new Action({
+        id: 'js_app_nav_left_email_notification_link',
+        name: 'emailNotification',
+        label: __('Email Notifications'),
+        action: () => this._goToSection('emailNotification')
+      });
+      menu.insertItem(emailNotificationSettingsItem);
+      if (/emailNotification/.test(route.data.action)) {
+        menu.selectItem(emailNotificationSettingsItem);
+      }
+    }
   },
 
   /**
@@ -111,6 +127,17 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
   },
 
   /**
+   * Init the email notification section.
+   * @private
+   */
+  _initEmailNotificationSection: function() {
+    if (route.data.action != 'emailNotification') { return; }
+    const section = new EmailNotificationSettingsComponent('#js_wk_administration_main');
+    section.start();
+  },
+
+  /**
+   * /**
    * Go to a section
    * @private
    */

@@ -1,0 +1,34 @@
+<div class="grid grid-responsive-12">
+    <div class="row">
+        <div class="email-notification-settings col8">
+        <br/>
+        <div class="warning message hidden" id="email-notification-setting-overridden-banner">
+            <p>
+                {{ __('Settings have been found in your database as well as in your passbolt.php (or environment variables). The settings displayed in the form below are the one stored in your database and have precedence over others.') }}
+            </p>
+        </div>
+        <div class="warning message hidden" id="email-notification-fileconfig-exists-banner">
+            <p>
+                {{ __('You seem to have Email Notification Settings defined in your passbolt.php (or via environment variables). Submitting the form will overwrite those settings with the ones you choose in the form below.') }}
+            </p>
+        </div>
+        <h3>Email delivery</h3>
+        <p>
+            In this section you can adjust which emails will be delivered
+            and which notifications will be ignored.
+        </p>
+            <form id="js-email-notification-settings-form"></form>
+            <p>&nbsp;</p>
+        </div>
+        <div class="col4 last">
+            <h3>{{__('Need some help?')}}</h3>
+            <div class="notice message">
+                <p>{{__('For more information about email notification, checkout the dedicated page on the help website.')}}</p>
+                <a class="button" href="https://help.passbolt.com/configure/notifications/email" target="_blank">
+                    <i class="fa fa-fw fa-life-ring"></i>
+                    <span>{{__('Read documentation')}}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

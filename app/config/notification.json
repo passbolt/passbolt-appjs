@@ -20,7 +20,7 @@
 				"msg": "The passwords have been deleted"
 			},
 			"app_resources_update_success": {
-			  "msg": "The password has been updated successfully"
+				"msg": "The password has been updated successfully"
 			},
 			"app_users_addPost_success": {
 				"msg": "The user has been added successfully"
@@ -58,15 +58,15 @@
 			"app_favorites_delete_success": {
 				"msg": "The password has been removed from favorites"
 			},
-            "app_comments_addPost_success": {
-                "msg": "The comment has been added successfully"
-            },
-            "app_comments_delete_success": {
-              "msg": "The comment has been deleted"
-            },
-            "app_share_share_success": {
-              "msg": "The permissions have been updated successfully"
-            },
+			"app_comments_addPost_success": {
+				"msg": "The comment has been added successfully"
+			},
+			"app_comments_delete_success": {
+				"msg": "The comment has been deleted"
+			},
+			"app_share_share_success": {
+				"msg": "The permissions have been updated successfully"
+			},
 			"app_groups_add_success": {
 				"msg": "The group has been added successfully"
 			},
@@ -87,7 +87,7 @@
 			},
 			"app_passwords_delete_error_not_found": {
 				"msg": "The password does not exist"
-			}, 
+			},
 			"app_passwords_view_error_not_found": {
 				"msg": "The password does not exist"
 			},
@@ -99,6 +99,9 @@
 			},
 			"app_directorysync_settings_update_success": {
 				"msg": "The users directory settings for the organization were updated."
+			},
+			"app_notificationorgsettings_post_success": {
+				"msg": "The email notification settings were updated."
 			}
 		}
 	}

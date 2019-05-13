@@ -1,0 +1,47 @@
+<div class="row">
+	<div class="col6">
+		<label>{{__('Passwords')}}</label>
+		<span id="js-send-password-create-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-password-update-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-password-delete-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-password-share-toggle-button" class="input toggle-switch"></span>
+	</div>
+	<div class="col6 last">
+		<label>{{__('Group membership')}}</label>
+		<span id="js-send-group-delete-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-group-user-add-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-group-user-update-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-group-user-delete-toggle-button" class="input toggle-switch"></span>
+	</div>
+</div>
+<div class="row">
+	<div class="col6">
+		<label>{{__('Registration & Recovery')}}</label>
+		<span id="js-send-user-create-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-user-recover-toggle-button" class="input toggle-switch"></span>
+		<label>{{__('Comments')}}</label>
+		<span id="js-send-comment-add-toggle-button" class="input toggle-switch"></span>
+	</div>
+	<div class="col6 last">
+		<label>{{__('Group manager')}}</label>
+		<span id="js-send-group-manager-update-toggle-button" class="input toggle-switch"></span>
+	</div>
+</div>
+<div class="row">
+	<h3>Email content visibility</h3>
+	<p>
+		In this section you can adjust the composition of the emails, e.g. which information will be included in the
+		notification.
+	</p>
+	<div class="col6">
+		<label>{{__('Passwords')}}</label>
+		<span id="js-show-username-toggle-button" class="input toggle-switch"></span>
+		<span id="js-show-uri-toggle-button" class="input toggle-switch"></span>
+		<span id="js-show-secret-toggle-button" class="input toggle-switch"></span>
+		<span id="js-show-description-toggle-button" class="input toggle-switch"></span>
+	</div>
+	<div class="col6 last">
+		<label>{{__('Comments')}}</label>
+		<span id="js-show-comment-toggle-button" class="input toggle-switch"></span>
+	</div>
+</div>

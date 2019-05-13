@@ -1,0 +1,6 @@
+<li>
+    <a id="js-email-notification-settings-save-button" class="button">
+        <i class="fa fa-fw fa-save"></i>
+        <span>{{__('save settings'}}</span>
+    </a>
+</li>
