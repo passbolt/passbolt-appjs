@@ -134,16 +134,14 @@ const EmailNotificationSettingsComponent = Component.extend('passbolt.component.
    * When the form is updated enable the save settings button
    */
   '#js-email-notification-settings-form changed': function() {
-    if (!this.options.settingsOverriden) {
-      this.primaryMenu.saveButton.state.disabled = false;
-    }
+    this.primaryMenu.saveButton.state.disabled = false;
   },
 
   /**
    * Listen when the user want to save the changes.
    */
   '{window} #js_wsp_primary_menu_wrapper #js-email-notification-settings-save-button click': function() {
-    if (this.form.validate() && !this.options.settingsOverriden) {
+    if (this.form.validate()) {
       this.state.loaded = false;
       const data = this.form.getData();
       this.emailNotificationSettings.assign(data.EmailNotificationSettings);
