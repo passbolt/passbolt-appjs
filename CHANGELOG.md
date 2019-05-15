@@ -4,9 +4,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.10.1] - 2019-05-15
+### Fixed
+- PB-167: Email notification settings admin screen should be available on CE
+
 ## [2.10.0] - 2019-05-15
-- PB-195: Ensure the requests to the API are made in v2
+### Added
 - PB-167: Email notification settings admin screen
+
+### Improved
+- PB-195: Ensure the requests to the API are made in v2
 
 ## [2.8.4] - 2019-04-15
 ### Improved
@@ -152,7 +159,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.1...HEAD
+[2.10.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.4...v2.10.0
 [2.8.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.3...v2.8.4
 [2.8.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.2...v2.8.3

@@ -91,7 +91,6 @@ const AdministrationWorkspace = Component.extend('passbolt.component.administrat
       }
     }
 
-
     if (plugins.emailNotificationSettings) {
       const emailNotificationSettingsItem = new Action({
         id: 'js_app_nav_left_email_notification_link',

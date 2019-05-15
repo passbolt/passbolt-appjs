@@ -82,7 +82,7 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
     // Administration
     if (User.getCurrent().isAdmin()) {
       const plugins = Config.read('server.passbolt.plugins');
-      if (plugins.directorySync || plugins.multiFactorAuthentication) {
+      if (plugins.directorySync || plugins.multiFactorAuthentication || plugins.emailNotificationSettings) {
         const helpItem = new Action({
           id: 'js_app_nav_left_administration_link',
           label: __('administration'),
@@ -127,7 +127,14 @@ const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLef
    */
   _goToAdministrationWorkspace: function() {
     const controller = 'Administration';
-    const action = 'mfa';
+    let action;
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins.multiFactorAuthentication) {
+      action = "mfa";
+    } else {
+      action = "emailNotification";
+    }
+
     route.data.update({controller: controller, action: action});
   },
 
