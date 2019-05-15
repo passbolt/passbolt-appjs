@@ -82,6 +82,7 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     this._initGeneralSwitch();
     this._enableFormFields();
     this._initChoosenFields();
+    this._initCustomFields();
     this.state.loaded = true;
     this.enabled = usersDirectorySettings.isEnabled();
   },
@@ -106,6 +107,16 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
     for (const i in this.elements) {
       this.elements[i].state.disabled = false;
     }
+  },
+
+  /**
+   * Init custom fields.
+   * @private
+   */
+  _initCustomFields: function() {
+    // Show / hide suffix prefix fields depending on the show email prefix / suffix settings.
+    const useEmailPrefixSuffix = this.usersDirectorySettings.use_email_prefix_suffix;
+    domEvents.dispatch($('#js-use-email-prefix-suffix-toggle-button')[0], {type: 'changed', data: {value: useEmailPrefixSuffix}});
   },
 
   /**
@@ -280,6 +291,31 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
       }).start(),
       new FeedbackComponent('#js-user-object-class-input-feedback', {}).start()
     );
+
+    this.addElement(
+      new ToggleButtonComponent('#js-use-email-prefix-suffix-toggle-button', {
+        label: __('Build email based on a prefix and suffix?'),
+        modelReference: 'UsersDirectorySettings.use_email_prefix_suffix',
+        state: {disabled: true},
+        value: false
+      }).start()
+    );
+
+    this.addElement(
+      new TextboxComponent('#js-email-prefix-input', {
+        modelReference: 'UsersDirectorySettings.email_prefix',
+        state: {disabled: true},
+      }).start(),
+      new FeedbackComponent('#js-email-prefix-input-feedback', {}).start()
+    );
+
+    this.addElement(
+      new TextboxComponent('#js-email-suffix-input', {
+        modelReference: 'UsersDirectorySettings.email_suffix',
+        state: {disabled: true},
+      }).start(),
+      new FeedbackComponent('#js-email-suffix-input-feedback', {}).start()
+    );
   },
 
   /**
@@ -323,10 +359,10 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
 
     this.addElement(
       new ToggleButtonComponent('#js-enabled-users-only-toggle-button', {
-        label: __('Only for AD. Synchronize only the users that are enabled'),
+        label: __('Only synchronize enabled users (AD)'),
         modelReference: 'UsersDirectorySettings.enabled_users_only',
         state: {disabled: true},
-        value: true
+        value: false
       }).start()
     );
 
@@ -400,6 +436,20 @@ const UsersDirectorySettingsForm = Form.extend('passbolt.form.administration.use
       $('.ldap-settings').removeClass('enabled');
     }
     this.enabled = enabled;
+  },
+
+  /**
+   * Listen when the user enables use email prefix/suffix.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occured
+   */
+  '{element} #js-use-email-prefix-suffix-toggle-button changed': function(el, ev) {
+    const enabled = ev.data.value;
+    if (enabled) {
+      $('#use-email-prefix-suffix-options').removeClass('hidden');
+    } else {
+      $('#use-email-prefix-suffix-options').addClass('hidden');
+    }
   }
 
 });
