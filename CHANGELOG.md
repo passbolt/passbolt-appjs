@@ -3,7 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.10.0] - 2019-05-15
 - PB-195: Ensure the requests to the API are made in v2
+- PB-167: Email notification settings admin screen
 
 ## [2.8.4] - 2019-04-15
 ### Improved
@@ -149,7 +152,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.8.4...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.0...HEAD
+[2.10.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.4...v2.10.0
 [2.8.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.3...v2.8.4
 [2.8.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.2...v2.8.3
 [2.8.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.1...v2.8.2

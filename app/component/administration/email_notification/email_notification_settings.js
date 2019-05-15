@@ -91,22 +91,32 @@ const EmailNotificationSettingsComponent = Component.extend('passbolt.component.
 
     if (!this.emailNotificationSettings) {
       return EmailNotificationSettingsMap.findOne()
-      .then(settings => {
-        if (EmailNotificationSettingsMap.fileConfigExists(settings)) {
-          // show the file config exists banner
-          document.getElementById('email-notification-fileconfig-exists-banner').classList.remove('hidden');
-          if (EmailNotificationSettingsMap.settingsOverridenByfile(settings)) {
-            document.getElementById('email-notification-fileconfig-exists-banner').classList.add('hidden');
-            // show the settings overridden banner
-            document.getElementById('email-notification-setting-overridden-banner').classList.remove('hidden');
-          }
-        }
-
-        this.emailNotificationSettings = settings;
-        this.form.loadForm(this.emailNotificationSettings);
-      });
+        .then(settings => {
+          this.emailNotificationSettings = settings;
+          this.form.loadForm(this.emailNotificationSettings);
+          this._showWarning();
+        });
     } else {
       this.form.loadForm(this.emailNotificationSettings);
+      this._showWarning();
+    }
+  },
+
+  /**
+   * Show configuration warning.
+   * @private
+   */
+  _showWarning: function() {
+    const settings = this.emailNotificationSettings;
+
+    if (EmailNotificationSettingsMap.fileConfigExists(settings)) {
+      // show the file config exists banner
+      document.getElementById('email-notification-fileconfig-exists-banner').classList.remove('hidden');
+      if (EmailNotificationSettingsMap.settingsOverridenByfile(settings)) {
+        document.getElementById('email-notification-fileconfig-exists-banner').classList.add('hidden');
+        // show the settings overridden banner
+        document.getElementById('email-notification-setting-overridden-banner').classList.remove('hidden');
+      }
     }
   },
 
@@ -138,13 +148,13 @@ const EmailNotificationSettingsComponent = Component.extend('passbolt.component.
       const data = this.form.getData();
       this.emailNotificationSettings.assign(data.EmailNotificationSettings);
       this.emailNotificationSettings.save()
-        .then(() => {
-          this.state.loaded = true;
+        .then(settingsUpdated => {
+          this.emailNotificationSettings = settingsUpdated;
           this.refresh();
         })
         // Something went wrong
         .catch(() => {
-          this.state.loaded = true;
+          this.emailNotificationSettings = null;
           this.refresh();
         });
     }

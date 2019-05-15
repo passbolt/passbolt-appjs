@@ -141,7 +141,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * Show the loading.
    */
   _showLoading: function() {
-    
+
   },
 
   /**

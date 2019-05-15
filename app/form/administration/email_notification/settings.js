@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.10.0
  */
-import EmailNotificationSettingsMap from 'app/model/map/email_notification_settings';
 import Form from 'passbolt-mad/form/form';
 import ToggleButtonComponent from 'passbolt-mad/form/element/toggle_button';
 import template from 'app/view/template/form/administration/email_notification/settings.stache!';
@@ -64,7 +63,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
   _initFormPasswordSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-send-password-create-toggle-button', {
-        label: __("When you create a password"),
+        label: __("When a password is created, notify its creator."),
         modelReference: 'EmailNotificationSettings.send_password_create',
         state: {disabled: true}
       }).start()
@@ -72,7 +71,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-password-update-toggle-button', {
-        label: __("When a password is updated"),
+        label: __("When a password is updated, notify the users who have access to it."),
         modelReference: 'EmailNotificationSettings.send_password_update',
         state: {disabled: true}
       }).start()
@@ -80,7 +79,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-password-delete-toggle-button', {
-        label: __("When a password is deleted"),
+        label: __("When a password is deleted, notify the users who had access to it."),
         modelReference: 'EmailNotificationSettings.send_password_delete',
         state: {disabled: true}
       }).start()
@@ -88,7 +87,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-password-share-toggle-button', {
-        label: __("When a password is shared with you"),
+        label: __("When a password is shared, notify the users who gain access to it."),
         modelReference: 'EmailNotificationSettings.send_password_share',
         state: {disabled: true}
       }).start()
@@ -101,7 +100,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
   _initFormRegistrationSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-send-user-create-toggle-button', {
-        label: __("When you are invited to passbolt"),
+        label: __("When new users are invited to passbolt, notify them."),
         modelReference: 'EmailNotificationSettings.send_user_create',
         state: {disabled: true}
       }).start()
@@ -109,7 +108,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-user-recover-toggle-button', {
-        label: __("When you try to recover an account"),
+        label: __("When users try to recover their account, notify them."),
         modelReference: 'EmailNotificationSettings.send_user_recover',
         state: {disabled: true}
       }).start()
@@ -122,7 +121,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
   _initFormCommentSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-send-comment-add-toggle-button', {
-        label: __("When somebody posts a comment"),
+        label: __("When a comment is posted on a password, notify the users who have access to this password."),
         modelReference: 'EmailNotificationSettings.send_comment_add',
         state: {disabled: true}
       }).start()
@@ -135,7 +134,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
   _initFormGroupSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-send-group-delete-toggle-button', {
-        label: __("When a group you belong to is deleted"),
+        label: __("When a group is deleted, notify the users who were member of it."),
         modelReference: 'EmailNotificationSettings.send_group_delete',
         state: {disabled: true}
       }).start()
@@ -143,7 +142,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-group-user-add-toggle-button', {
-        label: __("When you are added to a group"),
+        label: __("When users are added to a group, notify them."),
         modelReference: 'EmailNotificationSettings.send_group_user_add',
         state: {disabled: true}
       }).start()
@@ -151,7 +150,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-group-user-delete-toggle-button', {
-        label: __("When you are removed from a group"),
+        label: __("When users are removed from a group, notify them."),
         modelReference: 'EmailNotificationSettings.send_group_user_delete',
         state: {disabled: true}
       }).start()
@@ -159,8 +158,8 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
 
     this.addElement(
       new ToggleButtonComponent('#js-send-group-user-update-toggle-button', {
-        label: __("When your permission changes in a group"),
-        modelReference: 'EmailNotificationSettings.send_group_user_delete',
+        label: __("When user roles change in a group, notify the corresponding users."),
+        modelReference: 'EmailNotificationSettings.send_group_user_update',
         state: {disabled: true}
       }).start()
     );
@@ -172,7 +171,7 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
   _initFormGroupManagerSection: function() {
     this.addElement(
       new ToggleButtonComponent('#js-send-group-manager-update-toggle-button', {
-        label: __("When members change in a group you manage"),
+        label: __("When members of a group change, notify the group manager(s)."),
         modelReference: 'EmailNotificationSettings.send_group_manager_update',
         state: {disabled: true}
       }).start()
@@ -231,11 +230,8 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
     const emailNotificationSettings = this.options.emailNotificationSettings;
     this.load({'EmailNotificationSettings': emailNotificationSettings});
 
-    // check for dual configuration and don't enable the form if it exists.
-    if (!EmailNotificationSettingsMap.settingsOverridenByfile(emailNotificationSettings)) {
-      for (const i in this.elements) {
-        this.elements[i].state.disabled = false;
-      }
+    for (const i in this.elements) {
+      this.elements[i].state.disabled = false;
     }
 
     this.state.loaded = true;

@@ -87,7 +87,7 @@ User.getFilteredFields = function(filteredCase) {
   }
 
   return filteredFields;
-}; 
+};
 
 /**
  * The current logged-in user

@@ -10,8 +10,8 @@
 		<label>{{__('Group membership')}}</label>
 		<span id="js-send-group-delete-toggle-button" class="input toggle-switch"></span>
 		<span id="js-send-group-user-add-toggle-button" class="input toggle-switch"></span>
-		<span id="js-send-group-user-update-toggle-button" class="input toggle-switch"></span>
 		<span id="js-send-group-user-delete-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-group-user-update-toggle-button" class="input toggle-switch"></span>
 	</div>
 </div>
 <div class="row">

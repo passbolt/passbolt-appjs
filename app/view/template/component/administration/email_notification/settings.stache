@@ -14,8 +14,7 @@
         </div>
         <h3>Email delivery</h3>
         <p>
-            In this section you can adjust which emails will be delivered
-            and which notifications will be ignored.
+            In this section you can choose which email notifications will be sent.
         </p>
             <form id="js-email-notification-settings-form"></form>
             <p>&nbsp;</p>
