@@ -1,0 +1,14 @@
+<li class="open node root tag-item" id="{{ mappedItem.id }}">
+    <div class="row ">
+        <div class="main-cell-wrapper">
+            <div class="main-cell">
+                <a title="{{ mappedItem.label }}'"><span>{{ mappedItem.label }}</span></a>
+            </div>
+        </div>
+        {{#if(mappedItem.canEdit)}}
+            <div class="right-cell more-ctrl" style="float:right;">
+                <a href="#"><span>more</span></a>
+            </div>
+        {{/if}}
+    </div>
+</li>

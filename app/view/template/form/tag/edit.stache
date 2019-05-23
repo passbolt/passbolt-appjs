@@ -1,0 +1,14 @@
+<div class="form-content">
+    <input id="js_field_tag_id" name="Tag.id" class="ready" type="hidden">
+    <div id="js_field_tag_slug_wrapper" class="input text required js_form_element_wrapper">
+        <label for="js_field_tag_slug">{{ __('Tag name')}}</label>
+        <input id="js_field_tag_slug" name="Tag.name" class="required ready" maxlength="128" placeholder="name" type="text" autocomplete="off">
+
+        <div id="js_field_tag_slug_feedback" class="message hidden"></div>
+    </div>
+
+</div>
+<div class="submit-wrapper clearfix">
+    <input id="js-tag-edit-dialog-submit" class="button primary" value="save" type="submit">
+    <a class="js-dialog-cancel cancel">{{ __('cancel')}}</a>
+</div>

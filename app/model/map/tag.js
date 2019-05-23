@@ -29,6 +29,21 @@ const Tag = DefineMap.extend('passbolt.model.Tag', {
 DefineMap.setReference('Tag', Tag);
 Tag.List = DefineList.extend({'#': {Type: Tag}});
 
+/*
+ * Default validation rules.
+ * Keep these rules in sync with the passbolt API.
+ */
+Tag.validationRules = {
+  id: [
+    {rule: 'uuid'}
+  ],
+  slug: [
+    {rule: 'required', message: __('Tag can not be empty')},
+    {rule: ['maxLength', 128], message: __('Tag can not be more than %s characters in length', 128)},
+    {rule: 'utf8Extended', message: __('Tag should be a valid utf8 string.')}
+  ]
+};
+
 /**
  * Update the resource tags
  * @param {string} resourceId The target resource to update the tags for
@@ -53,6 +68,19 @@ Tag.connection = connect([connectParse, connectDataUrl, connectConstructor, conn
       return Ajax.request({
         url: 'tags.json',
         type: 'GET',
+        params: params
+      });
+    },
+    destroyData: function(params) {
+      return Ajax.request({
+        url: `tags/${params.id}.json?api-version=v2`,
+        type: 'DELETE'
+      });
+    },
+    updateData: function(params) {
+      return Ajax.request({
+        url: `tags/${params.id}.json?api-version=v2`,
+        type: 'PUT',
         params: params
       });
     }

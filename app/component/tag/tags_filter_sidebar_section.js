@@ -1,16 +1,17 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SARL (https://www.passbolt.com)
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import DomData from 'can-dom-data';
 import Action from 'passbolt-mad/model/map/action';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import Filter from 'app/model/filter';
@@ -19,16 +20,21 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PrimarySidebarSectionComponent from 'app/component/workspace/primary_sidebar_section';
-import Tag from 'app/model/map/tag';
+import TagMap from 'app/model/map/tag';
+import User from 'app/model/map/user';
 import TreeComponent from 'passbolt-mad/component/tree';
-
+import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
+import DialogComponent from 'passbolt-mad/component/dialog';
+import EditTagForm from 'app/form/tag/edit_tag';
 import template from 'app/view/template/component/tag/tags_filter_sidebar_section.stache!';
+import itemTemplate from 'app/view/template/component/tag/tag_filter_sidebar_item.stache!';
+import templateTagDeleteConfirmationDialog from 'app/view/template/component/tag/tag_delete_confirmation_dialog.stache!';
 
 const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.tag.TagsFilterSidebarSection', /** @static */ {
 
   defaults: {
     template: template,
-    selectedTags: new Tag.List(),
+    selectedTags: new TagMap.List(),
     silentLoading: false,
     loadedOnStart: false,
     tree: null,
@@ -38,16 +44,14 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
       disabled: true
     }
   }
-
-}, /** @prototype */ {
-
+},
+  /** @prototype */ {
   /**
    * @inheritdoc
    */
   afterStart: function() {
     this._initTree();
-    this._findTags()
-      .then(tags => this._loadTree(tags));
+    this._findTags().then(tags => this._loadTree(tags));
   },
 
   /**
@@ -55,7 +59,9 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    */
   _initTree: function() {
     const tree = new TreeComponent('#js_wsp_password_filter_tags_list', {
-      map: this._getTreeMap()
+      map: this._getTreeMap(),
+      itemClass: TagMap,
+      itemTemplate: itemTemplate
     });
     tree.state.on('empty', (ev, empty) => this._onTagListEmptyChange(empty));
     tree.start();
@@ -74,16 +80,15 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    * Find tags.
    */
   _findTags: function() {
-    return Tag.findAll()
-      .then(tags => {
-        this.options.tags = tags;
-        return tags;
-      });
+    return TagMap.findAll().then(tags => {
+      this.options.tags = tags;
+      return tags;
+    });
   },
 
   /**
-   * Find the tags.
-   * @param {string} scenario Find all the tags for a given scenario: all or my_tags
+   * Filter tags based on a scenario.
+   * @param {string} scenario The scenario e.g. "all" or "my_tags"
    */
   _filterTree: function(scenario) {
     let tags = this.options.tags;
@@ -123,7 +128,12 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   _getTreeMap: function() {
     return new MadMap({
       id: 'id',
-      label: 'slug'
+      label: 'slug',
+      canEdit: {
+        key: 'id',
+        func: (id, map, item) =>
+          !item.is_shared || User.getCurrent().isAdmin()
+      }
     });
   },
 
@@ -194,6 +204,40 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   },
 
   /**
+   * Show the tag contextual menu.
+   *
+   * @param {Tag} Tag tag model of the li element.
+   * @param {float} x x coordinate where the menu should be shown.
+   * @param {float} y y coordinate where the menu should be shown.
+   */
+  _showTagContextualMenu: function(Tag, x, y) {
+    // Instantiate the contextual menu.
+    const contextualMenu = ContextualMenuComponent.instantiate({
+      coordinates: {
+        x: x,
+        y: y
+      }
+    });
+    contextualMenu.start();
+
+    // Edit a Tag action
+    const tagEditAction = this._createEditTagAction(Tag, () => {
+      contextualMenu.destroyAndRemove();
+    });
+
+    // Add 'Edit Tag' action to contextual menu.
+    contextualMenu.insertItem(tagEditAction);
+
+    // Delete a Tag action
+    const tagDeleteAction = this._createDeleteTagAction(Tag, () => {
+      contextualMenu.destroyAndRemove();
+    });
+
+      // Add 'Delete Tag' action to contextual menu.
+    contextualMenu.insertItem(tagDeleteAction);
+  },
+
+  /**
    * Change the section title
    * @param {string} title
    */
@@ -202,9 +246,150 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   },
 
   /**
+   * Delete a Tag
+   * @param {TagMap} Tag The Tag to delete
+   */
+  _deleteTag: function(Tag, callback) {
+    Tag.destroy().then(() => {
+      $(`#js_wsp_password_filter_tags_list li#${Tag.id}`).hide('fast', function() {
+        $(this).remove();
+        callback(Tag);
+      });
+    });
+  },
+
+  /**
+   * Create Delete Tag Action
+   * @param {TagMap} Tag Tag to delete
+   * @param {function} callback to run after delete
+   */
+  _createDeleteTagAction: function(Tag, callback) {
+    return new Action({
+      id: 'js_tag_operation_delete_trigger',
+      label: __('Delete Tag'),
+      cssClasses: [],
+      action: () => {
+        const dialog = this._createDeleteTagConfirmationDialog(Tag);
+        dialog.start();
+        callback();
+      }
+    })},
+
+  /**
+   * Create the 'Delete Tag' confirmation dialog
+   * @param {TagMap} Tag
+   */
+  _createDeleteTagConfirmationDialog: function(Tag) {
+    const that = this;
+    return ConfirmDialogComponent.instantiate({
+      label: __('Do you really want to delete tag?'),
+      subtitle: __(`You are about to delete the tag '${Tag.slug}'`),
+      cssClasses: ['delete-tag-dialog', 'dialog-wrapper'],
+      content: templateTagDeleteConfirmationDialog,
+      submitButton: {
+        label: 'Delete tag',
+        cssClasses: ['primary warning']
+      },
+      action: () => {
+        that._deleteTag(Tag, deletedTag => {
+          if (this.options.filter && this.options.filter.tag.id === deletedTag.id) {
+            // If the previously selected tag is deleted, reset the workspace.
+            const filter = new Filter({
+              id: 'default',
+              type: 'default',
+              label: __('All items'),
+              order: ['Resource.modified DESC']
+            });
+            MadBus.trigger('filter_workspace', {filter: filter});
+          }
+
+          // Remove the deleted item from tag tree and update the tree
+          const items = that.options.tree.options.items.filter(item => item.id !== deletedTag.id);
+          that.options.tree.options.items = items;
+          that.options.tree.state.empty = !items.length;
+
+          // Broadcast the "tag_deleted" event
+          MadBus.trigger('tag_deleted', {tag: deletedTag});
+        });
+      }
+    });
+  },
+
+  /**
+   * Create Edit Tag Action
+   *
+   * @param {TagMap} Tag Tag to edit.
+   * @param {function} callback callback to run after save.
+   */
+  _createEditTagAction: function(Tag, callback) {
+    return new Action({
+      id: 'js_tag_operation_edit_trigger',
+      label: __('Edit Tag'),
+      cssClasses: [],
+      action: () => {
+        this._createEditTagConfirmationDialog(Tag);
+        callback();
+      }
+    });
+  },
+
+  /**
+   * Create the "Edit Tag" confirmation dialog
+   * @param {TagMap} Tag
+   */
+  _createEditTagConfirmationDialog: function(Tag) {
+    const dialog = DialogComponent.instantiate({
+      label: __('Edit tag'),
+      cssClasses: ['edit-tag-dialog', 'dialog-wrapper']
+    }).start();
+
+    // Attach the Tag Edit form to the dialog
+    dialog.add(EditTagForm, {
+      id: 'js_rs_edit',
+      data: Tag,
+      callbacks: {
+        save: updatedTag => {
+          this._findTags().then(tags => {
+            this._loadTree(tags);
+            // Check if a filter was applied before
+            if (this.options.filter) {
+              let filter;
+              // Was it a tag filter?
+              if (this.options.filter.tag) {
+                filter = new Filter({
+                  id: `workspace_filter_tag_${updatedTag.id}`,
+                  type: 'tag',
+                  label: updatedTag.slug + __(' (tag)'),
+                  rules: {
+                    'has-tag': updatedTag.slug
+                  },
+                  tag: updatedTag
+                });
+                this.options.filter = filter;
+              } else {
+                // For other type filters, simply reapply it
+                filter = this.options.filter;
+              }
+              MadBus.trigger('filter_workspace', {filter: filter});
+
+              // Select the last active tag
+              if (this.options.filter.tag) {
+                this.options.tree.view.selectItem(updatedTag);
+              }
+            }
+            dialog.remove();
+          });
+        }
+      }
+    });
+
+    $('#js_field_tag_slug').focus();
+  },
+
+  /**
    * Observe when the user select a tag.
    * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occured
+   * @param {HTMLEvent} ev The event which occurred
    */
   '{element} item_selected': function(el, ev) {
     const tag = ev.data.item;
@@ -343,7 +528,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   /**
    * Observe when the tree filter button launcher is clicked.
    * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occured
+   * @param {HTMLEvent} ev The event which occurred
    */
   '{element} #js_wsp_pwd_password_filter_tags_more click': function(el, ev) {
     ev.stopPropagation();
@@ -354,8 +539,29 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     const y = p.top + 16;
     this._showTreeFilterMenu(x, y);
     return false;
-  }
+  },
 
-});
+  /**
+   * Observe when the tag contextual menu button is clicked.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{element} #js_wsp_password_filter_tags_list li .right-cell.more-ctrl click': function(
+    el,
+    ev
+  ) {
+    ev.stopPropagation();
+    ev.stopImmediatePropagation();
+    ev.preventDefault();
+    const p = $(el).offset();
+    const x = p.left - 4;
+    const y = p.top + 16;
+
+    const tag = DomData.get($(el).parents('li')[0], TagMap.shortName);
+    this._showTagContextualMenu(tag, x, y);
+    return false;
+  }
+}
+);
 
 export default TagsFilterSidebarSectionComponent;
