@@ -115,7 +115,10 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     $(tagEditorInputText).focus();
 
     Tag.findAll()
-      .then(tags => this._initAutocomplete(tags));
+      .then(tags => this._initAutocomplete({
+        tags: tags,
+        existingTags: slugs
+      }));
   },
 
   /**
@@ -147,8 +150,13 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
 
   /**
    * Init the autocomplete component
+   * @param {Object} options options dictionary
    */
-  _initAutocomplete: function(tags) {
+  _initAutocomplete: function(options) {
+    // All tags
+    const tags = options.tags;
+    // Tags that are already in the editor
+    const editorTags = options.existingTags;
     const isAdmin = this.options.resource.permission.isAllowedTo(PermissionType.ADMIN);
     const slugs = this._extractTagSlugs(tags, isAdmin);
 
@@ -158,7 +166,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
       minChars: 1,
       source: (term, suggest) => {
         term = term.toLowerCase();
-        const matches = slugs.filter(item => item.toLowerCase().indexOf(term) != -1);
+        const matches = slugs.filter(item => editorTags.indexOf(item) === -1 && item.toLowerCase().indexOf(term) != -1);
         suggest(matches);
       }
     });
