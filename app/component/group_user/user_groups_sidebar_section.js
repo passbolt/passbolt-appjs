@@ -42,6 +42,7 @@ const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.exten
       .then(groups => {
         if (!groups.length) {
           this.state.empty = true;
+          $('.empty-group-feedback').removeClass('hidden');
         }
         tree.load(groups);
         this.state.loaded = true;

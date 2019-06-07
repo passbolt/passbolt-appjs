@@ -367,7 +367,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   openDeleteResourcesDialog: function(resources) {
     const multipleDelete = resources.length > 1;
     const dialog = ConfirmDialogComponent.instantiate({
-      label: __('Do you really want to delete?'),
+      label: __('Delete password?'),
       content: resourcesDeleteConfirmTemplate,
       submitButton: {
         label: multipleDelete ? __('delete passwords') : __('delete password'),
@@ -376,6 +376,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       action: () => this._deleteResources(resources)
     });
     dialog.setViewData('multipleDelete', multipleDelete);
+    dialog.setViewData('resources', resources);
     dialog.start();
   },
 

@@ -1,1 +1,3 @@
-{{ __('Please confirm you really want to delete the user. After clicking ok, the user will be') }} <strong>{{ __('deleted permanently') }}</strong>.
+<p>{{ __('Are you sure you want to delete') }} <strong>{{ user.profile.first_name }} {{ user.profile.last_name }} ({{ user.username }})</strong>?</p>
+
+<p> {{ __('Warning: This action can’t be undone. All the data associated with this user will be permanently deleted.') }} </p>
