@@ -20,6 +20,7 @@ import MadMap from 'passbolt-mad/util/map/map';
 import PermissionType from 'app/model/map/permission_type';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 import Tag from 'app/model/map/tag';
+import User from 'app/model/map/user';
 import TreeComponent from 'passbolt-mad/component/tree';
 import View from 'passbolt-mad/view/view';
 import 'lib/jquery.tag-editor.js';
@@ -34,7 +35,8 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
   defaults: {
     label: 'Sidebar Section Tag Controller',
     template: template,
-    resource: null
+    resource: null,
+    formError: null,
   }
 
 }, /** @prototype */ {
@@ -115,10 +117,13 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     $(tagEditorInputText).focus();
 
     Tag.findAll()
-      .then(tags => this._initAutocomplete({
+    .then(tags => {
+      this.options.allTags = tags;
+      this._initAutocomplete({
         tags: tags,
         existingTags: slugs
-      }));
+      });
+    });
   },
 
   /**
@@ -157,8 +162,8 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     const tags = options.tags;
     // Tags that are already in the editor
     const editorTags = options.existingTags;
-    const isAdmin = this.options.resource.permission.isAllowedTo(PermissionType.ADMIN);
-    const slugs = this._extractTagSlugs(tags, isAdmin);
+    const canUpdate = this.options.resource.permission.isAllowedTo(PermissionType.UPDATE);
+    const slugs = this._extractTagSlugs(tags, canUpdate);
 
     // eslint-disable-next-line no-undef
     new autoComplete({
@@ -224,7 +229,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * @param {string} slug The tag slug to validate
    */
   _beforeDeleteTag: function(slug) {
-    if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.ADMIN)) {
+    if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.UPDATE)) {
       const message = __('You do not have the permission to edit shared tags on this resource.');
       this._errorForm(message);
       return false;
@@ -241,7 +246,20 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     const $feedback = $('#js_edit_tags_form .message');
     $feedback.text(message)
       .removeClass('notice')
+      .removeClass('hidden')
       .addClass('error');
+    this.options.formError = message;
+  },
+
+  /**
+   * Clear form error.
+   * Sets the message to null and hides the message div
+   */
+  _clearFormError: function() {
+    const $feedback = $('#js_edit_tags_form .message');
+    $feedback.text('')
+      .addClass('hidden');
+    this.options.formError = null;
   },
 
   /**
@@ -251,12 +269,24 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * @param {string} slug The tag slug to validate
    */
   _beforeInsertTag: function(slug) {
-    if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.ADMIN)) {
-      const message = __('You do not have the permission to edit shared tags on this resource.');
-      this._errorForm(message);
-      return false;
+    const isShared = /^#/.test(slug);
+    const canUpdate = this.options.resource.permission.isAllowedTo(PermissionType.UPDATE);
+    const isAdmin = User.getCurrent().isAdmin();
+    const isNewTag = !this.options.allTags.filter(tag => tag.slug === slug).length;
+    let valid = true;
+
+    if (isShared && !isAdmin) {
+      if (!canUpdate) {
+        const message = __('You do not have the permission to change shared tags on this resource.');
+        this._errorForm(message);
+        valid = false;
+      } else if (isNewTag) {
+        const message = __('You do not have the permission to create new shared tags.');
+        this._errorForm(message);
+        valid = false;
+      }
     }
-    return true;
+    return valid;
   },
 
   /**
@@ -285,6 +315,18 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
       this.enableEditMode();
     } else {
       this.disableEditMode();
+    }
+  },
+
+
+  /**
+   * Listens to the tageditor change event
+   * Used to reset the form error status
+   */
+  '{element} #js_tag_editor_input_text input': function() {
+    if (this.options.formError) {
+      this._clearFormError();
+      this.options.formError = null;
     }
   },
 
@@ -317,6 +359,8 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
       this._destroyForm();
     }
   },
+
+  
 
   /**
    * Observe when a tag is deleted
