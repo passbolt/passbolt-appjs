@@ -108,7 +108,8 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
       startTags: slugs,
       onSave: data => this._onFormSave(data),
       beforeDelete: slug => this._beforeDeleteTag(slug),
-      beforeInsert: slug => this._beforeInsertTag(slug)
+      beforeInsert: slug => this._beforeInsertTag(slug),
+      canDelete: slug => this._canDeleteTag(slug)
     });
     $(tagEditorSelector).removeClass('hidden');
 
@@ -229,7 +230,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * @param {string} slug The tag slug to validate
    */
   _beforeDeleteTag: function(slug) {
-    if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.UPDATE)) {
+    if (!this._canDeleteTag(slug)) {
       const message = __('You do not have the permission to edit shared tags on this resource.');
       this._errorForm(message);
       return false;
@@ -287,6 +288,19 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
       }
     }
     return valid;
+  },
+
+  /**
+   * Determine if a tag can be deleted
+   * return true if it can be and false otherwise
+   * 
+   * @param {string} slug 
+   */
+  _canDeleteTag: function(slug) {
+    if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.UPDATE)) {
+      return false;
+    }
+    return true;
   },
 
   /**

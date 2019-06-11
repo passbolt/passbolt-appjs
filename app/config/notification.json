@@ -104,7 +104,7 @@
 				"msg": "The email notification settings were updated."
 			},
 			"app_tags_addPost_success": {
-				"msg": "Tag added successfully."
+				"msg": "Tag updated successfully."
 			},
 			"app_tags_update_success": {
 				"msg": "Tag updated successfully."
