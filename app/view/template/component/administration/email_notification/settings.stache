@@ -23,7 +23,7 @@
             <h3>{{__('Need some help?')}}</h3>
             <div class="notice message">
                 <p>{{__('For more information about email notification, checkout the dedicated page on the help website.')}}</p>
-                <a class="button" href="https://help.passbolt.com/configure/notifications/email" target="_blank">
+                <a class="button" href="https://help.passbolt.com/configure/notification/email" target="_blank">
                     <i class="fa fa-fw fa-life-ring"></i>
                     <span>{{__('Read documentation')}}</span>
                 </a>
