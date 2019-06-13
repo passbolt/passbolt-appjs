@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - PB-337: Tag autocomplete shows suggestions that are already in the list
 - PB-425: Fix documentation URL in the Email Notification screen 
+- PB-416: As an admin using Yubikey I should be able to setup a secret key with a '+' sign in it
 
 ## [2.10.1] - 2019-05-15
 ### Fixed
