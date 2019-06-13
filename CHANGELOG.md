@@ -18,7 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-366: Undeletable tags shouldn't have the "delete" button
 
 ### Fixed
-- PB-337 Tag autocomplete shows suggestions that are already in the list
+- PB-337: Tag autocomplete shows suggestions that are already in the list
+- PB-425: Fix documentation URL in the Email Notification screen 
 
 ## [2.10.1] - 2019-05-15
 ### Fixed
