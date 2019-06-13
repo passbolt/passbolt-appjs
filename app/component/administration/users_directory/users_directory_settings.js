@@ -343,9 +343,9 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       if (this.form.validate()) {
         this.usersDirectorySettings.assign(data.UsersDirectorySettings);
         this.usersDirectorySettings.testSettings(data.UsersDirectorySettings)
-        .then(data => {
-          this._showTestSettingsReport(data);
-        });
+          .then(data => {
+            this._showTestSettingsReport(data);
+          });
       } else {
         this._scrollToFirstError();
       }
@@ -393,24 +393,24 @@ const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.adminis
       if (this.form.validate()) {
         this.usersDirectorySettings.assign(data.UsersDirectorySettings);
         this.usersDirectorySettings.save()
-        .then(() => {
-          route.data.update({controller: 'Administration', action: 'usersDirectory'});
-          this.refresh();
-          MadBus.trigger('passbolt_notify', {
-            title: 'app_directorysync_settings_update_success',
-            status: 'success',
+          .then(() => {
+            route.data.update({controller: 'Administration', action: 'usersDirectory'});
+            this.refresh();
+            MadBus.trigger('passbolt_notify', {
+              title: 'app_directorysync_settings_update_success',
+              status: 'success',
+            });
           });
-        });
       } else {
         this._scrollToFirstError();
       }
     } else {
       this.usersDirectorySettings.destroy()
-      .then(() =>  {
-        this.usersDirectorySettings = new UsersDirectorySettings({});
-        route.data.update({controller: 'Administration', action: 'usersDirectory'});
-        this.refresh();
-      });
+        .then(() =>  {
+          this.usersDirectorySettings = new UsersDirectorySettings({});
+          route.data.update({controller: 'Administration', action: 'usersDirectory'});
+          this.refresh();
+        });
     }
   },
 
