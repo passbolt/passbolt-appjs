@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Improved
+PB-391: As an admin deleting a user I should see the name and email of the user i'm about the delete in the model dialog
+PB-396: As a user deleting a password I should see the name of the password i’m about to delete in the modal
+PB-397: As a user in the user workspace, I should see a relevant feedback if a user is not a member of any group
+PB-364: Fix Pressing enter on tag editor doesn't hide autocomplete
 
 ## [2.10.1] - 2019-05-15
 ### Fixed
