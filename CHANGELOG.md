@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-397: As a user in the user workspace, I should see a relevant feedback if a user is not a member of any group
 - PB-364: Fix Pressing enter on tag editor doesn't hide autocomplete
 - PB-340: Fix non admin users should not be able to create shared tags
+- PB-366: Undeletable tags shouldn't have the "delete" button
 
 ### Fixed
 - PB-337 Tag autocomplete shows suggestions that are already in the list
