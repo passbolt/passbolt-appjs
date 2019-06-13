@@ -563,15 +563,17 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {User} user The user to delete.
    */
   _deleteUserConfirm: function(user) {
-    ConfirmDialogComponent.instantiate({
-      label: __('Do you really want to delete?'),
+    const dialog = ConfirmDialogComponent.instantiate({
+      label: __('Delete user?'),
       content: userDeleteConfirmTemplate,
       submitButton: {
         label: __('delete user'),
         cssClasses: ['warning']
       },
       action: () => user.delete()
-    }).start();
+    });
+    dialog.setViewData('user', user);
+    dialog.start();
   },
 
   /**

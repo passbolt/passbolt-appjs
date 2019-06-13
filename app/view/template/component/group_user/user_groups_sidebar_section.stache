@@ -3,6 +3,6 @@
 </div>
 
 <div class="accordion-content">
-    <em class="hidden empty-feedback">{{ __('The user is not a member of any group yet') }}</em>
+    <em class="hidden empty-feedback empty-group-feedback">{{ __('The user is not a member of any group yet') }}</em>
     <ul class="shared-with" id="js_user_groups_list"></ul>
 </div>
