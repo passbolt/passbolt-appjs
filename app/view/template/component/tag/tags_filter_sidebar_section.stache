@@ -3,7 +3,7 @@
         <div class="row title">
             <div class="main-cell-wrapper">
                 <div class="main-cell">
-                    <h3><a class="accordion-trigger">{{ __('All tags') }}</a></h3>
+                    <h3><a class="accordion-trigger">{{ __('Filter by tags') }}</a></h3>
                 </div>
             </div>
             <div class="right-cell more-ctrl">

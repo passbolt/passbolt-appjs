@@ -27,7 +27,7 @@ import 'lib/autocomplete.js';
 
 import template from 'app/view/template/component/password/tag_sidebar_section.stache!';
 import itemTemplate from 'app/view/template/component/tag/tree_item.stache!';
-import tagUpdateFormTemplate from 'app/view/template/form/tag/update.stache!';
+import tagUpdateFormTemplate from 'app/view/template/form/tag/resource_tag_update.stache!';
 
 const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.password.TagSidebarSection', /** @static */ {
 
@@ -308,7 +308,20 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     if (ev.which == 27) {
       this._destroyForm();
     }
-  }
+  },
+
+  /**
+   * Observe when a tag is deleted
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} tag_deleted': function(el, ev) {
+    const deletedTag = ev.data.tag;
+    const tags = this.options.tree.options.items.filter(item => item.id !== deletedTag.id);
+    this.options.resource.tags = tags;
+    this.options.tree.reset();
+    this._loadTags(tags);
+  },
 
 });
 
