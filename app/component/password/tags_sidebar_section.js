@@ -94,6 +94,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * Enable the edit mode.
    */
   enableEditMode: function() {
+    this.state.loaded = false;
     this._editing = true;
     this.options.tree.state.hidden = true;
     this._hideEmptyMessage();
@@ -118,13 +119,14 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     $(tagEditorInputText).focus();
 
     Tag.findAll()
-    .then(tags => {
-      this.options.allTags = tags;
-      this._initAutocomplete({
-        tags: tags,
-        existingTags: slugs
+      .then(tags => {
+        this.options.allTags = tags;
+        this._initAutocomplete({
+          tags: tags,
+          existingTags: slugs
+        });
+        this.state.loaded = true;
       });
-    });
   },
 
   /**
