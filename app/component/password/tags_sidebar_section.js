@@ -283,11 +283,12 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
         const message = __('You do not have the permission to change shared tags on this resource.');
         this._errorForm(message);
         valid = false;
-      } else if (isNewTag) {
-        const message = __('You do not have the permission to create new shared tags.');
-        this._errorForm(message);
-        valid = false;
-      }
+      } 
+      // else if (isNewTag) {
+      //   const message = __('You do not have the permission to create new shared tags.');
+      //   this._errorForm(message); 
+      //   valid = false;
+      // }
     }
     return valid;
   },
@@ -298,7 +299,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * 
    * @param {string} slug 
    */
-  _canDeleteTag: function(slug) {
+  _canDeleteTag: function(slug) { 
     if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.UPDATE)) {
       return false;
     }

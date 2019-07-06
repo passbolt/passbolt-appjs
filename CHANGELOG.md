@@ -3,23 +3,17 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Added
-- PB-290: As LU I can delete a personal tag
-- PB-291: As LU I can rename a personal tag
-- PB-296: As AD I can delete a shared tag 
-- PB-294: As AD I can rename a shared tag
 
 ### Improved
 - PB-391: As an admin deleting a user I should see the name and email of the user i'm about the delete in the model dialog
 - PB-396: As a user deleting a password I should see the name of the password i’m about to delete in the modal
 - PB-397: As a user in the user workspace, I should see a relevant feedback if a user is not a member of any group
 - PB-364: Fix Pressing enter on tag editor doesn't hide autocomplete
-- PB-340: Fix non admin users should not be able to create shared tags
 - PB-366: Undeletable tags shouldn't have the "delete" button
 
 ### Fixed
 - PB-337: Tag autocomplete shows suggestions that are already in the list
-- PB-425: Fix documentation URL in the Email Notification screen 
+- PB-425: Fix documentation URL in the Email Notification screen
 - PB-416: As an admin using Yubikey I should be able to setup a secret key with a '+' sign in it
 
 ## [2.10.1] - 2019-05-15

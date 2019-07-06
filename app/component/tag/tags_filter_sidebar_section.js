@@ -129,11 +129,11 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     return new MadMap({
       id: 'id',
       label: 'slug',
-      canEdit: {
-        key: 'id',
-        func: (id, map, item) =>
-          !item.is_shared || User.getCurrent().isAdmin()
-      }
+      // canEdit: {
+      //   key: 'id',
+      //   func: (id, map, item) =>
+      //     !item.is_shared || User.getCurrent().isAdmin()
+      // }
     });
   },
 
