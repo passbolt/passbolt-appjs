@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.10.3] - 2019-07-10
+### Fixed
+- Publish latest build
+
 ## [2.10.2] - 2019-07-10
 ### Improved
 - PB-391: As an admin deleting a user I should see the name and email of the user i'm about the delete in the model dialog
@@ -172,7 +176,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.3...HEAD
+[2.10.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.2...v2.10.3
 [2.10.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.1...v2.10.2
 [2.10.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.8.4...v2.10.0
