@@ -11,25 +11,26 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
-import EditView from 'app/view/component/group/edit';
-import Group from 'app/model/map/group';
-import GroupCreateForm from 'app/form/group/create';
+import EditView from '../../view/component/group/edit';
+import Group from '../../model/map/group';
+import GroupCreateForm from '../../form/group/create';
 import GroupService from '../../model/service/plugin/group';
-import GroupUser from 'app/model/map/group_user';
+import GroupUser from '../../model/map/group_user';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import TreeComponent from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/group/edit.stache!';
-import treeItemTemplate from 'app/view/template/component/group/group_user_list_item.stache!';
+import template from '../../view/template/component/group/edit.stache';
+import treeItemTemplate from '../../view/template/component/group/group_user_list_item.stache';
 
 const EditComponent = Component.extend('passbolt.component.group.Edit', /** @static */ {
 

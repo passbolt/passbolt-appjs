@@ -12,12 +12,12 @@
  * @since         2.0.0
  */
 import Config from 'passbolt-mad/config/config';
-import GroupsFilterSidebarSectionComponent from 'app/component/password/groups_filter_sidebar_section';
-import PrimarySidebarAbstractComponent from 'app/component/workspace/primary_sidebar';
-import ShortcutsFilterSidebarSectionComponent from 'app/component/password/shortcuts_filter_sidebar_section';
-import TagsFilterSidebarSectionComponent from 'app/component/tag/tags_filter_sidebar_section';
+import GroupsFilterSidebarSectionComponent from '../password/groups_filter_sidebar_section';
+import PrimarySidebarAbstractComponent from '../workspace/primary_sidebar';
+import ShortcutsFilterSidebarSectionComponent from '../password/shortcuts_filter_sidebar_section';
+import TagsFilterSidebarSectionComponent from '../tag/tags_filter_sidebar_section';
 
-import template from 'app/view/template/component/password/primary_sidebar.stache!';
+import template from '../../view/template/component/password/primary_sidebar.stache';
 
 const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt.component.password.PrimarySidebar', /** @static */ {
 

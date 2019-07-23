@@ -11,18 +11,49 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import domEvents from 'can-dom-events';
-import Group from 'app/model/map/group';
-import GroupUser from 'app/model/map/group_user';
+import Group from '../../model/map/group';
+import GroupUser from '../../model/map/group_user';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import route from 'can-route';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 import TreeComponent from 'passbolt-mad/component/tree';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
-import template from 'app/view/template/component/group_user/group_users_sidebar_section.stache!';
-import groupMembersListItemTemplate from 'app/view/template/component/group/group_members_list_item.stache!';
+import template from '../../view/template/component/group_user/group_users_sidebar_section.stache';
+import groupMembersListItemTemplate from '../../view/template/component/group/group_members_list_item.stache';
+
+/*
+
+function cleanAppDir($dir){
+    $files = scandir($dir);
+    $relativePath = str_replace($dir, " /Users/cedricalfonsi/projects/passbolt-appjs/", "");
+    $test = count(explode("/", $relativePath));
+    var_dump($test, $relativePath);
+    return;
+    foreach($files as $key => $value){
+        $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
+        if(!is_dir($path)) {
+            $content = file_get_contents($path);
+
+        } else if($value != "." && $value != "..") {
+            cleanAppDir($path);
+        }
+    }
+
+    return $results;
+}
+
+$files = getDirContents(__DIR__);
+foreach ($files as $file) {
+  if (is_dir($file)) continue;
+  $content = file_get_contents($file);
+  str_replace()
+}
+
+*/
 
 const GroupUsersSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.group_user.GroupUsersSidebarSection', /** @static */ {
 

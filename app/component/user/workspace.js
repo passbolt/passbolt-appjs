@@ -11,40 +11,41 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
-import BreadcrumbComponent from 'app/component/user/workspace_breadcrumb';
+import BreadcrumbComponent from '../user/workspace_breadcrumb';
 import ButtonDropdownComponent from 'passbolt-mad/component/button_dropdown';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
-import Filter from 'app/model/filter';
-import GridComponent from 'app/component/user/grid';
-import Group from 'app/model/map/group';
-import GroupDelete from 'app/model/map/group_delete';
-import GroupDeleteTransferPermissionForm from 'app/form/group/delete_transfer_permission';
-import GroupEditComponent from 'app/component/group/edit';
-import GroupSecondarySidebarComponent from 'app/component/group/group_secondary_sidebar';
+import Filter from '../../model/filter';
+import GridComponent from '../user/grid';
+import Group from '../../model/map/group';
+import GroupDelete from '../../model/map/group_delete';
+import GroupDeleteTransferPermissionForm from '../../form/group/delete_transfer_permission';
+import GroupEditComponent from '../group/edit';
+import GroupSecondarySidebarComponent from '../group/group_secondary_sidebar';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
-import PrimaryMenuComponent from 'app/component/user/workspace_primary_menu';
-import PrimarySidebarComponent from 'app/component/user/primary_sidebar';
+import PrimaryMenuComponent from '../user/workspace_primary_menu';
+import PrimarySidebarComponent from '../user/primary_sidebar';
 import route from 'can-route';
-import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
+import SecondaryMenuComponent from '../workspace/secondary_menu';
 import setObject from 'passbolt-mad/util/set/set';
-import User from 'app/model/map/user';
-import UserCreateForm from 'app/form/user/create';
-import UserDelete from 'app/model/map/user_delete';
-import UserDeleteTransferPermissionForm from 'app/form/user/delete_transfer_permission';
-import UserSecondarySidebarComponent from 'app/component/user/user_secondary_sidebar';
+import User from '../../model/map/user';
+import UserCreateForm from '../../form/user/create';
+import UserDelete from '../../model/map/user_delete';
+import UserDeleteTransferPermissionForm from '../../form/user/delete_transfer_permission';
+import UserSecondarySidebarComponent from '../user/user_secondary_sidebar';
 import uuid from 'uuid/v4';
 
-import createButtonTemplate from 'app/view/template/component/workspace/create_button.stache!';
-import groupDeleteConfirmTemplate from 'app/view/template/component/group/delete_confirm.stache!';
-import template from 'app/view/template/component/user/workspace.stache!';
-import userDeleteConfirmTemplate from 'app/view/template/component/user/delete_confirm.stache!';
+import createButtonTemplate from '../../view/template/component/workspace/create_button.stache';
+import groupDeleteConfirmTemplate from '../../view/template/component/group/delete_confirm.stache';
+import template from '../../view/template/component/user/workspace.stache';
+import userDeleteConfirmTemplate from '../../view/template/component/user/delete_confirm.stache';
 
 const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace', /** @static */ {
 

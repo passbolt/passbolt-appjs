@@ -6,8 +6,8 @@
  * The passbolt page
  *
  */
-import AppBootstrap from 'app/bootstrap';
-import $ from 'jquery';
+import AppBootstrap from './app/bootstrap';
+import $ from 'jquery/dist/jquery.min.js';
 
 $(document).ready(function () {
 	// Start the application bootstrap.

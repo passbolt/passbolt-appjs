@@ -9,6 +9,7 @@
     "url": "git@bitbucket.org:passbolt/passbolt-appjs.git"
   },
   "dependencies": {
+    "@babel/runtime": "^7.5.5",
     "browser-cookies": "^1.2.0",
     "can-ajax": "2.0.0",
     "can-assign": "1.2.0",
@@ -120,7 +121,9 @@
     "mocha": "^5.2.0",
     "sinon": "^1.16.1",
     "steal-tools": "^2.2.2",
-    "testee": "^0.9.1"
+    "testee": "^0.9.1",
+    "webpack": "^4.36.1",
+    "webpack-cli": "^3.3.6"
   },
   "keywords": [
     "passbolt",
@@ -136,11 +139,6 @@
     "test": "grunt test"
   },
   "steal": {
-    "babelOptions": {
-      "presets": [
-        "react"
-      ]
-    },
     "plugins": [
       "steal-stache"
     ],

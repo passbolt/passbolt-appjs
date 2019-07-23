@@ -11,13 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import MadBus from 'passbolt-mad/control/bus';
-import PermissionType from 'app/model/map/permission_type';
-import ResourceEditDescriptionForm from 'app/form/resource/edit_description';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import PermissionType from '../../model/map/permission_type';
+import ResourceEditDescriptionForm from '../../form/resource/edit_description';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 
-import template from 'app/view/template/component/password/description_sidebar_section.stache!';
+import template from '../../view/template/component/password/description_sidebar_section.stache';
 
 const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.password.DescriptionSidebarSection', /** @static */ {
 
@@ -165,7 +166,7 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
       console.error(error);
       MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
     }
-    
+
     this.disableEditMode();
   }
 });

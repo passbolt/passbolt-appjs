@@ -11,19 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Filter from 'app/model/filter';
+import Filter from '../../model/filter';
 import getObject from 'can-util/js/get/get';
-import Group from 'app/model/map/group';
-import GroupListView from 'app/view/component/group/groups_list';
+import Group from '../../model/map/group';
+import GroupListView from '../../view/component/group/groups_list';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import TreeComponent from 'passbolt-mad/component/tree';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 import uuid from 'uuid/v4';
 
-import itemTemplate from 'app/view/template/component/group/group_item.stache!';
+import itemTemplate from '../../view/template/component/group/group_item.stache';
 
 const GroupsList = TreeComponent.extend('passbolt.component.group.GroupsList', /** @static */ {
 

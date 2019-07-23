@@ -14,11 +14,11 @@
 import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
 import getObject from 'can-util/js/get/get';
-import Notification from 'app/model/map/notification';
-import NotificationView from 'app/view/component/footer/notification';
+import Notification from '../../model/map/notification';
+import NotificationView from '../../view/component/footer/notification';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/footer/notification.stache!';
+import template from '../../view/template/component/footer/notification.stache';
 
 const NotificationComponent = Component.extend('passbolt.component.footer.Notification', /** @static */ {
 

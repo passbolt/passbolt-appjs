@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import View from 'passbolt-mad/view/view';
 
 const FavoriteView = View.extend('passbolt.view.component.favorite.Favorite', /** @static */ {

@@ -11,25 +11,26 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import DomData from 'can-dom-data';
 import Action from 'passbolt-mad/model/map/action';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
-import Filter from 'app/model/filter';
+import Filter from '../../model/filter';
 import getObject from 'can-util/js/get/get';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
-import PrimarySidebarSectionComponent from 'app/component/workspace/primary_sidebar_section';
-import TagMap from 'app/model/map/tag';
-import User from 'app/model/map/user';
+import PrimarySidebarSectionComponent from '../workspace/primary_sidebar_section';
+import TagMap from '../../model/map/tag';
+import User from '../../model/map/user';
 import TreeComponent from 'passbolt-mad/component/tree';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
-import EditTagForm from 'app/form/tag/edit_tag';
-import template from 'app/view/template/component/tag/tags_filter_sidebar_section.stache!';
-import itemTemplate from 'app/view/template/component/tag/tag_filter_sidebar_item.stache!';
-import templateTagDeleteConfirmationDialog from 'app/view/template/component/tag/tag_delete_confirmation_dialog.stache!';
+import EditTagForm from '../../form/tag/edit_tag';
+import template from '../../view/template/component/tag/tags_filter_sidebar_section.stache';
+import itemTemplate from '../../view/template/component/tag/tag_filter_sidebar_item.stache';
+import templateTagDeleteConfirmationDialog from '../../view/template/component/tag/tag_delete_confirmation_dialog.stache';
 
 const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.tag.TagsFilterSidebarSection', /** @static */ {
 

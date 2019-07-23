@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
+import Ajax from '../../net/ajax';
 import chunk from 'passbolt-mad/util/array/chunk';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
@@ -22,7 +22,7 @@ import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import Permission from 'app/model/map/permission';
+import Permission from './permission';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';
 import 'urijs/src/IPv6';
@@ -31,7 +31,7 @@ import URI from 'urijs/src/URI';
  *import Secret from 'app/model/map/secret';
  *import Tag from 'app/model/map/tag';
  */
-import User from 'app/model/map/user';
+import User from './user';
 import ResourceService from '../service/plugin/resource';
 
 const Resource = DefineMap.extend('passbolt.model.Resource', {

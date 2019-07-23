@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 
-import ActionLogDetail from 'app/model/action_log_detail/action_log_detail';
+import ActionLogDetail from './action_log_detail';
 import Group from "../map/group";
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';

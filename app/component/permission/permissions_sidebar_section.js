@@ -11,18 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
-import Permission from 'app/model/map/permission';
-import PermissionType from 'app/model/map/permission_type';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import Permission from '../../model/map/permission';
+import PermissionType from '../../model/map/permission_type';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 import TreeComponent from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
 
-import template from 'app/view/template/component/permission/permissions_sidebar_section.stache!';
-import permissionlistItemTemplate from 'app/view/template/component/permission/permissions_sidebar_list_item.stache!';
+import template from '../../view/template/component/permission/permissions_sidebar_section.stache';
+import permissionlistItemTemplate from '../../view/template/component/permission/permissions_sidebar_list_item.stache';
 
 const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.permission.PermissionsSidebarSection', /** @static */ {
 

@@ -11,20 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-
+import $ from 'jquery/dist/jquery.min.js';
 import Component from 'passbolt-mad/component/component';
 import getObject from 'can-util/js/get/get';
-import GridContextualMenuComponent from 'app/component/password/grid_contextual_menu';
+import GridContextualMenuComponent from '../password/grid_contextual_menu';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import Lock from 'app/util/lock';
+import Lock from '../../util/lock';
 import MadBus from 'passbolt-mad/control/bus';
 import PasswordsGrid from "../../../src/components/PasswordsGrid/PasswordsGrid";
 import React from "react";
 import ReactDOM from "react-dom";
-import Resource from 'app/model/map/resource';
-import ResourceService from 'app/model/service/plugin/resource';
-import PermissionType from 'app/model/map/permission_type';
+import Resource from '../../model/map/resource';
+import ResourceService from '../../model/service/plugin/resource';
+import PermissionType from '../../model/map/permission_type';
 import route from 'can-route';
 
 const GridComponent = Component.extend('passbolt.component.password.Grid', {
@@ -112,10 +112,10 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
       this._filterLock.release();
     },
-    
+
     /**
      * Select and scroll to a given a resource
-     * @param {Resource} resource 
+     * @param {Resource} resource
      */
     selectAndScrollTo: async function(resource) {
       this.gridRef.current.updateState({ selectedResources: [resource.id] });
@@ -174,7 +174,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
     /**
      * Filter the resources
-     * @param {Resources.List} resources 
+     * @param {Resources.List} resources
      */
     filterResources: function (resources) {
       if (this.filter.type == "favorite") {
@@ -217,7 +217,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
     /**
      * Handle resources selected event.
-     * @param {array} resourcesIds 
+     * @param {array} resourcesIds
      */
     selectResources: function (resourcesIds) {
       const selectedResources = this.resources.reduce((carry, resource) => {
@@ -232,7 +232,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
     /**
      * Handle resource right selected event.
-     * @param {strinf} resourceId 
+     * @param {strinf} resourceId
      * @param {HTMLEvent} srcEv The source event
      */
     rightSelectResource: function (resourceId, srcEv) {

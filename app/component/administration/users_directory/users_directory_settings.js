@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
@@ -18,19 +19,19 @@ import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
-import UsersDirectoryService from 'app/model/service/users_directory';
-import UsersDirectorySettings from 'app/model/map/users_directory_settings';
-import UsersDirectorySettingsForm from 'app/form/administration/users_directory/settings';
+import UsersDirectoryService from '../../../model/service/users_directory';
+import UsersDirectorySettings from '../../../model/map/users_directory_settings';
+import UsersDirectorySettingsForm from '../../../form/administration/users_directory/settings';
 import MenuComponent from 'passbolt-mad/component/menu';
-import PrimaryMenu from 'app/component/administration/users_directory/primary_menu';
-import ProgressDialog from 'app/component/dialog/progress';
+import PrimaryMenu from '../../administration/users_directory/primary_menu';
+import ProgressDialog from '../../dialog/progress';
 import route from 'can-route';
-import template from 'app/view/template/component/administration/users_directory/settings.stache!';
-import templateItemBreadcrumb from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
-import templateSynchronizeReport from 'app/view/template/component/administration/users_directory/synchronize_report.stache!';
-import templateSynchronizeSimulationReport from 'app/view/template/component/administration/users_directory/synchronize_simulation_report.stache!';
-import templateTestSettingsReport from 'app/view/template/component/administration/users_directory/test_settings_report.stache!';
-import User from 'app/model/map/user';
+import template from '../../../view/template/component/administration/users_directory/settings.stache';
+import templateItemBreadcrumb from '../../../view/template/component/breadcrumb/breadcrumb_item.stache';
+import templateSynchronizeReport from '../../../view/template/component/administration/users_directory/synchronize_report.stache';
+import templateSynchronizeSimulationReport from '../../../view/template/component/administration/users_directory/synchronize_simulation_report.stache';
+import templateTestSettingsReport from '../../../view/template/component/administration/users_directory/test_settings_report.stache';
+import User from '../../../model/map/user';
 
 const UsersDirectorySettingsAdmin = Component.extend('passbolt.component.administration.users_directory.UsersDirectorySettings', /** @static */ {
 

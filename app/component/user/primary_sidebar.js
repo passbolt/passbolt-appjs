@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import GroupsFilterSidebarSectionComponent from 'app/component/user/groups_filter_sidebar_section';
-import PrimarySidebarAbstractComponent from 'app/component/workspace/primary_sidebar';
-import ShortcutsFilterSidebarSectionComponent from 'app/component/user/shortcuts_filter_sidebar_section';
+import GroupsFilterSidebarSectionComponent from '../user/groups_filter_sidebar_section';
+import PrimarySidebarAbstractComponent from '../workspace/primary_sidebar';
+import ShortcutsFilterSidebarSectionComponent from '../user/shortcuts_filter_sidebar_section';
 
-import template from 'app/view/template/component/user/primary_sidebar.stache!';
+import template from '../../view/template/component/user/primary_sidebar.stache';
 
 const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt.component.user.PrimarySidebar', /** @static */ {
 

@@ -11,13 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Comment from 'app/model/map/comment';
-import CommentCreateForm from 'app/form/comment/create';
-import CommentsListComponent from 'app/component/comment/comments_list';
+import $ from 'jquery/dist/jquery.min.js';
+import Comment from '../../model/map/comment';
+import CommentCreateForm from '../../form/comment/create';
+import CommentsListComponent from '../comment/comments_list';
 import ComponentHelper from 'passbolt-mad/helper/component';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 
-import template from 'app/view/template/component/comment/comments_sidebar_section.stache!';
+import template from '../../view/template/component/comment/comments_sidebar_section.stache';
 
 const CommentsSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.comment.CommentsSidebarSection', /** @static */ {
 

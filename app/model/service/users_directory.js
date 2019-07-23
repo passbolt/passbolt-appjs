@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
-import AppAjax from 'app/net/ajax';
-import UsersDirectoryReport from 'app/model/map/users_directory_report';
+import AppAjax from '../../net/ajax';
+import UsersDirectoryReport from '../../model/map/users_directory_report';
 
 class UsersDirectoryService {}
 

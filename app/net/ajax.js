@@ -10,14 +10,13 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Ajax from 'passbolt-mad/net/ajax';
 import Config from 'passbolt-mad/config/config';
-import DialogComponent from 'passbolt-mad/component/dialog';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
-import SessionExpiredComponent from 'app/component/session/session_expired';
-import MfaRequiredComponent from 'app/component/mfa/mfa_required';
+import MfaRequiredComponent from '../component/mfa/mfa_required';
 
 /**
  * @inherits passbolt-mad/Ajax
@@ -62,7 +61,6 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
     return this._super(request, data)
       .then(null, data => {
         this._triggerNotification(request, request._response);
-        this._sessionExpired(request, data);
         this._mfaRequired(request, request._response);
         return Promise.reject(data);
       });
@@ -118,40 +116,6 @@ const AppAjax = Ajax.extend('app.net.Ajax', /** @static */ {
       return true;
     }
     return false;
-  },
-
-  /**
-   * Treat the session expired API response.
-   *
-   * @param request
-   * @param response
-   * @private
-   */
-  _sessionExpired: function(request, response) {
-    /*
-     * If the user is not logged in to the application.
-     * Redirect the user to the front page.
-     */
-    if (response.header) {
-      const sessionExpiredAutoRedirect = request.sessionExpiredAutoRedirect !== undefined ? request.sessionExpiredAutoRedirect : true;
-      if (response.header.code === 403 && response.header.message === 'You need to login to access this location.' && sessionExpiredAutoRedirect) {
-        // If the session expired dialog is already displayed.
-        if ($('.session-expired-dialog').length > 0) {
-          return;
-        }
-
-        const dialog = DialogComponent.instantiate({
-          label: __('Session expired'),
-          cssClasses: ['session-expired-dialog', 'dialog-wrapper']
-        }).start();
-
-        // attach the component to the dialog
-        dialog.add(SessionExpiredComponent, {});
-      }
-    } else {
-      // @todo Same for success we use message as title, maybe we should to something cleaner.
-      this.response.header.title = response.header.message;
-    }
   }
 
 }, /** @prototype */ {

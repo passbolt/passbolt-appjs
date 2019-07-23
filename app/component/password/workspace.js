@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import BreadcrumbComponent from 'app/component/password/workspace_breadcrumb';
+import $ from 'jquery/dist/jquery.min.js';
+import BreadcrumbComponent from '../password/workspace_breadcrumb';
 import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
@@ -19,30 +20,30 @@ import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import getObject from 'can-util/js/get/get';
-import GridComponent from 'app/component/password/grid';
+import GridComponent from '../password/grid';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
-import PasswordSecondarySidebarComponent from 'app/component/password/password_secondary_sidebar';
-import Plugin from 'app/util/plugin';
+import PasswordSecondarySidebarComponent from '../password/password_secondary_sidebar';
+import Plugin from '../../util/plugin';
 
-import PrimaryMenuComponent from 'app/component/password/workspace_primary_menu';
-import PrimarySidebarComponent from 'app/component/password/primary_sidebar';
-import ResourceCreateForm from 'app/form/resource/create';
-import ResourceEditForm from 'app/form/resource/edit';
+import PrimaryMenuComponent from '../password/workspace_primary_menu';
+import PrimarySidebarComponent from '../password/primary_sidebar';
+import ResourceCreateForm from '../../form/resource/create';
+import ResourceEditForm from '../../form/resource/edit';
 import route from 'can-route';
-import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
+import SecondaryMenuComponent from '../workspace/secondary_menu';
 
-import Filter from 'app/model/filter';
-import Group from 'app/model/map/group';
-import Resource from 'app/model/map/resource';
-import ResourceService from 'app/model/service/plugin/resource';
+import Filter from '../../model/filter';
+import Group from '../../model/map/group';
+import Resource from '../../model/map/resource';
+import ResourceService from '../../model/service/plugin/resource';
 
-import commentDeleteConfirmTemplate from 'app/view/template/component/comment/delete_confirm.stache!';
-import createButtonTemplate from 'app/view/template/component/workspace/create_button.stache!';
-import importButtonTemplate from 'app/view/template/component/workspace/import_button.stache!';
-import resourcesDeleteConfirmTemplate from 'app/view/template/component/password/delete_confirm.stache!';
-import template from 'app/view/template/component/password/workspace.stache!';
+import commentDeleteConfirmTemplate from '../../view/template/component/comment/delete_confirm.stache';
+import createButtonTemplate from '../../view/template/component/workspace/create_button.stache';
+import importButtonTemplate from '../../view/template/component/workspace/import_button.stache';
+import resourcesDeleteConfirmTemplate from '../../view/template/component/password/delete_confirm.stache';
+import template from '../../view/template/component/password/workspace.stache';
 
 const PasswordWorkspaceComponent = Component.extend('passbolt.component.password.Workspace', /** @static */ {
 

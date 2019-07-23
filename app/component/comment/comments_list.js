@@ -11,14 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Comment from 'app/model/map/comment';
+import $ from 'jquery/dist/jquery.min.js';
+import Comment from '../../model/map/comment';
 import DomData from 'can-dom-data';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import Tree from 'passbolt-mad/component/tree';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
-import itemTemplate from 'app/view/template/component/comment/comment_item.stache!';
+import itemTemplate from '../../view/template/component/comment/comment_item.stache';
 
 const CommentsListComponent = Tree.extend('passbolt.component.comment.CommentsList', /** @static */ {
 

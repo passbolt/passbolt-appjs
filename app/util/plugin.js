@@ -33,7 +33,7 @@ export default class Plugin {
   /**
    * Loop until the plugin is ready.
    * @param {func} resolve The resolver
-   * @return {Promise} 
+   * @return {Promise}
    */
   static async _isReady(resolve) {
     // If the plugin is already ready, return.
@@ -69,6 +69,7 @@ export default class Plugin {
    * Send a message to the plugin
    * @param {string} type The event type
    * @param {mixed} data The data to send with the event
+   * @return {Promise}
    */
   static request(message, data) {
     // The generated requestId used to identify the request.
@@ -89,7 +90,7 @@ export default class Plugin {
         } else {
           reject(event.data.body);
         }
-      })
+      });
 
       // Emit the message to the addon-code.
       this.send(message, requestArgs);

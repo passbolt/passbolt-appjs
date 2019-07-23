@@ -11,16 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import domEvents from 'can-dom-events';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import MadBus from 'passbolt-mad/control/bus';
 import ResourceService from '../../model/service/plugin/resource';
-import SecretCreateForm from 'app/form/secret/create';
+import SecretCreateForm from '../../form/secret/create';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
-import template from 'app/view/template/form/resource/create.stache!';
+import template from '../../view/template/form/resource/create.stache';
 
 const CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
 

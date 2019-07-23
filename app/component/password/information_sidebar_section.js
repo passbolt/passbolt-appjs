@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Clipboard from 'app/util/clipboard';
-import Resource from 'app/model/map/resource';
+import Clipboard from '../../util/clipboard';
+import Resource from '../../model/map/resource';
 import ResourceService from '../../model/service/plugin/resource';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 
-import template from 'app/view/template/component/password/information_sidebar_section.stache!';
+import template from '../../view/template/component/password/information_sidebar_section.stache';
 
 const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.password.InformationSidebarSection', /** @static */ {
 

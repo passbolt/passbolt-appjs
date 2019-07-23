@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 
-import template from 'app/view/template/component/group/information_sidebar_section.stache!';
+import template from '../../view/template/component/group/information_sidebar_section.stache';
 
 const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.group.InformationSidebarSection', /** @static */ {
 

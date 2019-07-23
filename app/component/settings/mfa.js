@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
+import AuthService from '../../model/service/plugin/auth';
 import Component from 'passbolt-mad/component/component';
 import HtmlHelper from 'passbolt-mad/helper/html';
-import Session from 'app/model/utility/session';
 
 const MfaComponent = Component.extend('passbolt.component.settings.mfa', /** @static */ {
 
@@ -23,12 +24,12 @@ const MfaComponent = Component.extend('passbolt.component.settings.mfa', /** @st
   /**
    * @inheritdoc
    */
-  afterStart: function() {
-    Session.check()
-      .then(() => {
-        const iframeContent = `<iframe id='js_mfa_iframe' src='${APP_URL}/mfa/setup/select' width='100%' height='100%'></iframe>`;
-        HtmlHelper.create($(this.element), 'inside_replace', iframeContent);
-      });
+  afterStart: async function() {
+    const isAuthenticated = await AuthService.isAuthenticated();
+    if (isAuthenticated) {
+      const iframeContent = `<iframe id='js_mfa_iframe' src='${APP_URL}/mfa/setup/select' width='100%' height='100%'></iframe>`;
+      HtmlHelper.create($(this.element), 'inside_replace', iframeContent);
+    }
   }
 });
 

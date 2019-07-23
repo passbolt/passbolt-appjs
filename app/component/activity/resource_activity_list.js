@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import ActionLog from 'app/model/map/action_log';
+import ActionLog from '../../model/map/action_log';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadMap from 'passbolt-mad/util/map/map';
 import Tree from 'passbolt-mad/component/tree';
-import Resource from 'app/model/map/resource';
-import itemTemplate from 'app/view/template/component/activity/resource_activity_item.stache!';
+import Resource from '../../model/map/resource';
+import itemTemplate from '../../view/template/component/activity/resource_activity_item.stache';
 import PermissionUpdatedDetail from "../../model/action_log_detail/permission_updated_detail";
 import ActionLogDetail from "../../model/action_log_detail/action_log_detail";
 

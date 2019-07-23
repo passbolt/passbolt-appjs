@@ -14,10 +14,10 @@
 
 import Form from "passbolt-mad/form/form";
 import Button from "passbolt-mad/component/button";
-import User from "app/model/map/user";
+import User from "../../model/map/user";
 import TextboxComponent from "passbolt-mad/form/element/textbox";
 import FeedbackComponent from "passbolt-mad/form/feedback";
-import template from "app/view/template/form/tag/edit.stache!";
+import template from "../../view/template/form/tag/edit.stache";
 
 const EditTagForm = Form.extend(
   "passbolt.form.tag.Edit",

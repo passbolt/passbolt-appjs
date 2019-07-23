@@ -13,8 +13,8 @@
  */
 import DefineMap from 'passbolt-mad/model/map/map';
 import getObject from 'can-util/js/get/get';
-import Group from 'app/model/map/group';
-import Resource from 'app/model/map/resource';
+import Group from './group';
+import Resource from './resource';
 
 const GroupDelete = DefineMap.extend('passbolt.model.GroupDelete', {
   group_id: 'string',

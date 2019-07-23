@@ -11,19 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import 'app/config/routes.js';
-import Ajax from 'app/net/ajax';
+import './config/routes.js';
+import Ajax from './net/ajax';
 import cookies from 'browser-cookies/src/browser-cookies';
-import AccountSetting from 'app/model/map/accountSetting';
+// import AccountSetting from './model/map/accountSetting';
 import Bootstrap from 'passbolt-mad/bootstrap';
 import Config from 'passbolt-mad/config/config';
-import AppComponent from 'app/component/app';
-import Plugin from 'app/util/plugin';
-import ResourceService from 'app/model/service/plugin/resource';
-import Role from 'app/model/map/role';
-import User from 'app/model/map/user';
-import notificationConfig from 'app/config/notification.json';
-import appConfig from 'app/config/config.json';
+import AppComponent from './component/app';
+import Plugin from './util/plugin';
+import ResourceService from './model/service/plugin/resource';
+import Role from './model/map/role';
+import User from './model/map/user';
+import notificationConfig from './config/notification.json';
+import appConfig from './config/config.json';
 
 const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 
@@ -116,6 +116,5 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
   }
 
 });
-
 
 export default AppBootstrap;

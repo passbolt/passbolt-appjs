@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import Component from 'passbolt-mad/component/component';
-import PrimarySidebarSectionView from 'app/view/component/workspace/primary_sidebar_section';
+import PrimarySidebarSectionView from '../../view/component/workspace/primary_sidebar_section';
 
 //import template from 'app/view/template/component/workspace/sidebar_section.ejs!';
 

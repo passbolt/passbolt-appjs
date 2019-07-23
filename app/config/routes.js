@@ -1,7 +1,8 @@
+
+import $ from 'jquery/dist/jquery.min.js';
 import CanDefineMap from 'can-define/map/map';
 import route from 'can-route';
 import RoutePushstate from 'can-route-pushstate';
-import $ from 'jquery';
 
 const AppViewModel = CanDefineMap.extend({
   controller: 'string',

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.2.0
  */
-import Plugin from 'app/util/plugin';
+import Plugin from './plugin';
 
 class Clipboard {
   static copy(value, name) {

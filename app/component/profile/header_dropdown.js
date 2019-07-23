@@ -19,7 +19,7 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import route from 'can-route';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/profile/header_dropdown.stache!';
+import template from '../../view/template/component/profile/header_dropdown.stache';
 
 const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component.ProfileDropdown', /** @static */ {
 

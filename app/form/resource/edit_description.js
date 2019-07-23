@@ -16,7 +16,7 @@ import Feedback from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import Textbox from 'passbolt-mad/form/element/textbox';
 
-import template from 'app/view/template/form/resource/edit_description.stache!';
+import template from '../../view/template/form/resource/edit_description.stache';
 
 const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription', /** @static */ {
 

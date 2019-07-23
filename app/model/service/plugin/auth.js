@@ -11,9 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import Plugin from 'app/util/plugin';
+import Plugin from '../../../util/plugin';
 
 export default class AuthService {
+
+  /**
+   * Check if the user is authenticated
+   * @return {Promise<bool>}
+   */
+  static async isAuthenticated() {
+    try {
+      await Plugin.request("passbolt.auth.is-authenticated");
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
   /**
    * Logout the user

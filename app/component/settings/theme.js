@@ -11,15 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
-import Theme from 'app/model/map/theme';
+import Theme from '../../model/map/theme';
 import TreeComponent from 'passbolt-mad/component/tree';
 
-import template from 'app/view/template/component/settings/theme.stache!';
-import itemTemplate from 'app/view/template/component/settings/theme_item.stache!';
+import template from '../../view/template/component/settings/theme.stache';
+import itemTemplate from '../../view/template/component/settings/theme_item.stache';
 
 const ThemeComponent = Component.extend('passbolt.component.settings.Theme', /** @static */ {
 

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import Config from 'passbolt-mad/config/config';
 import DomData from 'can-dom-data';
@@ -19,7 +20,7 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import MenuComponent from 'passbolt-mad/component/menu';
 import route from 'can-route';
 import String from 'can-string';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
 const NavigationLeft = MenuComponent.extend('passbolt.component.AppNavigationLeft', /** @static */ {
 

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
+import Ajax from '../../net/ajax';
 import Config from 'passbolt-mad/config/config';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
@@ -20,10 +20,10 @@ import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import GroupUser from 'app/model/map/group_user';
+import GroupUser from './group_user';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import User from 'app/model/map/user';
+import User from './user';
 import uuid from 'uuid/v4';
 
 const Group = DefineMap.extend('passbolt.model.Group', {

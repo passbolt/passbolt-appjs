@@ -10,11 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import $ from 'jquery/dist/jquery.min.js';
 import DialogComponent from 'passbolt-mad/component/dialog';
 import HtmlHelper from 'passbolt-mad/helper/html';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import progressTemplate from 'app/view/template/component/dialog/progress.stache!';
+import progressTemplate from '../../view/template/component/dialog/progress.stache';
 
 const ProgressDialog = DialogComponent.extend('passbolt.component.ProgressDialog', /** @static */ {
 

@@ -11,15 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
-import Filter from 'app/model/filter';
+import Filter from '../../model/filter';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MenuComponent from 'passbolt-mad/component/menu';
-import PrimarySidebarSectionComponent from 'app/component/workspace/primary_sidebar_section';
+import PrimarySidebarSectionComponent from '../workspace/primary_sidebar_section';
 
-import template from 'app/view/template/component/user/shortcuts_filter_sidebar_section.stache!';
+import template from '../../view/template/component/user/shortcuts_filter_sidebar_section.stache';
 
 const ShortcutsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.user.ShortcutsFilterSidebarSection', /** @static */ {
 

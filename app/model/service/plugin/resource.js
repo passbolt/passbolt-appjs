@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import Plugin from 'app/util/plugin';
+import Plugin from '../../../util/plugin';
 
 export default class ResourceService {
 

@@ -15,7 +15,7 @@ import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
 import MadBus from 'passbolt-mad/control/bus';
 import ToggleButton from 'passbolt-mad/component/toggle_button';
-import template from 'app/view/template/component/workspace/secondary_menu.stache!';
+import template from '../../view/template/component/workspace/secondary_menu.stache';
 
 const WorkspaceSecondaryMenu = Component.extend('passbolt.component.WorkspaceSecondaryMenu', /** @static */ {
 

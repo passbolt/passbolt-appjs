@@ -15,9 +15,9 @@ import PropTypes from "prop-types";
 import React from "react";
 import ReactList from "react-list";
 import getTimeAgo from "passbolt-mad/util/time/get_time_ago";
-import Clipboard from 'app/util/clipboard';
-import Plugin from "app/util/plugin";
-import FavoriteService from "app/model/service/plugin/favorite";
+import Clipboard from '../../../app/util/clipboard';
+import FavoriteService from "../../../app/model/service/plugin/favorite";
+import ResourceService from '../../../app/model/service/plugin/resource';
 
 export default class PasswordsGrid extends React.Component {
 
@@ -189,7 +189,7 @@ export default class PasswordsGrid extends React.Component {
 
   handleCopyPasswordClick(ev, resource) {
     ev.stopPropagation();
-    Plugin.decryptSecretAndCopyToClipboard(resource.id);
+    ResourceService.decryptSecretAndCopyToClipboard(resource.id);
   }
 
   async handleFavoriteClick(ev, resource) {

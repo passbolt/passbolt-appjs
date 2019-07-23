@@ -11,24 +11,25 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import DomData from 'can-dom-data';
-import Filter from 'app/model/filter';
+import Filter from '../../model/filter';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
-import PermissionType from 'app/model/map/permission_type';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
-import Tag from 'app/model/map/tag';
-import User from 'app/model/map/user';
+import PermissionType from '../../model/map/permission_type';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
+import Tag from '../../model/map/tag';
+import User from '../../model/map/user';
 import TreeComponent from 'passbolt-mad/component/tree';
 import View from 'passbolt-mad/view/view';
-import 'lib/jquery.tag-editor.js';
-import 'lib/autocomplete.js';
+import '../../../lib/jquery.tag-editor.js';
+import '../../../lib/autocomplete.js';
 
-import template from 'app/view/template/component/password/tag_sidebar_section.stache!';
-import itemTemplate from 'app/view/template/component/tag/tree_item.stache!';
-import tagUpdateFormTemplate from 'app/view/template/form/tag/resource_tag_update.stache!';
+import template from '../../view/template/component/password/tag_sidebar_section.stache';
+import itemTemplate from '../../view/template/component/tag/tree_item.stache';
+import tagUpdateFormTemplate from '../../view/template/form/tag/resource_tag_update.stache';
 
 const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.password.TagSidebarSection', /** @static */ {
 
@@ -283,10 +284,10 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
         const message = __('You do not have the permission to change shared tags on this resource.');
         this._errorForm(message);
         valid = false;
-      } 
+      }
       // else if (isNewTag) {
       //   const message = __('You do not have the permission to create new shared tags.');
-      //   this._errorForm(message); 
+      //   this._errorForm(message);
       //   valid = false;
       // }
     }
@@ -296,10 +297,10 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
   /**
    * Determine if a tag can be deleted
    * return true if it can be and false otherwise
-   * 
-   * @param {string} slug 
+   *
+   * @param {string} slug
    */
-  _canDeleteTag: function(slug) { 
+  _canDeleteTag: function(slug) {
     if (/^#/.test(slug) && !this.options.resource.permission.isAllowedTo(PermissionType.UPDATE)) {
       return false;
     }
@@ -377,7 +378,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     }
   },
 
-  
+
 
   /**
    * Observe when a tag is deleted

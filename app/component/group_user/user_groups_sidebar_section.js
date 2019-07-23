@@ -11,16 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Group from 'app/model/map/group';
+import $ from 'jquery/dist/jquery.min.js';
+import Group from '../../model/map/group';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadMap from 'passbolt-mad/util/map/map';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
 import Tree from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
 
-import template from 'app/view/template/component/group_user/user_groups_sidebar_section.stache!';
-import groupListItemTemplate from 'app/view/template/component/group_user/user_groups_list_item.stache!';
+import template from '../../view/template/component/group_user/user_groups_sidebar_section.stache';
+import groupListItemTemplate from '../../view/template/component/group_user/user_groups_list_item.stache';
 
 const UserGroupsSidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.group_user.UserGroupsSidebarSection', /** @static */ {
 

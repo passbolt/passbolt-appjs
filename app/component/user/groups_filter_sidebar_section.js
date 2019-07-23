@@ -12,10 +12,10 @@
  * @since         2.0.0
  */
 import Component from 'passbolt-mad/component/component';
-import Group from 'app/model/map/group';
-import PeopleGroupsListComponent from 'app/component/group/people_groups_list';
+import Group from '../../model/map/group';
+import PeopleGroupsListComponent from '../group/people_groups_list';
 
-import template from 'app/view/template/component/user/groups_filter_sidebar_section.stache!';
+import template from '../../view/template/component/user/groups_filter_sidebar_section.stache';
 
 const GroupsFilterSidebarSectionComponent = Component.extend('passbolt.component.user.GroupsFilterSidebarSection', /** @static */ {
 

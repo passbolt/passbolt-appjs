@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Filter from 'app/model/filter';
-import Group from 'app/model/map/group';
-import GroupsListComponent from 'app/component/group/groups_list';
-import GroupsListView from 'app/view/component/group/groups_list';
+import Filter from '../../model/filter';
+import Group from '../../model/map/group';
+import GroupsListComponent from '../group/groups_list';
+import GroupsListView from '../../view/component/group/groups_list';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 
-import itemTemplate from 'app/view/template/component/group/group_item.stache!';
+import itemTemplate from '../../view/template/component/group/group_item.stache';
 
 const PasswordCategoriesGroupsList = GroupsListComponent.extend('passbolt.component.PasswordCategoriesGroupsList', /** @static */ {
 
