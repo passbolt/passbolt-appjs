@@ -15,6 +15,7 @@ import DomData from 'can-dom-data';
 import Action from 'passbolt-mad/model/map/action';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import Filter from 'app/model/filter';
+import getObject from 'can-util/js/get/get';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
@@ -491,38 +492,30 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    * @param {object} options Optional parameters
    *   * selectTag {string}: select a tag after the list is updated (useful for after import for instance).
    */
-  '{mad.bus.element} tags_updated': function(model, ev, options) {
-    // Refresh the list of tags.
-    this._findTags()
-      .then(tags => {
-        if (this.state.destroyed) {
-          return;
-        }
-        this._loadTree(tags);
+  '{mad.bus.element} tags_updated': async function(el, ev, options) {
+    const tags = await this._findTags();
+    const selectedTagId = getObject(ev, 'data.selectTag');
+    if (this.state.destroyed) {
+      return;
+    }
+    this._loadTree(tags);
 
-        if (options.selectTag !== undefined) {
-        // Retrieve corresponding tag in the list.
-          const tag = Array.from(tags).find(tag => tag.slug == options.selectTag);
-
-          // Retrieve tag.
-          const filter = new Filter({
-            id: `workspace_filter_tag_${tag.id}`,
-            type: 'tag',
-            label: tag.slug + __(' (tag)'),
-            rules: {
-              'has-tag': tag.slug
-            },
-            tag: tag
-          });
-          this.options.filter = filter;
-          MadBus.trigger('filter_workspace', {filter: filter});
-        } else {
-        // Filter the list how it was.
-          if (this.options.treeFilter) {
-            this._filterTree(this.options.treeFilter);
-          }
-        }
+    if (selectedTagId) {
+      const tag = Array.from(tags).find(tag => tag.slug == selectedTagId);
+      const filter = new Filter({
+        id: `workspace_filter_tag_${tag.id}`,
+        type: 'tag',
+        label: tag.slug + __(' (tag)'),
+        rules: { 'has-tag': tag.slug },
+        tag: tag
       });
+      this.options.filter = filter;
+      MadBus.trigger('filter_workspace', {filter: filter});
+    } else {
+      if (this.options.treeFilter) {
+        this._filterTree(this.options.treeFilter);
+      }
+    }
   },
 
   /**

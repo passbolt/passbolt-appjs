@@ -12,8 +12,8 @@
  * @since         2.0.0
  */
 import Clipboard from 'app/util/clipboard';
-import Plugin from 'app/util/plugin';
 import Resource from 'app/model/map/resource';
+import ResourceService from '../../model/service/plugin/resource';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
 
 import template from 'app/view/template/component/password/information_sidebar_section.stache!';
@@ -67,7 +67,7 @@ const InformationSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    */
   '{element} li.password .secret-copy > a click': function() {
     const resource = this.options.resource;
-    Plugin.decryptSecretAndCopyToClipboard(resource.id);
+    ResourceService.decryptSecretAndCopyToClipboard(resource.id);
   },
 
   /**

@@ -17,12 +17,12 @@ import DropdownComponent from 'passbolt-mad/form/element/dropdown';
 import EditView from 'app/view/component/group/edit';
 import Group from 'app/model/map/group';
 import GroupCreateForm from 'app/form/group/create';
+import GroupService from '../../model/service/plugin/group';
 import GroupUser from 'app/model/map/group_user';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
-import Plugin from 'app/util/plugin';
 import TreeComponent from 'passbolt-mad/component/tree';
 import TreeView from 'passbolt-mad/view/component/tree';
 import User from 'app/model/map/user';
@@ -184,7 +184,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
     const group = this.options.data.Group;
     const canAddGroupUsers = this.formState == 'create' || this.isGroupManager;
     const groupId = group.id || '';
-    Plugin.insertGroupEditframe(groupId, canAddGroupUsers);
+    GroupService.insertGroupEditframe(groupId, canAddGroupUsers);
   },
 
   /**
@@ -301,7 +301,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
     }
 
     // Notify the plugin, the user shouldn't be listed by the autocomplete anymore.
-    Plugin.groupEditIframeRemoveGroupUser(groupUser);
+    GroupService.groupEditIframeRemoveGroupUser(groupUser);
     this.checkManager();
   },
 
@@ -311,7 +311,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
    */
   editGroupUser: function(groupUser, value) {
     groupUser.is_admin = value;
-    Plugin.groupEditIframeEditGroupUser(groupUser);
+    GroupService.groupEditIframeEditGroupUser(groupUser);
     this.checkManager();
   },
 
@@ -396,7 +396,7 @@ const EditComponent = Component.extend('passbolt.component.group.Edit', /** @sta
         const groupJson = {name: formData['Group']['name']};
 
         MadBus.trigger('passbolt_loading');
-        Plugin.groupEditIframeSave(groupJson);
+        GroupService.groupEditIframeSave(groupJson);
 
         this.state.loaded = false;
       }

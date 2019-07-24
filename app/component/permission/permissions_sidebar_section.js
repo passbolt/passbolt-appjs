@@ -168,9 +168,9 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
   },
 
   /**
-   * Observe when the item is updated
+   * Observe permissions are updated
    */
-  '{acoInstance} updated': function() {
+  '{mad.bus.element} permissions_updated': function() {
     if ($(this.element).hasClass('closed')) {
       return;
     }

@@ -18,6 +18,7 @@ import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import DialogComponent from 'passbolt-mad/component/dialog';
+import getObject from 'can-util/js/get/get';
 import GridComponent from 'app/component/password/grid';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
@@ -32,10 +33,10 @@ import ResourceEditForm from 'app/form/resource/edit';
 import route from 'can-route';
 import SecondaryMenuComponent from 'app/component/workspace/secondary_menu';
 
-import Favorite from 'app/model/map/favorite';
 import Filter from 'app/model/filter';
 import Group from 'app/model/map/group';
 import Resource from 'app/model/map/resource';
+import ResourceService from 'app/model/service/plugin/resource';
 
 import commentDeleteConfirmTemplate from 'app/view/template/component/comment/delete_confirm.stache!';
 import createButtonTemplate from 'app/view/template/component/workspace/create_button.stache!';
@@ -224,16 +225,11 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Component}
    */
   _initGrid: function() {
-    if (this.options.grid) {
-      $(this.options.grid.element).empty().removeClass();
-      this.options.grid.destroy();
-    }
     const component = new GridComponent('#js_wsp_pwd_browser', {
       selectedResources: this.options.selectedResources,
-      cssClasses: ['tableview']
     });
-    this.options.grid = component;
     this.addLoadedDependency(component);
+    this.grid = component;
     return component;
   },
 
@@ -280,7 +276,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       cssClasses: ['create-password-dialog', 'dialog-wrapper']
     }).start();
 
-      // Attach the form to the dialog
+    // Attach the form to the dialog
     const form = dialog.add(ResourceCreateForm, {
       data: resource,
       callbacks: {
@@ -300,18 +296,25 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Form} form The form object
    * @param {Dialog} dialog The dialog object
    */
-  _saveResource: function(resource, form, dialog) {
+  _saveResource: async function(resource, form, dialog) {
     this.state.loaded = false;
     dialog.remove();
-    resource.save()
-      .then(() => {
-        const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
-        filter.forceReload = true;
-        MadBus.trigger('filter_workspace', {filter: filter});
-        this.state.loaded = true;
-      }, v => {
-        form.showErrors(JSON.parse(v.responseText)['body']);
-      });
+    try {
+      const resourceCreated = await resource.save();
+      // If the workspace is not filter by all items, recently modified or items I own.
+      // Filter the workspace by all items
+      if (!["default", "modified", "owner"].includes(this.filter.type)) {
+        const filter = this.getFilter();
+        MadBus.trigger('filter_workspace', {filter: filter, selectAndScrollTo: resourceCreated});
+      } else {
+        this.grid.selectAndScrollTo(resourceCreated);
+      }
+
+      MadBus.trigger('passbolt_notify', { status: 'success', title: "app_resources_add_success" });
+    } catch (error) {
+      MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
+    }
+    this.state.loaded = true;
   },
 
   /**
@@ -332,7 +335,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       action: 'edit',
       data: resource,
       callbacks: {
-        submit: data => {
+        submit: async(data) => {
+          this.state.loaded = false;
           const resourceToUpdate = new Resource(data['Resource']);
           // If not secrets present, no need to add them to the API request.
           if (data['Resource'].secrets.length > 0) {
@@ -340,11 +344,15 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
           } else {
             resourceToUpdate['__FILTER_CASE__'] = 'edit';
           }
-          resourceToUpdate.save()
-            .then(savedResource => {
-              resource.assign(savedResource);
-            });
           dialog.remove();
+          try {
+            const resourceUpdated = await resourceToUpdate.save();
+            this.grid.selectAndScrollTo(resourceUpdated);
+            MadBus.trigger('passbolt_notify', { status: 'success', title: "app_resources_update_success" });
+          } catch (error) {
+            MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
+          }
+          this.state.loaded = true;
         }
       }
     });
@@ -356,7 +364,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Resource.List} resources The target resources.
    */
   openShareResourcesDialog: function(resources) {
-    Plugin.insertShareIframe(resources.map(resource => resource.id));
+    ResourceService.insertShareIframe(resources.map(resource => resource.id));
   },
 
   /**
@@ -385,56 +393,20 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    *
    * @param {Resource.List} resources The resource to delete
    */
-  _deleteResources: function(resources) {
-    const multipleDelete = resources.length > 1;
+  _deleteResources: async function(resources) {
     this.state.loaded = false;
-    this.options.selectedResources.splice(0, this.options.selectedResources.length);
-    if (multipleDelete) {
-      Resource.deleteAll(resources)
-        .then(() => {
-          MadBus.trigger('passbolt_notify', {
-            title: 'app_resources_delete_all_success',
-            status: 'success'
-          });
-          this.state.loaded = true;
-        });
-    } else {
-      resources[0].destroy().then(() => {
-        this.state.loaded = true;
-      });
+    const resourcesIds = resources.reduce((carry, resource) => [...carry, resource.id], []);
+    try {
+      await ResourceService.deleteAllByIds(resourcesIds);
+      let notificationTitle = "app_resources_delete_success";
+      if (resources.length > 1) {
+        notificationTitle = "app_resources_delete_all_success";
+      }
+      MadBus.trigger('passbolt_notify', { status: 'success', title: notificationTitle });
+    } catch (error) {
+      MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
     }
-  },
-
-  /**
-   * Mark a resource as favorite.
-   *
-   * @param {Resource} resource The target resource entity
-   */
-  favoriteResource: function(resource) {
-    const data = {
-      foreign_model: 'resource',
-      foreign_key: resource.id
-    };
-    const favorite = new Favorite(data);
-    favorite.save()
-      .then(favorite => {
-        resource.favorite = favorite;
-        Resource.connection.hydrateInstance(resource);
-      });
-  },
-
-  /**
-   * Unmark a resource as favorite.
-   *
-   * @param {Resource} resource The target resource entity
-   */
-  unfavoriteResource: function(resource) {
-    const favorite = resource.favorite;
-    favorite.destroy()
-      .then(() => {
-        resource.favorite = null;
-        Resource.connection.hydrateInstance(resource);
-      });
+    this.state.loaded = true;
   },
 
   /**
@@ -455,10 +427,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     });
     confirm.start();
   },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE MODEL EVENTS */
-  /* ************************************************************** */
 
   /**
    * Observe when a resource is updated.
@@ -496,7 +464,11 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       if (component) {
         component.start();
       }
-      route.data.update({controller: 'Password', action: 'view', id: selectedResources[0].id});
+      const url = new URL(window.location);
+      const matches = url.pathname.match('^\/app\/passwords\/view\/(.*)$');
+      if (!matches || matches[1] !== selectedResources[0].id) {
+        route.data.update({controller: 'Password', action: 'view', id: selectedResources[0].id});
+      }
     } else {
       this._destroySecondarySidebar();
       route.data.update({controller: 'Password', action: 'index'});
@@ -515,10 +487,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       }
     }
   },
-
-  /* ************************************************************** */
-  /* LISTEN TO THE APP EVENTS */
-  /* ************************************************************** */
 
   /**
    * Observe when the user wants to create a new instance
@@ -541,33 +509,12 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} filter_workspace': function(el, ev) {
     const filter = ev.data.filter;
-
-    // When filtering the resources browser, unselect all the resources.
-    this.options.selectedResources.splice(0, this.options.selectedResources.length);
+    this.filter = filter;
 
     // Unselect all group if the filter does not target a group (dirty).
     if (!filter.rules['is-shared-with-group']) {
       this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
     }
-
-    /*
-     * Rebuild the grid each time the workspace is filtered except if:
-     * - The user is searching on all items.
-     * - The user empty the search on all items.
-     * If no filterSettings, it means that the grid had never been filtered, no need to reinit it.
-     */
-    if (this.options.grid.filterSettings) {
-      const wasSearchingAllItems = filter.id == "default" && this.options.grid.filterSettings.id == "search";
-      const isSearchingAllItems = filter.id == "search" && this.options.grid.filterSettings.id == "default";
-      const isUpdatingSearch = filter.id == "search" && this.options.grid.filterSettings.id == "search";
-      if (!wasSearchingAllItems && !isSearchingAllItems && !isUpdatingSearch) {
-        const grid = this._initGrid();
-        grid.start();
-      }
-    }
-
-
-    MadBus.trigger('filter_grid', {filter: filter});
   },
 
   /**
@@ -632,26 +579,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   },
 
   /**
-   * Observe when the user wants to mark a resource as favorite
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_resource_favorite': function(el, ev) {
-    const resource = ev.data.resource;
-    this.favoriteResource(resource);
-  },
-
-  /**
-   * Observe when the user wants to unmark a resource from favorite
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_resource_unfavorite': function(el, ev) {
-    const resource = ev.data.resource;
-    this.unfavoriteResource(resource);
-  },
-
-  /**
    * Listen to the workspace request_export
    */
   '{mad.bus.element} request_export': function() {
@@ -665,61 +592,22 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * If no tag has been created (no tag integration) then just refresh the workspace.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
-   * @param options
-   *   * tag : the tag created during the import.
    */
-  '{mad.bus.element} passbolt.plugin.import-passwords-complete': function(el, ev, options) {
-    // If a tag is provided, then we update the tags list and select the corresponding tag.
-    if (options !== undefined && options.tag !== undefined) {
-      MadBus.trigger('tags_updated', {selectTag: options.tag});
-    } else {
-      // else, we simply refresh the entire workspace.
-      const workspace = 'password';
-      MadBus.trigger('request_workspace', {workspace: workspace});
-    }
+  '{mad.bus.element} passbolt.plugin.import-passwords-complete': function(el, ev) {
+    const selectTag = getObject(ev, 'data.tag');
+    MadBus.trigger('tags_updated', { selectTag });
+    ResourceService.updateLocalStorage();
   },
 
   /**
    * Observe when the plugin informs that the share operation has been completed.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} passbolt.share.complete': function() {
-    const selectedResources = this.options.selectedResources;
-    const selectedResourcesIds = selectedResources.map(resource => resource.id).get();
-
-    /*
-     * Unselect all the resources.
-     * The user could have lost his access to some of them.
-     * Retrieve the resources and then select the ones the user can still access.
-     */
-    // selectedResources.splice(0);
-    this.updateResourcesAfterShare(selectedResourcesIds)
-      .then(updatedResources => selectedResources.replace(updatedResources));
-  },
-
-  /**
-   * Update resources after they have been shared.
-   * - Update the permission of the current user locally
-   * - Destroy them locally if the user has not access to them
-   * @param resourcesIds
-   * @return {Promise}
-   */
-  updateResourcesAfterShare: function(updatedResourcesIds) {
-    const originalResources = this.options.grid.options.items;
-    return Resource.findAllByIds(updatedResourcesIds)
-      .then(resources => {
-        // Destroy the resources the user could have lost access to.
-        const deletedResourcesIds = updatedResourcesIds.filter(updatedResourceId => resources.indexOf({id: updatedResourceId}) === -1);
-        originalResources
-          .filter(originalResource => deletedResourcesIds.indexOf(originalResource.id) !== -1)
-          .forEach(deletedResource => {
-            Resource.dispatch('destroyed', deletedResource);
-          });
-
-        // Update all the retrieved resources.
-        Resource.dispatch('updated', resources);
-
-        return resources;
-      });
+  '{mad.bus.element} passbolt.share.complete': async function(el, ev) {
+    // Update the resource local storage.
+    await ResourceService.updateLocalStorage();
+    MadBus.trigger('permissions_updated', this.options.selectedResources);
   },
 
   /**

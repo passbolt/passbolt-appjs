@@ -64,7 +64,6 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
     this.options.filterForm = form;
 
     const keywordsTextbox = form.addElement(new Textbox('#js_app_filter_keywords', {
-      onChangeTimeout: 200,
       modelReference: 'passbolt.model.Filter.keywords'
     }));
     keywordsTextbox.start();

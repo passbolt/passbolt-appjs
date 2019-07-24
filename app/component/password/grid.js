@@ -11,794 +11,301 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import CheckboxComponent from 'passbolt-mad/form/element/checkbox';
-import Clipboard from 'app/util/clipboard';
-import ComponentHelper from 'passbolt-mad/helper/component';
-import Config from 'passbolt-mad/config/config';
-import FavoriteComponent from 'app/component/favorite/favorite';
+
+import Component from 'passbolt-mad/component/component';
 import getObject from 'can-util/js/get/get';
-import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
-import GridColumn from 'passbolt-mad/model/map/grid_column';
-import GridComponent from 'passbolt-mad/component/grid';
 import GridContextualMenuComponent from 'app/component/password/grid_contextual_menu';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
+import Lock from 'app/util/lock';
 import MadBus from 'passbolt-mad/control/bus';
-import MadMap from 'passbolt-mad/util/map/map';
-import PasswordGridView from 'app/view/component/password/grid';
-import Plugin from 'app/util/plugin';
+import PasswordsGrid from "../../../src/components/PasswordsGrid/PasswordsGrid";
+import React from "react";
+import ReactDOM from "react-dom";
 import Resource from 'app/model/map/resource';
-import View from 'passbolt-mad/view/view';
+import ResourceService from 'app/model/service/plugin/resource';
+import PermissionType from 'app/model/map/permission_type';
+import route from 'can-route';
 
-import columnHeaderSelectTemplate from 'app/view/template/component/password/grid/column_header_select.stache!';
-import columnHeaderFavoriteTemplate from 'app/view/template/component/password/grid/column_header_favorite.stache!';
-import cellSecretTemplate from 'app/view/template/component/password/grid/cell_secret_template.stache!';
-import cellUsernameTemplate from 'app/view/template/component/password/grid/cell_username_template.stache!';
-import cellUriTemplate from 'app/view/template/component/password/grid/cell_uri_template.stache!';
-import gridWelcomeTemplate from 'app/view/template/component/password/grid/grid_welcome.stache!';
-import gridFilteredEmptyTemplate from 'app/view/template/component/password/grid/grid_filtered_empty.stache!';
-import gridFavoriteEmptyTemplate from 'app/view/template/component/password/grid/grid_favorite_empty.stache!';
-import gridGroupEmptyTemplate from 'app/view/template/component/password/grid/grid_group_empty.stache!';
-import gridOwnerEmptyTemplate from 'app/view/template/component/password/grid/grid_owner_empty.stache!';
-import gridSharedEmptyTemplate from 'app/view/template/component/password/grid/grid_shared_empty.stache!';
-
-const PasswordGridComponent = GridComponent.extend('passbolt.component.password.Grid', /** @static */ {
+const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
   defaults: {
-    itemClass: Resource,
-    viewClass: PasswordGridView,
     selectedResources: new Resource.List(),
     prefixItemId: 'resource_',
     silentLoading: false,
     loadedOnStart: false,
-    Resource: Resource,
-    paginate: true,
-    selectAllCheckboxSelector: '#js-passwords-select-all'
+    isFirstLoad: true,
+    Resource: Resource
   }
 
-}, /** @prototype */ {
+}, {
+    // @inheritdoc
+    init: function (el, options) {
+      this._super(el, options);
+      this._filterLock = new Lock();
+    },
 
-  /**
-   * The filter used to filter the browser.
-   * @type {Filter}
-   */
-  filterSettings: null,
+    // @inheritdoc
+    afterStart: async function () {
+      this.gridRef = React.createRef();
+      const grid = React.createElement(PasswordsGrid, { ref: this.gridRef });
+      ReactDOM.render(grid, this.element);
+    },
 
-  /**
-   * The array of select checkbox components.
-   */
-  _selectCheckboxComponents: {},
-
-  /**
-   * Multi select initial element reference.
-   */
-  _multiShiftSelectFirstElement: null,
-
-  /**
-   * Pending filter timeout to execute once the grid is loaded.
-   */
-  _pendingFilterTimeout: null,
-
-  /**
-   * A filter is currently applied to the grid
-   */
-  _applyingFilter: false,
-
-  /**
-   * @inheritdoc
-   */
-  init: function(el, options) {
-    options.map = this._getGridMap();
-    options.columnModel = this._getGridColumns();
-    this._super(el, options);
-  },
-
-  /**
-   * Init the grid map.
-   * @return {UtilMap}
-   */
-  _getGridMap: function() {
-    const map = new MadMap({
-      id: 'id',
-      name: 'name',
-      username: 'username',
-      secret: 'Secret',
-      uri: 'uri',
-      safeUrl: {
-        key: 'uri',
-        func: function(value, map, item) {
-          return item.safeUrl();
-        }
-      },
-      modified: {
-        key: 'modified',
-        func: function(value) {
-          return getTimeAgo(value);
-        }
-      },
-      owner: 'Creator.username'
-    });
-    return map;
-  },
-
-  /**
-   * Init the grid columns
-   * @return {array}
-   */
-  _getGridColumns: function() {
-    const columns = [];
-
-    // Select column
-    const selectColumn = new GridColumn({
-      name: 'multipleSelect',
-      index: 'multipleSelect',
-      css: ['selections s-cell'],
-      label: columnHeaderSelectTemplate,
-      sortable: false,
-      afterRender: (cellElement, cellValue, mappedItem, item, columnModel) =>
-        this._initSelectColumnComponent(cellElement, cellValue, mappedItem, item, columnModel)
-    });
-    columns.push(selectColumn);
-
-    // Favorite column
-    const favoriteColumn = new GridColumn({
-      name: 'favorite',
-      index: 'favorite',
-      css: ['selections s-cell'],
-      label: columnHeaderFavoriteTemplate,
-      afterRender: this._initFavoriteCellComponent
-    });
-    columns.push(favoriteColumn);
-
-    // Name column
-    const nameColumn = new GridColumn({
-      name: 'name',
-      index: 'name',
-      css: ['m-cell'],
-      label: __('Resource'),
-      sortable: true
-    });
-    columns.push(nameColumn);
-
-    // Username column
-    const usernameColumn = new GridColumn({
-      name: 'username',
-      index: 'username',
-      css: ['m-cell', 'username'],
-      label: __('Username'),
-      sortable: true,
-      template: cellUsernameTemplate
-    });
-    columns.push(usernameColumn);
-
-    // Secret column
-    const secretColumn = new GridColumn({
-      name: 'secret',
-      index: 'secret',
-      css: ['m-cell', 'password'],
-      label: __('Password'),
-      template: cellSecretTemplate
-    });
-    columns.push(secretColumn);
-
-    // Uri column
-    const uriColumn = new GridColumn({
-      name: 'uri',
-      index: 'uri',
-      css: ['l-cell'],
-      label: __('URI'),
-      sortable: true,
-      template: cellUriTemplate
-    });
-    columns.push(uriColumn);
-
-    // Modified column
-    const modifiedColumn = new GridColumn({
-      name: 'modified',
-      index: 'modified',
-      css: ['m-cell'],
-      sortable: true,
-      label: __('Modified')
-    });
-    columns.push(modifiedColumn);
-
-    // Owner column
-    const ownerColumn = new GridColumn({
-      name: 'owner',
-      index: 'owner',
-      css: ['m-cell'],
-      label: __('Owner'),
-      sortable: true
-    });
-    columns.push(ownerColumn);
-
-    return columns;
-  },
-
-  /**
-   * Init the select component for a given cell.
-   * @inheritdoc
-   */
-  _initSelectColumnComponent: function(cellElement, cellValue, mappedItem, item) {
-    const availableValues = {};
-    availableValues[item.id] = '';
-    const checkbox = ComponentHelper.create(
-      cellElement,
-      'inside_replace',
-      CheckboxComponent, {
-        id: `multiple_select_checkbox_${item.id}`,
-        cssClasses: ['js_checkbox_multiple_select'],
-        availableValues: availableValues
+    /**
+     * Filter the grid
+     * @param {Filter} filter The filter to apply
+     */
+    filterWorkspace: async function (filter) {
+      // Generate a random id to identify the current filter request.
+      // This random id will allow us to identify the latest filter request.
+      // Only the latest request will be treated, the others will be ignore.
+      const filterRequestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
+      this.filterRequestId = filterRequestId;
+      await this._filterLock.acquire();
+      if (this.filterRequestId !== filterRequestId) {
+        this._filterLock.release();
+        return;
       }
-    );
-    checkbox.start();
-    this._selectCheckboxComponents[item.id] = checkbox;
-  },
 
-  /**
-   * After an item is rendered select mark it has selected if it has been previously selected.
-   * It is usefull to mark paginated items as selected.
-   * @inheritdoc
-   */
-  _afterRenderItem: function(item, mappedItem) {
-    this._super(item, mappedItem);
-    if (this.isSelected(item)) {
-      this.selectItem(item);
-      this._selectCheckboxComponents[item.id].setValue([item.id]);
-    }
-  },
-
-  /**
-   * Init the favorite component for a given cell.
-   * @inheritdoc
-   */
-  _initFavoriteCellComponent: function(cellElement, cellValue, mappedItem, item) {
-    const availableValues = {};
-    availableValues[item.id] = '';
-    const favorite = ComponentHelper.create(
-      cellElement,
-      'inside_replace',
-      FavoriteComponent, {
-        id: `favorite_${item.id}`,
-        instance: item
+      this.filter = filter;
+      if (filter.type !== 'search') {
+        this.state.loaded = false;
+        this.gridRef.current.resetState({ resources: null });
       }
-    );
-    favorite.start();
-  },
+      this.resources = await this.getResources();
+      this.filteredResources = this.filterResources(this.resources);
+      const selectedResourcesIds = this.selectResourcesOnWorkspaceFiltered();
 
-  /**
-   * Show the contextual menu
-   * @param {Resource} resource The resource to show the contextual menu for
-   * @param {string} x The x position where the menu will be rendered
-   * @param {string} y The y position where the menu will be rendered
-   */
-  showContextualMenu: function(resource, x, y) {
-    const coordinates = {x: x, y: y};
-    const contextualMenu = GridContextualMenuComponent.instantiate({resource: resource, coordinates: coordinates});
-    contextualMenu.start();
-  },
-
-  /**
-   * Refresh item
-   * @param {Resource} item The item to refresh
-   */
-  refreshItem: function(resource) {
-    // If the item doesn't exist
-    if (!this.itemExists(resource)) {
-      return;
-    }
-
-    // if the resource has not been removed from the grid, update it
-    this._super(resource);
-
-    // If the item was previously selected, update the view that has been altered when the item has been refreshed.
-    if (this.isSelected(resource)) {
-      // Select the checkbox (if it is not already done).
-      const checkbox = this._selectCheckboxComponents[resource.id];
-      checkbox.setValue([resource.id]);
-
-      // Make the item selected in the view.
-      this.view.selectItem(resource);
-    }
-  },
-
-  /**
-   * Is the item selected
-   *
-   * @param {Resource}
-   * @return {bool}
-   */
-  isSelected: function(item) {
-    const resources = this.options.selectedResources;
-    return resources.indexOf(item) != -1;
-  },
-
-  /**
-   * Select an item
-   * @param {Resource} item The item to select
-   */
-  select: function(item) {
-    if (!this.itemExists(item)) {
-      return;
-    }
-    const checkbox = this._selectCheckboxComponents[item.id];
-    checkbox.setValue([item.id]);
-    this.selectItem(item);
-  },
-
-  /**
-   * Unselect an item
-   * @param {Resource} item The item to unselect
-   */
-  unselect: function(item) {
-    if (!this.itemExists(item)) {
-      return;
-    }
-    const checkbox = this._selectCheckboxComponents[item.id];
-    checkbox.reset();
-    this.unselectItem(item);
-  },
-
-  /**
-   * Filter the browser using a filter settings object
-   * @param {Filter} filter The filter to
-   * @return {Promise}
-   */
-  filterBySettings: function(filter) {
-    // Only one filter can be applied at a time.
-    if (this._applyingFilter) {
-      clearTimeout(this._pendingFilterTimeout);
-      this._pendingFilterTimeout = setTimeout(() => this.filterBySettings(filter), 200);
-      return;
-    }
-
-    this.state.loaded = false;
-    this._applyingFilter = true;
-    return this._findResources(filter)
-      .then(resources => this._handleApiResources(resources, filter))
-      .then(() => this._markSortedBySettings(filter))
-      .then(() => this._filterByKeywordsBySettings(filter))
-      .then(() => this._selectResourceBySettings(filter))
-      .then(() => {
-        this._applyingFilter = false;
+      this.gridRef.current.resetState({
+        resources: this.filteredResources.get(),
+        selectedResources: selectedResourcesIds,
+        search: getObject(filter, "rules.keywords") || "",
+        filterType: this.filter.type
       });
-  },
 
-  /**
-   * @inheritdoc
-   */
-  sort: function(columnModel, sortAsc) {
-    this.options.selectedResources.splice(0);
-    return this._super(columnModel, sortAsc);
-  },
+      this.options.isFirstLoad = false;
+      this.state.loaded = true;
+      ResourceService.updateLocalStorage();
+      this._filterLock.release();
+    },
 
-  /**
-   * Find resources if the given filter needs it
-   * @param {Filter} filter
-   * @return {Promise}
-   * @private
-   */
-  _findResources: function(filter) {
-    const forceReload = filter.forceReload;
-    const oldFilterId = getObject(this, 'filterSettings.id');
-    const searching =
-      // The user was already searching or is on all items
-      (filter.id == 'search' && (oldFilterId == 'search' || oldFilterId == 'default'))
-      // The user empty the search bar
-      || (filter.id == 'default' && oldFilterId == 'search');
+    /**
+     * Handle the resources local storage update.
+     */
+    handleResourcesLocalStorageUpdated: async function () {
+      await this._filterLock.acquire();
+      this.resources = await this.getUpdatedResources();
+      this.filteredResources = this.filterResources(this.resources);
 
-    // Do not request the API if the user is performing a search on the default filter
-    if (searching && !forceReload) {
-      return Promise.resolve();
-    }
+      // Remove from the selected resources the ones which have not filtered anymore.
+      const selectedResources = this.options.selectedResources;
+      const selectedResourcesIds = selectedResources.reduce((carry, resource) => [...carry, resource.id], []);
+      const newSelectedResources = this.filteredResources.filter(resource => selectedResourcesIds.includes(resource.id));
+      if (newSelectedResources.length !== selectedResources.length) {
+        selectedResources.splice(0, selectedResources.length, ...newSelectedResources);
+      }
 
-    const findOptions = {
-      contain: {favorite: 1, permission: 1, tag: 1},
-      filter: filter.getRules(['keywords']),
-      order: filter.getOrders(),
-      silentLoading: false
-    };
-    return Resource.findAll(findOptions);
-  },
+      this.gridRef.current.updateState({
+        resources: this.filteredResources.get()
+      });
 
-  /**
-   * Handle the find request API response
-   * @param {Resources.List} resources The resources list from the API. If undefined, the grid doesn't need to be reloaded.
-   * @param {Filter} filter The filter to apply
-   * @return {Promise}
-   * @private
-   */
-  _handleApiResources: function(resources, filter) {
-    this.filterSettings = filter;
-    if (!resources) {
-      return Promise.resolve();
-    }
-    if (this.state.destroyed) {
-      return Promise.resolve();
-    }
+      this._filterLock.release();
+    },
+    
+    /**
+     * Select and scroll to a given a resource
+     * @param {Resource} resource 
+     */
+    selectAndScrollTo: async function(resource) {
+      this.gridRef.current.updateState({ selectedResources: [resource.id] });
+      // Force the local storage update, so the resource is in its final position.
+      await this.handleResourcesLocalStorageUpdated();
+      const resourceIndex = this.resources.indexOf(resource);
+      this.gridRef.current.scrollTo(resource.id);
+      this.options.selectedResources.splice(0, this.options.selectedResources.length, this.resources[resourceIndex]);
+    },
 
-    this.state.selectType = null;
-    this.view.reset();
-    this._uncheckSelectAllCheckbox();
-    const loadOptions = {};
-    const keywords = filter.getRule('keywords');
-    if (keywords && keywords != '') {
-      filter.filterByKeywordsApplied = true;
-      loadOptions.filter = {
-        keywords: keywords,
-        fields: this._getFilterFields()
-      };
-    }
+    /**
+     * Get the resources (in canJS format)
+     * @return {Resource.List}
+     */
+    getResources: function () {
+      if (this.filter.type === "group") {
+        const groupId = this.filter.rules['is-shared-with-group'];
+        const contain = { favorite: 1, permission: 1, tag: 1 };
+        const filter = { 'is-shared-with-group': groupId };
+        return Resource.findAll({ contain, filter });
+      }
+      if (this.filter.type === "tag") {
+        const groupId = this.filter.rules['has-tag'];
+        const contain = { favorite: 1, permission: 1, tag: 1 };
+        const filter = { 'has-tag': groupId };
+        return Resource.findAll({ contain, filter });
+      }
 
-    if (filter.viewResourceId) {
-      loadOptions.visibleItemId = filter.viewResourceId;
-    }
+      return Resource.findAll({ source: 'storage', retryOnNotInitialized: true });
+    },
 
-    return this.load(resources, loadOptions);
-  },
+    /**
+     * Get the resources after a local storage update
+     * @return {Resource.List}
+     */
+    getUpdatedResources: async function () {
+      const updatedResources = await Resource.findAll({ source: 'storage' });
 
-  /**
-   * Mark the grid as sorted following the filter settings.
-   * It happens when the API result is already sorted.
-   * @param {Filter}filter
-   * @private
-   */
-  _markSortedBySettings: function(filter) {
-    if (this.state.destroyed) {
-      return Promise.resolve();
-    }
-
-    const orders = filter.getOrders();
-    if (orders && orders[0]) {
-      const matches = /((\w*)\.)?(\w*)\s*(asc|desc|ASC|DESC)?/i.exec(orders[0]);
-      const fieldName = matches[3];
-      const sortWay = matches[4] ? matches[4].toLowerCase() : 'asc';
-
-      if (fieldName) {
-        const sortedColumnModel = this.getColumnModel(fieldName);
-        if (sortedColumnModel) {
-          this.view.markColumnAsSorted(sortedColumnModel, sortWay === 'asc');
+      // Filtering by tags and groups doesn't yet benefit from the local storage.
+      // Update the resources local variable with the one returned by the cache.
+      if (this.filter.type === "group" || this.filter.type === "tag") {
+        for (let i = this.resources.length - 1; i >= 0; i--) {
+          const updatedResourceIndex = updatedResources.indexOf(this.resources[i]);
+          if (updatedResourceIndex === -1) {
+            this.resources.splice(updatedResourceIndex, 1);
+          } else {
+            this.resources[i] = updatedResources[updatedResourceIndex];
+          }
         }
+
+        return this.resources;
       }
-    }
-  },
 
-  /**
-   * Filter the grid by keywords following the filter settings
-   * @param {Filter} filter
-   * @returns {Promise}
-   * @private
-   */
-  _filterByKeywordsBySettings: function(filter) {
-    if (this.state.destroyed) {
-      return Promise.resolve();
-    }
-    if (filter.filterByKeywordsApplied) {
-      return;
-    }
-    const keywords = filter.getRule('keywords');
-    if (keywords && keywords != '') {
-      const filterFields = this._getFilterFields();
-      return this.filterByKeywords(keywords, filterFields);
-    } else if (this.state.filtered) {
-      return this.resetFilter();
-    }
-  },
+      return updatedResources;
+    },
 
-  /**
-   * Select a resource following the filter settings
-   * @param {Filter} filter
-   * @returns {Promise}
-   * @private
-   */
-  _selectResourceBySettings: function(filter) {
-    if (this.state.destroyed) {
-      return Promise.resolve();
-    }
-
-    // @todo check if still in use.
-    if (filter.resource) {
-      this.select(filter.resource);
-    }
-    if (filter.viewResourceId) {
-      const resource = this.options.items.filter(resource => resource.id == filter.viewResourceId).get(0);
-      if (resource) {
-        this.options.selectedResources.push(resource);
-        this.scrollToItem(resource);
-      } else {
-        MadBus.trigger('passbolt_notify', {
-          status: 'error',
-          title: `app_passwords_view_error_not_found`
-        });
+    /**
+     * Filter the resources
+     * @param {Resources.List} resources 
+     */
+    filterResources: function (resources) {
+      if (this.filter.type == "favorite") {
+        return resources.filter(resource => resource.favorite !== null);
       }
-    }
-  },
-
-  /**
-   * Get the fields the grid can be filter on by keywords.
-   * @returns {string[]}
-   * @private
-   */
-  _getFilterFields: function() {
-    const filterFields = ['username', 'name', 'uri', 'description'];
-    const plugins = Config.read('server.passbolt.plugins');
-    if (plugins && plugins.tags) {
-      filterFields.push('tags[].slug');
-    }
-    return filterFields;
-  },
-
-  /**
-   * Observe when the component is empty
-   * @param {boolean} empty True if empty, false otherwise
-   */
-  onEmptyChange: function(empty) {
-    if (this.state.destroyed) {
-      return;
-    }
-    this._super(empty);
-    // Remove the empty feedback before the grid is loaded, otherwise the rows are inserted under the feedback.
-    if (this.state.filtering && !empty) {
-      $(this.element).removeClass('all_items');
-      $('.empty-content', this.element).remove();
-    }
-  },
-
-  /**
-   * Observe when the component is loaded
-   * @param {boolean} loaded True if loaded, false otherwise
-   */
-  onLoadedChange: function(loaded) {
-    this._super(loaded);
-    if (this.state.destroyed) {
-      return;
-    }
-
-    const empty = this.state.empty;
-    if (!loaded || !empty) {
-      if (this.state.filtering && $(this.element).hasClass('filtered')) {
-        return;
+      if (this.filter.type == "shared_with_me") {
+        return resources.filter(resource => resource.permission.type !== PermissionType.ADMIN);
       }
-      $(this.element).removeClass('all_items');
-      $('.empty-content', this.element).remove();
-      return;
-    }
-
-    let emptyTemplate;
-    const emptyCssClasses = [];
-    switch (this.filterSettings.type) {
-      case 'default': {
-        emptyCssClasses.push('all_items');
-        emptyTemplate = gridWelcomeTemplate;
-        break;
+      if (this.filter.type == "owner") {
+        return resources.filter(resource => resource.permission.type === PermissionType.ADMIN);
       }
-      case 'search': {
-        // Template already in the dom. In case of filtering we don't remove it from the dom when the component is unloaded to avoid blinking.
-        if ($('.empty-content', this.element).length) {
-          return;
+
+      return resources;
+    },
+
+    /**
+     * Select resources after the workspace is filtered.
+     * @return {array} The selected resource ids.
+     */
+    selectResourcesOnWorkspaceFiltered: function () {
+      const selectedResourcesIds = [];
+
+      // During the first load, we check if a resource id has been given in parameter.
+      // Otherwise unselect all the resources.
+      if (this.options.isFirstLoad && ["commentsView", "view"].includes(route.data.action)) {
+        const selectedResourceIndex = this.resources.indexOf({ id: route.data.id });
+        if (selectedResourceIndex !== -1) {
+          this.options.selectedResources.push(this.resources[selectedResourceIndex]);
+          selectedResourcesIds.push(route.data.id);
+        } else {
+          MadBus.trigger('passbolt_notify', { status: 'error', title: 'app_passwords_edit_error_not_found' });
         }
-        emptyTemplate = gridFilteredEmptyTemplate;
-        break;
+      } else {
+        const selectedResources = this.options.selectedResources;
+        selectedResources.splice(0, selectedResources.length);
       }
-      case 'group': {
-        emptyTemplate = gridGroupEmptyTemplate;
-        break;
+
+      return selectedResourcesIds;
+    },
+
+    /**
+     * Handle resources selected event.
+     * @param {array} resourcesIds 
+     */
+    selectResources: function (resourcesIds) {
+      const selectedResources = this.resources.reduce((carry, resource) => {
+        if (resourcesIds.includes(resource.id)) {
+          carry = [...carry, resource];
+        }
+        return carry;
+      }, []);
+
+      this.options.selectedResources.splice(0, this.options.selectedResources.length, ...selectedResources);
+    },
+
+    /**
+     * Handle resource right selected event.
+     * @param {strinf} resourceId 
+     * @param {HTMLEvent} srcEv The source event
+     */
+    rightSelectResource: function (resourceId, srcEv) {
+      // Find the resource and select it.
+      const selectedResources = this.resources.filter(resource => resource.id == resourceId);
+      this.options.selectedResources.splice(0, this.options.selectedResources.length, ...selectedResources);
+
+      // Get the offset position of the clicked item.
+      const $item = $(`#${this.options.prefixItemId}${resourceId}`);
+      const itemOffset = $item.offset();
+
+      // Show contextual menu.
+      this.showContextualMenu(selectedResources[0], srcEv.pageX - 3, itemOffset.top, srcEv.target);
+    },
+
+    /**
+     * Show the contextual menu
+     * @param {Resource} resource The resource to show the contextual menu for
+     * @param {string} x The x position where the menu will be rendered
+     * @param {string} y The y position where the menu will be rendered
+     */
+    showContextualMenu: function (resource, x, y) {
+      const coordinates = { x: x, y: y };
+      const contextualMenu = GridContextualMenuComponent.instantiate({ resource: resource, coordinates: coordinates });
+      contextualMenu.start();
+    },
+
+    /**
+     * Observe when the workspace has been filtered.
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{mad.bus.element} filter_workspace': async function (el, ev) {
+      await this.filterWorkspace(ev.data.filter);
+      if (ev.data.selectAndScrollTo) {
+        this.selectAndScrollTo(ev.data.selectAndScrollTo);
       }
-      case 'owner': {
-        emptyTemplate = gridOwnerEmptyTemplate;
-        break;
-      }
-      case 'modified': {
-        emptyCssClasses.push('all_items');
-        emptyTemplate = gridWelcomeTemplate;
-        break;
-      }
-      case 'favorite': {
-        emptyTemplate = gridFavoriteEmptyTemplate;
-        break;
-      }
-      case 'shared_with_me': {
-        emptyTemplate = gridSharedEmptyTemplate;
-        break;
-      }
-      default: {
+    },
+
+    /**
+     * The resources local storate has been updated.
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{document} passbolt.storage.resources.updated': async function (el, ev) {
+      if (!Array.isArray(ev.data)) {
+        console.warn('The local storage has been flushed by the addon. The view is not in sync anymore');
         return;
       }
+
+      this.handleResourcesLocalStorageUpdated();
+    },
+
+    /**
+     * Items have been selected
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{mad.bus.element} grid_resources_selected': function (el, ev) {
+      const resourcesIds = ev.detail;
+      this.selectResources(resourcesIds);
+    },
+
+    /**
+     * An item has been right selected
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{mad.bus.element} grid_resource_right_selected': function (el, ev) {
+      const resourceId = ev.detail.resource.id;
+      const srcEv = ev.detail.srcEv;
+      this.rightSelectResource(resourceId, srcEv);
     }
+  });
 
-    $(this.element).addClass(emptyCssClasses);
-    const empty_html = View.render(emptyTemplate);
-    $('.tableview-content', this.element).prepend(empty_html);
-  },
-
-  /**
-   * Observe when a resource is updated.
-   * If the resource is displayed by he grid, refresh it.
-   * note : We listen the model directly, listening on changes on
-   * a list seems too much here (one event for each updated attribute)
-   * @param {DefineMap.prototype} model The model reference
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {Resource} resource The updated resource
-   */
-  '{Resource} updated': function(model, ev, resource) {
-    if (this.options.items.indexOf(resource) != -1) {
-      this.refreshItem(resource);
-    }
-  },
-
-  /**
-   * Observe when an item is selected in the grid.
-   * This event comes from the grid view
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{element} item_selected': function(el, ev) {
-    const item = ev.data.item;
-    const srcEv = ev.data.srcEv;
-    const resources = this.options.selectedResources;
-
-    // Disable the select all checkbox component if previously selected.
-    if (this.state.selectType == 'all') {
-      this._uncheckSelectAllCheckbox();
-    }
-
-    if (srcEv.metaKey) {
-      this.state.selectType = 'multiple';
-      if (this.isSelected(item)) {
-        const position = resources.indexOf(item);
-        resources.splice(position, 1);
-      } else {
-        resources.push(item);
-      }
-    } else if (srcEv.shiftKey) {
-      if (!resources.length) {
-        this._multiShiftSelectFirstElement = item;
-        this.state.selectType = 'multiple-range';
-        resources.push(item);
-        return;
-      } else if (resources.length && this.state.selectType != 'multiple-range') {
-        this._multiShiftSelectFirstElement = resources.get(resources.length - 1);
-        this.state.selectType = 'multiple-range';
-      }
-      if (this._multiShiftSelectFirstElement.id == item.id) {
-        resources.splice(0, resources.length, item);
-      }  else {
-        resources.splice(0, resources.length);
-        const rangeResources = this.options.items.filterRange(this._multiShiftSelectFirstElement, item);
-        resources.push.apply(resources, rangeResources);
-      }
-    } else {
-      this.state.selectType = 'single';
-      if (resources.length == 1 && this.isSelected(item)) {
-        resources.splice(0);
-      } else {
-        resources.splice(0, resources.length, item);
-      }
-    }
-  },
-
-  /**
-   * An item has been right selected
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{element} item_right_selected': function(el, ev) {
-    const item = ev.data.item;
-    const srcEv = ev.data.srcEv;
-    // Select item.
-    this.options.selectedResources.splice(0, this.options.selectedResources.length, item);
-    // Get the offset position of the clicked item.
-    const $item = $(`#${this.options.prefixItemId}${item.id}`);
-    const itemOffset = $item.offset();
-    // Show contextual menu.
-    this.showContextualMenu(item, srcEv.pageX - 3, itemOffset.top, srcEv.target);
-  },
-
-  /**
-   * A password has been clicked.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{element} password_clicked': function(el, ev) {
-    const resource = ev.data.item;
-    Plugin.decryptSecretAndCopyToClipboard(resource.id);
-  },
-
-  /**
-   * A username has been clicked.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{element} username_clicked': function(el, ev) {
-    const item = ev.data.item;
-    Clipboard.copy(item.username, 'username');
-  },
-
-  /**
-   * Listen to the check event on any checkbox form element components.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{element} .js_checkbox_multiple_select checked': function(el, ev) {
-    ev.stopPropagation();
-    const id = ev.data;
-    const resource = this.options.items.filter({id: id}).pop();
-    this.options.selectedResources.push(resource);
-  },
-
-  /**
-   * Listen to the uncheck event on any checkbox form element components.
-   */
-  '{element} .js_checkbox_multiple_select unchecked': function(el, ev) {
-    ev.stopPropagation();
-    const id = ev.data;
-    const resources = this.options.selectedResources;
-    const unselectedResources = resources.filter(resource => resource.id == id);
-    if (unselectedResources.length) {
-      const position = resources.indexOf(unselectedResources[0]);
-      resources.splice(position, 1);
-    }
-  },
-
-  /**
-   * Listen to the workspace filter event.
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} filter_grid': function(el, ev) {
-    if (this.state.destroyed) {
-      return;
-    }
-    const filter = ev.data.filter;
-    this.filterBySettings(filter);
-  },
-
-  /**
-   * Observe when an item is unselected
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {array<Resource>} items The unselected items
-   */
-  '{selectedResources} remove': function(el, ev, items) {
-    items.forEach(item => {
-      this.unselect(item);
-    });
-  },
-
-  /**
-   * Observe when an item is unselected
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   * @param {array<Resource>} items The selected items change
-   */
-  '{selectedResources} add': function(el, ev, items) {
-    items.forEach(item => {
-      this.select(item);
-    });
-  },
-
-  /**
-   * Init the select all checkbox
-   */
-  _uncheckSelectAllCheckbox: function() {
-    $(this.options.selectAllCheckboxSelector).prop('checked', false);
-  },
-
-  /**
-   * Observe when all items are selected
-   */
-  '{element} {selectAllCheckboxSelector} click': function() {
-    const resources = this.options.selectedResources;
-    resources.splice(0, resources.length);
-    // If already in select all mode
-    if (this.state.selectType == 'all') {
-      this.state.selectType = null;
-      return;
-    }
-    this.state.selectType = 'all';
-    resources.replace(this.options.items);
-  }
-
-});
-
-export default PasswordGridComponent;
+export default GridComponent;

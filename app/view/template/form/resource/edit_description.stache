@@ -8,7 +8,7 @@
     </div>
 
 	<div class="actions">
-		<input type="submit" class="button resource-submit" value="{{ __('save') }}" />
+		<input type="submit" class="button" value="{{ __('save') }}" />
 		<a id="js_resource_description_edit_cancel" class="button cancel tag-editor-cancel" role="button"><span>{{__('cancel')}}</span></a>
 	</div>
 </div>

@@ -13,6 +13,7 @@
  */
 import AdministrationWorkspaceComponent from 'app/component/administration/workspace';
 import Ajax from 'app/net/ajax';
+import AuthService from '../model/service/plugin/auth';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
@@ -274,6 +275,18 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   '{window} p3_narrow_checked': function() {
     MadBus.trigger('passbolt.html_helper.window_resized');
+  },
+
+  /**
+   * The user wants to logout
+   */
+  '{element} #js_app_navigation_right .logout a click': async function() {
+    try {
+      await AuthService.logout();
+      location.href = APP_URL;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 });

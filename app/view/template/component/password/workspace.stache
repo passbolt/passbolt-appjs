@@ -1,13 +1,9 @@
 <div class="js_workspace">
-
 	<div id="js_password_workspace_primary_sidebar" class="panel left">
 	</div>
-
 	<div class="panel middle">
         <div id="js_wsp_password_breadcrumb" class="breadcrumbs">
         </div>
         <div id="js_wsp_pwd_browser" class="tableview">
         </div>
-	</div>
-
 </div>

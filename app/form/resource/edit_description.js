@@ -48,14 +48,6 @@ const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription'
     const descriptionTextbox = new Textbox(descriptionSelector, descriptionOptions).start();
     const descriptionFeedback = new Feedback(`#${this.element.id} .js_resource_description_feedback`).start();
     this.addElement(descriptionTextbox, descriptionFeedback);
-
-    /*
-     * Force event submit event (not thrown by default)
-     * TODO : understand why we need to do that... weird
-     */
-    $('.button.resource-submit').click(() => {
-      domEvents.dispatch(this.element, {type: 'submit'});
-    });
   }
 });
 

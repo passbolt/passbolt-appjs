@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import ComponentHelper from 'passbolt-mad/helper/component';
+import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
 import ResourceEditDescriptionForm from 'app/form/resource/edit_description';
 import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
@@ -154,10 +155,17 @@ const DescriptionSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * @param {Resource} resource The target resource
    * @param {Form} form The form data object
    */
-  _saveResource: function(resource, formData) {
+  _saveResource: async function(resource, formData) {
     resource.description = formData['Resource']['description'];
     resource.__FILTER_CASE__ = 'edit_description';
-    resource.save();
+    try {
+      await resource.save();
+      MadBus.trigger('passbolt_notify', { status: 'success', title: "app_resources_update_success" });
+    } catch (error) {
+      console.error(error);
+      MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
+    }
+    
     this.disableEditMode();
   }
 });

@@ -96,7 +96,10 @@
     "jssha": "~2.0.1",
     "moment": "^2.10.0",
     "moment-timezone": "^0.5.23",
-    "passbolt-mad": "^2.10.0",
+    "passbolt-mad": "^2.11.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-list": "^0.8.11",
     "react-view-model": "1.0.1",
     "steal": "^2.2.1",
     "steal-mocha": "^2.0.1",
@@ -133,6 +136,11 @@
     "test": "grunt test"
   },
   "steal": {
+    "babelOptions": {
+      "presets": [
+        "react"
+      ]
+    },
     "plugins": [
       "steal-stache"
     ],

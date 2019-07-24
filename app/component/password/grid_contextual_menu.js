@@ -18,7 +18,7 @@ import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import PermissionType from 'app/model/map/permission_type';
-import Plugin from 'app/util/plugin';
+import ResourceService from '../../model/service/plugin/resource';
 
 const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.component.password.GridContextualMenu', /** @static */ {
 
@@ -126,7 +126,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    */
   _copySecret: function() {
     const resourceId = this.options.resource.id;
-    Plugin.decryptSecretAndCopyToClipboard(resourceId);
+    ResourceService.decryptSecretAndCopyToClipboard(resourceId);
     this.remove();
   },
 
