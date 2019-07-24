@@ -14,14 +14,13 @@
 import Plugin from '../../../util/plugin';
 
 export default class GroupService {
-
   /**
    * Request the plugin to insert the group edit iframe
    * @param {string} groupId The target group id
    * @param {boolean} canAddGroupUsers Is the current user can add members to this group
    */
   static insertGroupEditframe(groupId, canAddGroupUsers) {
-    Plugin.send('passbolt.plugin.group_edit', { groupId, canAddGroupUsers });
+    Plugin.send('passbolt.plugin.group_edit', {groupId: groupId, canAddGroupUsers: canAddGroupUsers});
   }
 
   /**
@@ -36,7 +35,7 @@ export default class GroupService {
       is_admin: data.is_admin,
       is_new: data.is_new
     };
-    Plugin.send('passbolt.group.edit.edit_group_user', { groupUser });
+    Plugin.send('passbolt.group.edit.edit_group_user', {groupUser: groupUser});
   }
 
   /**
@@ -51,7 +50,7 @@ export default class GroupService {
       is_admin: data.is_admin,
       is_new: data.is_new || false
     };
-    Plugin.send('passbolt.group.edit.remove_group_user', { groupUser });
+    Plugin.send('passbolt.group.edit.remove_group_user', {groupUser: groupUser});
   }
 
   /**
@@ -59,6 +58,6 @@ export default class GroupService {
    * @param {Object} group The group to save
    */
   static groupEditIframeSave(group) {
-    Plugin.send('passbolt.group.edit.save', { group });
+    Plugin.send('passbolt.group.edit.save', {group: group});
   }
 }

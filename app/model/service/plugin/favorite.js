@@ -14,7 +14,6 @@
 import Plugin from '../../../util/plugin';
 
 export default class FavoriteService {
-
   /**
    * Mark a resource as favorite.
    * @return {Promise}

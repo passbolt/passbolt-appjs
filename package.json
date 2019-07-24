@@ -111,6 +111,7 @@
     "xregexp": "~3.2.0"
   },
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
     "chai": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.0.0",
@@ -121,9 +122,7 @@
     "mocha": "^5.2.0",
     "sinon": "^1.16.1",
     "steal-tools": "^2.2.2",
-    "testee": "^0.9.1",
-    "webpack": "^4.36.1",
-    "webpack-cli": "^3.3.6"
+    "testee": "^0.9.1"
   },
   "keywords": [
     "passbolt",

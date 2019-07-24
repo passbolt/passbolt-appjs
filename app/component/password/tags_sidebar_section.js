@@ -285,11 +285,13 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
         this._errorForm(message);
         valid = false;
       }
-      // else if (isNewTag) {
-      //   const message = __('You do not have the permission to create new shared tags.');
-      //   this._errorForm(message);
-      //   valid = false;
-      // }
+      /*
+       * else if (isNewTag) {
+       *   const message = __('You do not have the permission to create new shared tags.');
+       *   this._errorForm(message);
+       *   valid = false;
+       * }
+       */
     }
     return valid;
   },

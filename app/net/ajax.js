@@ -13,6 +13,7 @@
 import $ from 'jquery/dist/jquery.min.js';
 import Ajax from 'passbolt-mad/net/ajax';
 import Config from 'passbolt-mad/config/config';
+import DialogComponent from 'passbolt-mad/component/dialog';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';

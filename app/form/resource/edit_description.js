@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import domEvents from 'can-dom-events';
 import Feedback from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import Textbox from 'passbolt-mad/form/element/textbox';

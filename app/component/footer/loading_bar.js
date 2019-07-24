@@ -190,7 +190,7 @@ const LoadingBarComponent = Component.extend('passbolt.component.footer.LoadingB
 
   /**
    * Complete the progress.
-   * @private 
+   * @private
    */
   _completeProgress: function() {
     if (this._completing) {

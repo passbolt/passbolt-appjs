@@ -14,8 +14,10 @@ export default class Lock {
     return new Promise(resolve => {
       // If nobody has the lock, take it and resolve immediately
       if (!this._locked) {
-        // Safe because JS doesn't interrupt you on synchronous operations,
-        // so no need for compare-and-swap or anything like that.
+        /*
+         * Safe because JS doesn't interrupt you on synchronous operations,
+         * so no need for compare-and-swap or anything like that.
+         */
         this._locked = true;
         return resolve();
       }
