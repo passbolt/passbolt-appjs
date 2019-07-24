@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Improved
+- PB-242: Performance - Fetch the passwords in priority
+- Extend resource checkbox clickable area
+- Select the just created resource
+- Select created tag after the import of resources
+- Unselect the select all checkbox if all passwords are not selected
+- PB-567: Retrieve the user authenticated status from the browser extension
+
+### Fixed
+- Take in account the search even if the passwords list is not loaded
+- Log the user out when the session is expired
 
 ## [2.10.4] - 2019-07-11
 ### Fixed
