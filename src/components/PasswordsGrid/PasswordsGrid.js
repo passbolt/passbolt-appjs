@@ -414,9 +414,6 @@ export default class PasswordsGrid extends React.Component {
       <div className={`tableview ready ${isEmpty ? "empty" : ""} ${["default", "modified"].includes(this.state.filterType) ? "all_items" : ""}`}>
         {!isReady &&
           <div className="empty-content">
-            <div className="processing-wrapper">
-              <p className="processing-text">Retrieving your passwords</p>
-            </div>
           </div>
         }
         {isReady &&

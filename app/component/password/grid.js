@@ -84,9 +84,11 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
         filterType: this.filter.type
       });
 
+      if (!this.options.isFirstLoad) {
+        ResourceService.updateLocalStorage();
+      }
       this.options.isFirstLoad = false;
       this.state.loaded = true;
-      ResourceService.updateLocalStorage();
       this._filterLock.release();
     },
 
@@ -94,6 +96,10 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
      * Handle the resources local storage update.
      */
     handleResourcesLocalStorageUpdated: async function () {
+      if (this.options.isFirstLoad) {
+        return;
+      }
+
       await this._filterLock.acquire();
       this.resources = await this.getUpdatedResources();
       this.filteredResources = this.filterResources(this.resources);

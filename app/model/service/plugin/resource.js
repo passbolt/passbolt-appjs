@@ -92,7 +92,7 @@ const retryRequest = function (callback, options) {
   options = Object.assign({
     attempt: 0,
     timeout: 60000,
-    attemptsLimit: 1200
+    attemptsLimit: 240
   }, options);
 
   return new Promise(async (resolve, reject) => {

@@ -129,7 +129,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   _startCheckIsAuthenticatedLoop: function() {
     const interval = setInterval(async () => {
-      const isAuthenticated = await AuthService.isAuthenticated();
+      const isAuthenticated = await AuthService.isAuthenticated({ requestApi: false });
       if (!isAuthenticated) {
         clearInterval(interval);
         this._displaySessionExpiredDialog();

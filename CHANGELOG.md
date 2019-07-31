@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.11.0] - 2019-08-02
 ### Improved
 - PB-242: Performance - Fetch the passwords in priority
 - Extend resource checkbox clickable area
@@ -200,7 +202,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.4...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.11.0...HEAD
+[2.11.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.4...v2.11.0
 [2.10.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.3...v2.10.4
 [2.10.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.2...v2.10.3
 [2.10.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.1...v2.10.2

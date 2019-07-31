@@ -17,15 +17,12 @@ export default class AuthService {
 
   /**
    * Check if the user is authenticated
+   * @param {object} options Optional parameters
+   * - options.requestApi {bool}, get the status from the API, default true.
    * @return {Promise<bool>}
    */
-  static async isAuthenticated() {
-    try {
-      await Plugin.request("passbolt.auth.is-authenticated");
-      return true;
-    } catch (error) {
-      return false;
-    }
+  static async isAuthenticated(options) {
+    return await Plugin.request("passbolt.auth.is-authenticated", [options]);
   }
 
   /**

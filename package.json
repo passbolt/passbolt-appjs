@@ -1,6 +1,6 @@
 {
   "name": "passbolt-appjs",
-  "version": "2.10.4",
+  "version": "2.11.0",
   "author": "Passbolt SA",
   "license": "AGPL-3.0",
   "description": "Passbolt javascript application for the open source password manager for teams",
@@ -97,7 +97,7 @@
     "jssha": "~2.0.1",
     "moment": "^2.10.0",
     "moment-timezone": "^0.5.23",
-    "passbolt-mad": "^2.11.1",
+    "passbolt-mad": "^2.11.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-list": "^0.8.11",
