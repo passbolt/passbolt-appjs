@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.11.1] - 2019-08-02
+### Fixed
+- Fix plugin "is ready" detection
+
 ## [2.11.0] - 2019-08-02
 ### Improved
 - PB-242: Performance - Fetch the passwords in priority
@@ -202,7 +206,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.11.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.11.1...HEAD
+[2.11.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.4...v2.11.0
 [2.10.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.3...v2.10.4
 [2.10.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.2...v2.10.3

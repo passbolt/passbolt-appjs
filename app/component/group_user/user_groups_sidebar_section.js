@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import Group from '../../model/map/group';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';

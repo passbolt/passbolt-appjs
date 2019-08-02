@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import Action from 'passbolt-mad/model/map/action';
 import UserEditAvatarForm from '../../form/user/edit_avatar';
 import BreadcrumbComponent from './workspace_breadcrumb';

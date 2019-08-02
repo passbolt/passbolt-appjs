@@ -1,5 +1,5 @@
 
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import CanDefineMap from 'can-define/map/map';
 import route from 'can-route';
 import RoutePushstate from 'can-route-pushstate';

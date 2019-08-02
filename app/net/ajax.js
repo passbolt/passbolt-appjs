@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import Ajax from 'passbolt-mad/net/ajax';
 import Config from 'passbolt-mad/config/config';
 import DialogComponent from 'passbolt-mad/component/dialog';

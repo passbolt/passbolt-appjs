@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import Component from 'passbolt-mad/component/component';
 import SecondarySidebarState from '../../model/state/secondary_sidebar_state';
 
