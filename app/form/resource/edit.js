@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
 import CreateForm from '../../form/resource/create';
 // eslint-disable-next-line no-unused-vars

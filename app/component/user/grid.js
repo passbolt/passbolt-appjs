@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import CheckboxComponent from 'passbolt-mad/form/element/checkbox';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
