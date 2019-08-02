@@ -11,26 +11,28 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import AdministrationWorkspaceComponent from 'app/component/administration/workspace';
-import Ajax from 'app/net/ajax';
+import $ from 'jquery/dist/jquery.min.js';
+import AdministrationWorkspaceComponent from './administration/workspace';
+import AuthService from '../model/service/plugin/auth';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
-import FilterComponent from 'app/component/navigation/filter';
-import LoadingBarComponent from 'app/component/footer/loading_bar';
+import DialogComponent from 'passbolt-mad/component/dialog';
+import FilterComponent from './navigation/filter';
+import LoadingBarComponent from './footer/loading_bar';
 import MadBus from 'passbolt-mad/control/bus';
-import NavigationLeftComponent from 'app/component/navigation/left';
-import NotificationComponent from 'app/component/footer/notification';
-import PasswordWorkspaceComponent from 'app/component/password/workspace';
-import ProfileHeaderDropdownComponent from 'app/component/profile/header_dropdown';
+import NavigationLeftComponent from './navigation/left';
+import NotificationComponent from './footer/notification';
+import PasswordWorkspaceComponent from './password/workspace';
+import ProfileHeaderDropdownComponent from './profile/header_dropdown';
 import route from 'can-route';
-import Session from 'app/model/utility/session';
-import SettingsWorkspaceComponent from 'app/component/settings/workspace';
+import SessionExpiredComponent from './session/session_expired';
+import SettingsWorkspaceComponent from './settings/workspace';
 import String from 'can-string';
-import User from 'app/model/map/user';
-import UserWorkspaceComponent from 'app/component/user/workspace';
+import User from '../model/map/user';
+import UserWorkspaceComponent from './user/workspace';
 
-import template from 'app/view/template/app.stache!';
+import template from '../view/template/app.stache';
 
 const App = Component.extend('passbolt.component.App', /** @static */ {
 
@@ -86,7 +88,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
     this._workspace = null;
     this._initFooter();
     this._initHeader();
-    this._initSessionCheck();
+    this._startCheckIsAuthenticatedLoop();
     this._dispatchRoute();
     this._super();
     $('html').removeClass('launching');
@@ -122,31 +124,34 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   },
 
   /**
-   * Init the session
+   * Start the loop which check if the user is still authenticated.
+   * @private
    */
-  _initSessionCheck: function() {
-    // On the last API request, schedule a session check.
-    Ajax._requests.on('length', (ev, length) => {
-      if (!length) {
-        this._scheduleSessionCheck();
+  _startCheckIsAuthenticatedLoop: function() {
+    const interval = setInterval(async () => {
+      const isAuthenticated = await AuthService.isAuthenticated({ requestApi: false });
+      if (!isAuthenticated) {
+        clearInterval(interval);
+        this._displaySessionExpiredDialog();
       }
-    });
+    }, 1000);
   },
 
   /**
-   *
-   * @private
+   * Display the sesion expired dialog.
    */
-  _scheduleSessionCheck: function() {
-    const timeout = Session.getTimeout();
-    if (this._sessionCheckTimeout != null) {
-      clearTimeout(this._sessionCheckTimeout);
-      this._sessionCheckTimeout = null;
+  _displaySessionExpiredDialog: function() {
+    if ($('.session-expired-dialog').length > 0) {
+      return;
     }
-    this._sessionCheckTimeout = setTimeout(() => {
-      // If the session is expired, the app/net/ajax error handler will redirect the user to the login page.
-      $('html').one('mousemove mousedown keypress mousewheel', () => Session.check());
-    }, timeout);
+
+    const dialog = DialogComponent.instantiate({
+      label: __('Session expired'),
+      cssClasses: ['session-expired-dialog', 'dialog-wrapper']
+    }).start();
+
+    // attach the component to the dialog
+    dialog.add(SessionExpiredComponent, {});
   },
 
   /**
@@ -274,6 +279,18 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    */
   '{window} p3_narrow_checked': function() {
     MadBus.trigger('passbolt.html_helper.window_resized');
+  },
+
+  /**
+   * The user wants to logout
+   */
+  '{element} #js_app_navigation_right .logout a click': async function() {
+    try {
+      await AuthService.logout();
+      location.href = APP_URL;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 });

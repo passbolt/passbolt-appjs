@@ -11,18 +11,19 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.10.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MenuComponent from 'passbolt-mad/component/menu';
-import EmailNotificationSettingsMap from 'app/model/map/email_notification_settings';
-import EmailNotificationsSettingsForm from 'app/form/administration/email_notification/settings';
-import PrimaryMenu from 'app/component/administration/email_notification/primary_menu';
+import EmailNotificationSettingsMap from '../../../model/map/email_notification_settings';
+import EmailNotificationsSettingsForm from '../../../form/administration/email_notification/settings';
+import PrimaryMenu from '../../administration/email_notification/primary_menu';
 import route from 'can-route';
-import template from 'app/view/template/component/administration/email_notification/settings.stache!';
-import templateItemBreadcrumb from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
+import template from '../../../view/template/component/administration/email_notification/settings.stache';
+import templateItemBreadcrumb from '../../../view/template/component/breadcrumb/breadcrumb_item.stache';
 
 const EmailNotificationSettingsComponent = Component.extend('passbolt.component.administration.email_notification.EmailNotificationSettings', /** @static */ {
 

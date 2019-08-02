@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Clipboard from 'app/util/clipboard';
-import GpgkeySectionComponent from 'app/component/gpgkey/gpgkey_sidebar_section';
-import InformationSectionComponent from 'app/component/user/information_sidebar_section';
-import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
-import User from 'app/model/map/user';
-import UserGroupsSidebarSectionComponent from 'app/component/group_user/user_groups_sidebar_section';
+import Clipboard from '../../util/clipboard';
+import GpgkeySectionComponent from '../gpgkey/gpgkey_sidebar_section';
+import InformationSectionComponent from '../user/information_sidebar_section';
+import SecondarySidebarComponent from '../workspace/secondary_sidebar';
+import User from '../../model/map/user';
+import UserGroupsSidebarSectionComponent from '../group_user/user_groups_sidebar_section';
 
-import template from 'app/view/template/component/user/user_secondary_sidebar.stache!';
+import template from '../../view/template/component/user/user_secondary_sidebar.stache';
 
 const UserSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt.component.user.UserSecondarySidebar', /** @static */ {
 

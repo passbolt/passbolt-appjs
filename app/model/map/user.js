@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
+import Ajax from '../../net/ajax';
 import Config from 'passbolt-mad/config/config';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
@@ -22,8 +22,8 @@ import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import Profile from 'app/model/map/profile';
-import Role from 'app/model/map/role';
+import Profile from './profile';
+import Role from './role';
 import uuid from 'uuid/v4';
 
 const User = DefineMap.extend('passbolt.model.User', {

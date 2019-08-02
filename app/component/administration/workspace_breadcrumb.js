@@ -11,17 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MenuComponent from 'passbolt-mad/component/menu';
 import route from 'can-route';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/breadcrumb/breadcrumb.stache!';
-import itemTemplate from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
+import template from '../../view/template/component/breadcrumb/breadcrumb.stache';
+import itemTemplate from '../../view/template/component/breadcrumb/breadcrumb_item.stache';
 
 const WorkspaceBreadcrumbComponent = Component.extend('passbolt.component.settings.WorkspaceBreadcrumb', /** @static */ {
 

@@ -13,7 +13,7 @@
  */
 import Button from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
-import template from 'app/view/template/component/administration/mfa/primary_menu.stache!';
+import template from '../../../view/template/component/administration/mfa/primary_menu.stache';
 
 const PrimaryMenu = Component.extend('passbolt.component.administration.mfa.PrimaryMenu', /** @static */ {
   defaults: {

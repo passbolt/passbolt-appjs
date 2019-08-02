@@ -11,11 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Component from 'passbolt-mad/component/component';
 import MadBus from 'passbolt-mad/control/bus';
 import Config from 'passbolt-mad/config/config';
 
-import template from 'app/view/template/component/workspace/secondary_sidebar.stache!';
+import template from '../../view/template/component/workspace/secondary_sidebar.stache';
 
 const SecondarySidebarComponent = Component.extend('passbolt.component.workspace.SecondarySidebar', /** @static */ {
 

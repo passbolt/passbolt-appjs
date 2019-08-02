@@ -11,28 +11,29 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
-import UserEditAvatarForm from 'app/form/user/edit_avatar';
-import BreadcrumbComponent from 'app/component/settings/workspace_breadcrumb';
+import UserEditAvatarForm from '../../form/user/edit_avatar';
+import BreadcrumbComponent from './workspace_breadcrumb';
 import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import DialogComponent from 'passbolt-mad/component/dialog';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import KeysComponent from 'app/component/gpgkey/keys';
+import KeysComponent from '../gpgkey/keys';
 import MenuComponent from 'passbolt-mad/component/menu';
-import PrimaryMenuComponent from 'app/component/settings/workspace_primary_menu';
-import ProfileComponent from 'app/component/profile/profile';
+import PrimaryMenuComponent from './workspace_primary_menu';
+import ProfileComponent from '../profile/profile';
 import route from 'can-route';
 import TabComponent from 'passbolt-mad/component/tab';
-import ThemeComponent from 'app/component/settings/theme';
-import MfaComponent from 'app/component/settings/mfa';
-import User from 'app/model/map/user';
-import UserCreateForm from 'app/form/user/create';
+import ThemeComponent from './theme';
+import MfaComponent from './mfa';
+import User from '../../model/map/user';
+import UserCreateForm from '../../form/user/create';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/settings/workspace.stache!';
+import template from '../../view/template/component/settings/workspace.stache';
 
 const SettingsWorkspaceComponent = Component.extend('passbolt.component.settings.Workspace', /** @static */ {
 

@@ -11,20 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
-import Clipboard from 'app/util/clipboard';
+import Clipboard from '../../util/clipboard';
 import Config from 'passbolt-mad/config/config';
 import Button from 'passbolt-mad/component/button';
 import ButtonDropdownComponent from 'passbolt-mad/component/button_dropdown';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
-import PermissionType from 'app/model/map/permission_type';
-import Plugin from 'app/util/plugin';
-import Resource from 'app/model/map/resource';
+import PermissionType from '../../model/map/permission_type';
+import Resource from '../../model/map/resource';
+import ResourceService from '../../model/service/plugin/resource';
 
-import template from 'app/view/template/component/password/workspace_primary_menu.stache!';
+import template from '../../view/template/component/password/workspace_primary_menu.stache';
 
 const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.PasswordWorkspaceMenu', /** @static */ {
 
@@ -158,7 +159,7 @@ const PasswordWorkspaceMenuComponent = Component.extend('passbolt.component.Pass
    */
   _copySecret: function() {
     const resource = this.options.selectedResources[0];
-    Plugin.decryptSecretAndCopyToClipboard(resource.id);
+    ResourceService.decryptSecretAndCopyToClipboard(resource.id);
   },
 
   /**

@@ -12,7 +12,7 @@
  * @since         2.4.0
  */
 import Component from 'passbolt-mad/component/component';
-import template from 'app/view/template/component/mfa/mfa_required.stache!';
+import template from '../../view/template/component/mfa/mfa_required.stache';
 
 const MfaRequiredComponent = Component.extend('passbolt.component.mfa.MfaRequired', /** @static */ {
 

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 // eslint-disable-next-line no-unused-vars
@@ -18,7 +19,7 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import RadioComponent from 'passbolt-mad/form/element/radio';
 import domEvents from 'can-dom-events';
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
-import template from 'app/view/template/form/administration/users_directory/settings.stache!';
+import template from '../../../view/template/form/administration/users_directory/settings.stache';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 import ToggleButtonComponent from 'passbolt-mad/form/element/toggle_button';
 import 'chosen-js/chosen.jquery';

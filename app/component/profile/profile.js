@@ -13,7 +13,7 @@
  */
 import Component from 'passbolt-mad/component/component';
 import MadBus from 'passbolt-mad/control/bus';
-import template from 'app/view/template/component/profile/profile.stache!';
+import template from '../../view/template/component/profile/profile.stache';
 
 const ProfileComponent = Component.extend('passbolt.component.profile.Profile', /** @static */ {
 

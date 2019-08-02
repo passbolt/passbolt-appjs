@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
+import Ajax from '../../net/ajax';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';

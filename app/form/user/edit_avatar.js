@@ -13,7 +13,7 @@
  */
 import Form from 'passbolt-mad/form/form';
 
-import template from 'app/view/template/form/user/avatar.stache!';
+import template from '../../view/template/form/user/avatar.stache';
 
 const EditAvatarForm = Form.extend('passbolt.form.user.Avatar', /** @static */ {
 

@@ -13,11 +13,11 @@
  */
 import DropdownComponent from 'passbolt-mad/form/element/dropdown';
 import Form from 'passbolt-mad/form/form';
-import GroupUser from 'app/model/map/group_user';
+import GroupUser from '../../model/map/group_user';
 import getObject from 'can-util/js/get/get';
-import Permission from 'app/model/map/permission';
+import Permission from '../../model/map/permission';
 
-import template from 'app/view/template/form/user/delete_transfer_permissions.stache!';
+import template from '../../view/template/form/user/delete_transfer_permissions.stache';
 
 const DeleteTransferPermissionForm = Form.extend('passbolt.form.user.DeleteTransferPermissionForm', /** @static */ {
 

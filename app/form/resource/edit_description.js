@@ -11,12 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import domEvents from 'can-dom-events';
 import Feedback from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import Textbox from 'passbolt-mad/form/element/textbox';
 
-import template from 'app/view/template/form/resource/edit_description.stache!';
+import template from '../../view/template/form/resource/edit_description.stache';
 
 const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription', /** @static */ {
 
@@ -48,14 +47,6 @@ const EditDescriptionForm = Form.extend('passbolt.form.resource.EditDescription'
     const descriptionTextbox = new Textbox(descriptionSelector, descriptionOptions).start();
     const descriptionFeedback = new Feedback(`#${this.element.id} .js_resource_description_feedback`).start();
     this.addElement(descriptionTextbox, descriptionFeedback);
-
-    /*
-     * Force event submit event (not thrown by default)
-     * TODO : understand why we need to do that... weird
-     */
-    $('.button.resource-submit').click(() => {
-      domEvents.dispatch(this.element, {type: 'submit'});
-    });
   }
 });
 

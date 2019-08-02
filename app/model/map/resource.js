@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
+import Ajax from '../../net/ajax';
 import chunk from 'passbolt-mad/util/array/chunk';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
@@ -20,10 +20,9 @@ import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import Favorite from 'app/model/map/favorite';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import Permission from 'app/model/map/permission';
+import Permission from './permission';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';
 import 'urijs/src/IPv6';
@@ -32,7 +31,8 @@ import URI from 'urijs/src/URI';
  *import Secret from 'app/model/map/secret';
  *import Tag from 'app/model/map/tag';
  */
-import User from 'app/model/map/user';
+import User from './user';
+import ResourceService from '../service/plugin/resource';
 
 const Resource = DefineMap.extend('passbolt.model.Resource', {
   id: 'string',
@@ -43,7 +43,7 @@ const Resource = DefineMap.extend('passbolt.model.Resource', {
   modified: 'string',
   description: 'string',
   creator: User,
-  favorite: Favorite,
+  favorite: 'object',
   permission: Permission,
 
   /**
@@ -198,19 +198,6 @@ Resource.getFilteredFields = function(filteredCase) {
 };
 
 /**
- * Delete all the resources.
- * @param {Resource.List} resources
- * @return {Promise}
- */
-Resource.deleteAll = function(resources) {
-  const promises = resources.reduce((promise, resource) => {
-    resource.__SILENT_NOTIFY__ = true;
-    return promise.then(() => resource.destroy());
-  }, Promise.resolve([]));
-  return promises;
-};
-
-/**
  * Update resources after they have been shared.
  * @param resourcesIds
  * @return {Promise}
@@ -248,36 +235,24 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
       });
     },
     getListData: function(params) {
-      params = params || {};
-      params['api-version'] = 'v2';
-      return Ajax.request({
-        url: 'resources.json',
-        type: 'GET',
-        params: params
-      });
-    },
-    destroyData: function(params) {
-      return Ajax.request({
-        url: `resources/${params.id}.json?api-version=v2`,
-        type: 'DELETE',
-        silentNotify: params.__SILENT_NOTIFY__ ? params.__SILENT_NOTIFY__ : false
-      });
+      if (params.source && params.source == 'storage') {
+        return ResourceService.findAllFromLocalStorage(params);
+      } else {
+        params = params || {};
+        params['api-version'] = 'v2';
+        return Ajax.request({
+          url: 'resources.json',
+          type: 'GET',
+          params: params
+        });
+      }
     },
     createData: function(params) {
-      return Ajax.request({
-        url: 'resources.json?api-version=v2',
-        type: 'POST',
-        params: params
-      });
+      return ResourceService.save(params);
     },
     updateData: function(params) {
-      // Filter the attributes that need to be send by the request.
       const _params = Resource.filterAttributes(params);
-      return Ajax.request({
-        url: 'resources/{id}.json?api-version=v2',
-        type: 'PUT',
-        params: _params
-      });
+      return ResourceService.update(_params);
     }
   }
 });

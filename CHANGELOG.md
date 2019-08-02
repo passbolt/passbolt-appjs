@@ -4,6 +4,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.11.0] - 2019-08-02
+### Improved
+- PB-242: Performance - Fetch the passwords in priority
+- Extend resource checkbox clickable area
+- Select the just created resource
+- Select created tag after the import of resources
+- Unselect the select all checkbox if all passwords are not selected
+- PB-567: Retrieve the user authenticated status from the browser extension
+
+### Fixed
+- Take in account the search even if the passwords list is not loaded
+- Log the user out when the session is expired
+
 ## [2.10.4] - 2019-07-11
 ### Fixed
 - PB-504: update dependencies
@@ -19,11 +32,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-397: As a user in the user workspace, I should see a relevant feedback if a user is not a member of any group
 - PB-364: Fix Pressing enter on tag editor doesn't hide autocomplete
 - PB-366: Undeletable tags shouldn't have the "delete" button
+- Migrate the passwords grid in react
+- PB-242: Performance - The passwords should be fetched in priority
+- Extend resource checkbox clickable area
+- Select the just created resource
 
 ### Fixed
 - PB-337: Tag autocomplete shows suggestions that are already in the list
 - PB-425: Fix documentation URL in the Email Notification screen
 - PB-416: As an admin using Yubikey I should be able to setup a secret key with a '+' sign in it
+
+### Fixed
+- Select created tag after the import of resources
+- Unselect the select all checkbox if not all passwords are selected
+- The search should be applied even if the passwords take long to load
 
 ## [2.10.1] - 2019-05-15
 ### Fixed
@@ -180,7 +202,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.10.4...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.11.0...HEAD
+[2.11.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.4...v2.11.0
 [2.10.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.3...v2.10.4
 [2.10.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.2...v2.10.3
 [2.10.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.1...v2.10.2

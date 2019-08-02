@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Group from 'app/model/map/group';
-import PasswordCategoriesGroupsList from 'app/component/group/password_categories_groups_list';
-import PrimarySidebarSectionComponent from 'app/component/workspace/primary_sidebar_section';
-import User from 'app/model/map/user';
+import Group from '../../model/map/group';
+import PasswordCategoriesGroupsList from '../group/password_categories_groups_list';
+import PrimarySidebarSectionComponent from '../workspace/primary_sidebar_section';
+import User from '../../model/map/user';
 
-import template from 'app/view/template/component/password/groups_filter_sidebar_section.stache!';
+import template from '../../view/template/component/password/groups_filter_sidebar_section.stache';
 
 const GroupsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.password.GroupsFilterSidebarSection', /** @static */ {
 

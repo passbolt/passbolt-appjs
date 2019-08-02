@@ -18,7 +18,7 @@
             </ul>
             <ul id="js_app_navigation_right" class="right">
                 <li class="logout ready">
-                    <a href="{{ APP_URL }}auth/logout"><span>{{ __('logout') }}</span></a>
+                    <a><span>{{ __('logout') }}</span></a>
                 </li>
             </ul>
         </div>

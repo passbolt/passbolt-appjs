@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Ajax from 'app/net/ajax';
+import Ajax from '../../net/ajax';
 import connect from 'can-connect';
 import connectDataUrl from 'can-connect/data/url/url';
 import connectParse from 'can-connect/data/parse/parse';
@@ -19,7 +19,7 @@ import connectConstructor from 'can-connect/constructor/constructor';
 import connectMap from 'can-connect/can/map/map';
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import User from 'app/model/map/user';
+import User from './user';
 
 const ActionLog = DefineMap.extend('passbolt.model.ActionLog', {
   id: 'string',

@@ -12,9 +12,9 @@
  * @since         2.0.0
  */
 import Component from 'passbolt-mad/component/component';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
-import template from 'app/view/template/component/gpgkey/keys.stache!';
+import template from '../../view/template/component/gpgkey/keys.stache';
 
 const Keys = Component.extend('passbolt.component.gpgkey.Keys', /** @static */ {
 

@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 import Component from 'passbolt-mad/component/component';
-import template from 'app/view/template/component/session/session_expired.stache!';
+import template from '../../view/template/component/session/session_expired.stache';
 
 const SessionExpiredComponent = Component.extend('passbolt.component.session.SessionExpired', /** @static */ {
 

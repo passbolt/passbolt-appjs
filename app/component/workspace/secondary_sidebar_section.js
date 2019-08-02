@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Component from 'passbolt-mad/component/component';
-import SecondarySidebarState from 'app/model/state/secondary_sidebar_state';
+import SecondarySidebarState from '../../model/state/secondary_sidebar_state';
 
 const SecondarySidebarSection = Component.extend('passbolt.component.workspace.SecondarySidebarSection', /** @static */ {
 

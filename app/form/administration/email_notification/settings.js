@@ -13,7 +13,7 @@
  */
 import Form from 'passbolt-mad/form/form';
 import ToggleButtonComponent from 'passbolt-mad/form/element/toggle_button';
-import template from 'app/view/template/form/administration/email_notification/settings.stache!';
+import template from '../../../view/template/form/administration/email_notification/settings.stache';
 
 const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration.email_notification.Settings', /** @static */ {
 

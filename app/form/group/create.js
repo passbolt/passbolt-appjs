@@ -15,7 +15,7 @@ import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 
-import template from 'app/view/template/form/group/create.stache!';
+import template from '../../view/template/form/group/create.stache';
 
 const CreateForm = Form.extend('passbolt.form.group.Create', /** @static */ {
 

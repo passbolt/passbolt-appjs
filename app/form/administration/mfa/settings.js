@@ -11,12 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
 import ToggleButtonComponent from 'passbolt-mad/form/element/toggle_button';
 
-import template from 'app/view/template/form/administration/mfa/settings.stache!';
+import template from '../../../view/template/form/administration/mfa/settings.stache';
 
 const MfaSettingsForm = Form.extend('passbolt.form.administration.mfa.Settings', /** @static */ {
 

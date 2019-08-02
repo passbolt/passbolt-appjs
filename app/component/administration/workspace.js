@@ -11,17 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.6.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import UsersDirectorySettings from 'app/component/administration/users_directory/users_directory_settings';
+import UsersDirectorySettings from '../administration/users_directory/users_directory_settings';
 import MenuComponent from 'passbolt-mad/component/menu';
-import MfaSettings from 'app/component/administration/mfa/mfa_settings';
-import EmailNotificationSettingsComponent from 'app/component/administration/email_notification/email_notification_settings';
+import MfaSettings from '../administration/mfa/mfa_settings';
+import EmailNotificationSettingsComponent from '../administration/email_notification/email_notification_settings';
 import route from 'can-route';
-import template from 'app/view/template/component/administration/workspace.stache!';
+import template from '../../view/template/component/administration/workspace.stache';
 import uuid from 'uuid/v4';
 
 const AdministrationWorkspace = Component.extend('passbolt.component.administration.Workspace', /** @static */ {

@@ -15,7 +15,7 @@ import ButtonComponent from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
 import MadBus from 'passbolt-mad/control/bus';
 import route from 'can-route';
-import template from 'app/view/template/component/settings/workspace_primary_menu.stache!';
+import template from '../../view/template/component/settings/workspace_primary_menu.stache';
 
 const SettingsWorkspaceMenu = Component.extend('passbolt.component.settings.WorkspacePrimaryMenu', /** @static */ {
   defaults: {

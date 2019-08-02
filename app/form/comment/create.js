@@ -14,9 +14,9 @@
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import TextboxComponent from 'passbolt-mad/form/element/textbox';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
-import template from 'app/view/template/form/comment/add.stache!';
+import template from '../../view/template/form/comment/add.stache';
 
 const CreateForm = Form.extend('passbolt.form.comment.Create', /** @static */ {
 

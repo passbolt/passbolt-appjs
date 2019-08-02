@@ -19,8 +19,8 @@ import MadBus from 'passbolt-mad/control/bus';
 import Menu from 'passbolt-mad/component/menu';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/breadcrumb/breadcrumb.stache!';
-import itemTemplate from 'app/view/template/component/breadcrumb/breadcrumb_item.stache!';
+import template from '../../view/template/component/breadcrumb/breadcrumb.stache';
+import itemTemplate from '../../view/template/component/breadcrumb/breadcrumb_item.stache';
 
 const WorkspaceBreadcrumb = Component.extend('passbolt.component.WorkspaceBreadcrumb', /** @static */ {
 

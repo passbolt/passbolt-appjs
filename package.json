@@ -1,6 +1,6 @@
 {
   "name": "passbolt-appjs",
-  "version": "2.10.4",
+  "version": "2.11.0",
   "author": "Passbolt SA",
   "license": "AGPL-3.0",
   "description": "Passbolt javascript application for the open source password manager for teams",
@@ -9,6 +9,7 @@
     "url": "git@bitbucket.org:passbolt/passbolt-appjs.git"
   },
   "dependencies": {
+    "@babel/runtime": "^7.5.5",
     "browser-cookies": "^1.2.0",
     "can-ajax": "2.0.0",
     "can-assign": "1.2.0",
@@ -96,7 +97,10 @@
     "jssha": "~2.0.1",
     "moment": "^2.10.0",
     "moment-timezone": "^0.5.23",
-    "passbolt-mad": "^2.10.0",
+    "passbolt-mad": "^2.11.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-list": "^0.8.11",
     "react-view-model": "1.0.1",
     "steal": "^2.2.1",
     "steal-mocha": "^2.0.1",
@@ -107,6 +111,7 @@
     "xregexp": "~3.2.0"
   },
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
     "chai": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.0.0",

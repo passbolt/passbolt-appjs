@@ -13,8 +13,8 @@
  */
 import DefineList from 'passbolt-mad/model/list/list';
 import DefineMap from 'passbolt-mad/model/map/map';
-import Group from 'app/model/map/group';
-import User from 'app/model/map/user';
+import Group from './group';
+import User from './user';
 
 const GroupUser = DefineMap.extend('passbolt.model.GroupUser', {
   id: 'string',

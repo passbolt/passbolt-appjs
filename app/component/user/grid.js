@@ -11,25 +11,26 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import CheckboxComponent from 'passbolt-mad/form/element/checkbox';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
-import GridContextualMenuComponent from 'app/component/user/grid_contextual_menu';
-import Group from 'app/model/map/group';
-import GroupUser from 'app/model/map/group_user';
+import GridContextualMenuComponent from '../user/grid_contextual_menu';
+import Group from '../../model/map/group';
+import GroupUser from '../../model/map/group_user';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadMap from 'passbolt-mad/util/map/map';
-import User from 'app/model/map/user';
-import UserGridView from 'app/view/component/user/grid';
+import User from '../../model/map/user';
+import UserGridView from '../../view/component/user/grid';
 import View from 'passbolt-mad/view/view';
 
-import cellAvatarTemplate from 'app/view/template/component/user/grid/cell_avatar.stache!';
-import columnHeaderSelectTemplate from 'app/view/template/component/user/grid/column_header_select.stache!';
-import gridFilteredEmptyTemplate from 'app/view/template/component/user/grid/grid_filtered_empty.stache!';
-import itemTemplate from 'app/view/template/component/user/grid/grid_item.stache!';
+import cellAvatarTemplate from '../../view/template/component/user/grid/cell_avatar.stache';
+import columnHeaderSelectTemplate from '../../view/template/component/user/grid/column_header_select.stache';
+import gridFilteredEmptyTemplate from '../../view/template/component/user/grid/grid_filtered_empty.stache';
+import itemTemplate from '../../view/template/component/user/grid/grid_item.stache';
 
 const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /** @static */ {
 

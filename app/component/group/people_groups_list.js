@@ -11,13 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Action from 'passbolt-mad/model/map/action';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
-import GroupListComponent from 'app/component/group/groups_list';
+import GroupListComponent from '../group/groups_list';
 import MadBus from 'passbolt-mad/control/bus';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
-import 'app/view/template/component/group/group_item.stache!';
+import '../../view/template/component/group/group_item.stache';
 
 const PeopleGroupsListComponent = GroupListComponent.extend('passbolt.component.group.PeopleGroupsList', /** @static */ {
 

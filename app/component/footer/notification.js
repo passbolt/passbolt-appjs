@@ -14,11 +14,11 @@
 import Component from 'passbolt-mad/component/component';
 import Config from 'passbolt-mad/config/config';
 import getObject from 'can-util/js/get/get';
-import Notification from 'app/model/map/notification';
-import NotificationView from 'app/view/component/footer/notification';
+import Notification from '../../model/map/notification';
+import NotificationView from '../../view/component/footer/notification';
 import uuid from 'uuid/v4';
 
-import template from 'app/view/template/component/footer/notification.stache!';
+import template from '../../view/template/component/footer/notification.stache';
 
 const NotificationComponent = Component.extend('passbolt.component.footer.Notification', /** @static */ {
 
@@ -51,7 +51,7 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
        */
       if (notification.status == "error") {
         return {
-          msg: notification.data.header.message,
+          msg: getObject(notification, "data.header.message"),
           severity: "error"
         };
       }
@@ -172,22 +172,28 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
    * @param {Notification} notification
    */
   load: function(notification) {
-    // Only notification with a title can be displayed.
-    if (notification.title == undefined) {
-      return;
-    }
-    // Check if notification should be processed.
-    const notifSettings = this._getNotificationSettings(notification);
-    if (notifSettings === null) {
-      return;
-    }
-    const _notification = this._populateNotification(notification, notifSettings);
-    const display = this._checkShouldBeDisplayed(notification, notifSettings);
-    if (_notification === null) {
-      return;
-    }
-    if (display === false) {
-      return;
+    let _notification;
+
+    if (!notification.force) {
+      // Only notification with a title can be displayed.
+      if (notification.title == undefined) {
+        return;
+      }
+      // Check if notification should be processed.
+      const notifSettings = this._getNotificationSettings(notification);
+      if (notifSettings === null) {
+        return;
+      }
+      _notification = this._populateNotification(notification, notifSettings);
+      const display = this._checkShouldBeDisplayed(notification, notifSettings);
+      if (_notification === null) {
+        return;
+      }
+      if (display === false) {
+        return;
+      }
+    } else {
+      _notification = notification;
     }
     this.options.notifications.push(_notification);
 
@@ -207,12 +213,13 @@ const NotificationComponent = Component.extend('passbolt.component.footer.Notifi
    * Listen the event passbolt_notify and display load the corresponding notification.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
+   * @deprecated
    */
   '{mad.bus.element} passbolt_notify': function(el, ev) {
-    const notif = ev.data;
+    const notif = ev.data || ev.detail;
     // When we receive a notification, we load it in the main system.
     this.load(new Notification(notif));
-  }
+  },
 
 });
 

@@ -11,19 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Button from 'passbolt-mad/component/button';
 import Component from 'passbolt-mad/component/component';
-import FilterView from 'app/view/component/navigation/filter';
+import FilterView from '../../view/component/navigation/filter';
 import Form from 'passbolt-mad/form/form';
 import getObject from 'can-util/js/get/get';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
-import SettingsWorkspaceComponent from 'app/component/settings/workspace';
+import SettingsWorkspaceComponent from '../settings/workspace';
 import Textbox from 'passbolt-mad/form/element/textbox';
-import UserWorkspaceComponent from 'app/component/user/workspace';
+import UserWorkspaceComponent from '../user/workspace';
 
-import template from 'app/view/template/component/navigation/filter.stache!';
+import template from '../../view/template/component/navigation/filter.stache';
 
 const FilterComponent = Component.extend('passbolt.component.navigation.Filter', /** @static */ {
 
@@ -64,7 +65,6 @@ const FilterComponent = Component.extend('passbolt.component.navigation.Filter',
     this.options.filterForm = form;
 
     const keywordsTextbox = form.addElement(new Textbox('#js_app_filter_keywords', {
-      onChangeTimeout: 200,
       modelReference: 'passbolt.model.Filter.keywords'
     }));
     keywordsTextbox.start();

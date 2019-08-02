@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import Config from 'passbolt-mad/config/config';
 import View from 'passbolt-mad/view/view';
 

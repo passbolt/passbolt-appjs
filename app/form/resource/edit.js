@@ -11,14 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
+import $ from 'jquery/dist/jquery.min.js';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
-import CreateForm from 'app/form/resource/create';
+import CreateForm from '../../form/resource/create';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 
-import createTemplatetemplate from 'app/view/template/form/resource/create.stache!';
-import template from 'app/view/template/form/resource/edit.stache!';
+import createTemplatetemplate from '../../view/template/form/resource/create.stache';
+import template from '../../view/template/form/resource/edit.stache';
 
 const EditForm = CreateForm.extend('passbolt.form.resource.Edit', /** @static */ {
 

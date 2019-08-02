@@ -12,10 +12,10 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
-import Clipboard from 'app/util/clipboard';
+import Clipboard from '../../util/clipboard';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import MadBus from 'passbolt-mad/control/bus';
-import User from 'app/model/map/user';
+import User from '../../model/map/user';
 
 const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.component.user.GridContextualMenu', /** @static */ {
 

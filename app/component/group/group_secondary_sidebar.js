@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import Group from 'app/model/map/group';
-import GroupUsersSectionComponent from 'app/component/group_user/group_users_sidebar_section';
-import InformationSectionComponent from 'app/component/group/information_sidebar_section';
-import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
+import Group from '../../model/map/group';
+import GroupUsersSectionComponent from '../group_user/group_users_sidebar_section';
+import InformationSectionComponent from '../group/information_sidebar_section';
+import SecondarySidebarComponent from '../workspace/secondary_sidebar';
 
-import template from 'app/view/template/component/group/group_secondary_sidebar.stache!';
+import template from '../../view/template/component/group/group_secondary_sidebar.stache';
 
 const GroupSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt.component.group.GroupSecondarySidebar', /** @static */ {
 

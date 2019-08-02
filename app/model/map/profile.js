@@ -14,7 +14,7 @@
 import DefineMap from 'passbolt-mad/model/map/map';
 // eslint-disable-next-line no-unused-vars
 import I18n from 'passbolt-mad/util/lang/i18n';
-import ImageStorage from 'app/model/map/image_storage';
+import ImageStorage from './image_storage';
 
 const Profile = DefineMap.extend('passbolt.model.Profile', {
   id: 'string',

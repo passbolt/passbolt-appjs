@@ -10,11 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import ActionLog from 'app/model/map/action_log';
-import ResourceActivityListComponent from 'app/component/activity/resource_activity_list';
-import SecondarySidebarSectionComponent from 'app/component/workspace/secondary_sidebar_section';
-import template from 'app/view/template/component/activity/resource_activity_sidebar_section.stache!';
-
+import $ from 'jquery/dist/jquery.min.js';
+import ActionLog from '../../model/map/action_log';
+import ResourceActivityListComponent from './resource_activity_list';
+import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
+import template from '../../view/template/component/activity/resource_activity_sidebar_section.stache';
 
 const ResourceActivitySidebarSectionComponent = SecondarySidebarSectionComponent.extend('passbolt.component.activity.ResourceActivitySidebarSection', /** @static */ {
 

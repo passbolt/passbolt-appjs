@@ -11,18 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import ActivitySection from 'app/component/activity/resource_activity_sidebar_section';
-import Clipboard from 'app/util/clipboard';
-import CommentsSection from 'app/component/comment/comments_sidebar_section';
+import ActivitySection from '../activity/resource_activity_sidebar_section';
+import Clipboard from '../../util/clipboard';
+import CommentsSection from '../comment/comments_sidebar_section';
 import Config from 'passbolt-mad/config/config';
-import DescriptionSection from 'app/component/password/description_sidebar_section';
-import InformationSection from 'app/component/password/information_sidebar_section';
-import PermissionsSection from 'app/component/permission/permissions_sidebar_section';
-import Resource from 'app/model/map/resource';
-import SecondarySidebarComponent from 'app/component/workspace/secondary_sidebar';
-import TagsSection from 'app/component/password/tags_sidebar_section';
+import DescriptionSection from '../password/description_sidebar_section';
+import InformationSection from '../password/information_sidebar_section';
+import PermissionsSection from '../permission/permissions_sidebar_section';
+import Resource from '../../model/map/resource';
+import SecondarySidebarComponent from '../workspace/secondary_sidebar';
+import TagsSection from '../password/tags_sidebar_section';
 
-import template from 'app/view/template/component/password/password_secondary_sidebar.stache!';
+import template from '../../view/template/component/password/password_secondary_sidebar.stache';
 
 const PasswordSecondarySidebarComponent = SecondarySidebarComponent.extend('passbolt.component.password.PasswordSecondarySidebar', /** @static */ {
 
