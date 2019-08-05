@@ -12,12 +12,6 @@
  * @since         2.2.0
  */
 
-/**
- * Is the addon ready.
- * @type {boolean}
- */
-let isReady = false;
-
 export default class Plugin {
 
   /**
@@ -36,20 +30,12 @@ export default class Plugin {
    * @return {Promise}
    */
   static async _isReady(resolve) {
-    // If the plugin is already ready, return.
-    if (isReady) return;
-
-    try {
-      let requestPluginPromise = this.request('passbolt.plugin.is-ready');
-      // Don't wait the promise to be resolved, and schedule another check in Xms.
-      setTimeout(() => Plugin._isReady(resolve), 1000);
-      await requestPluginPromise;
-      isReady = true;
+    if ($('html').hasClass('passboltplugin-ready')) {
       resolve();
-    } catch (error) {
-      // An error can occur if the request promise is not resolved.
-      // It can happen in case of timeout, if the Plugin event listener was not ready at the moment
-      // the request has been done.
+    } else {
+      setTimeout(() => {
+        this._isReady(resolve);
+      }, 50);
     }
   }
 

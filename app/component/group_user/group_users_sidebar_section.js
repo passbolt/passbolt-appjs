@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import domEvents from 'can-dom-events';
 import Group from '../../model/map/group';
 import GroupUser from '../../model/map/group_user';

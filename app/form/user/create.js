@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import FeedbackComponent from 'passbolt-mad/form/feedback';
 import Form from 'passbolt-mad/form/form';
 import getObject from 'can-util/js/get/get';

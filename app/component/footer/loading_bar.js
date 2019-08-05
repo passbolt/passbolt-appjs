@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 import Ajax from 'passbolt-mad/net/ajax';
 import Component from 'passbolt-mad/component/component';
 import LoadingState from '../../model/state/loadingState';

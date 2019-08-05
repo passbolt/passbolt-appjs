@@ -7,7 +7,7 @@
  *
  */
 import AppBootstrap from './app/bootstrap';
-import $ from 'jquery/dist/jquery.min.js';
+import $ from 'jquery';
 
 $(document).ready(function () {
 	// Start the application bootstrap.
