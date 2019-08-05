@@ -14,7 +14,7 @@
 import './config/routes.js';
 import Ajax from './net/ajax';
 import cookies from 'browser-cookies/src/browser-cookies';
-// import AccountSetting from './model/map/accountSetting';
+import AccountSetting from './model/map/accountSetting';
 import Bootstrap from 'passbolt-mad/bootstrap';
 import Config from 'passbolt-mad/config/config';
 import AppComponent from './component/app';

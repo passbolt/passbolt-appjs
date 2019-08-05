@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.11.2] - 2019-08-04
+### Fixed
+- PB-611: Fix tags autocomplete can trigger XSS
+- Fix password grid contextual menu, open uri in a new tab can trigger XSS
+
 ## [2.11.1] - 2019-08-02
 ### Fixed
 - Fix plugin "is ready" detection
