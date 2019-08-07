@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
+import MadBus from 'passbolt-mad/control/bus';
 import Plugin from '../../../util/plugin';
 
 export default class AuthService {
@@ -30,6 +31,21 @@ export default class AuthService {
    * @return {Promise}
    */
   static logout() {
+    clearInterval(AuthService.checkAuthStatusLoopInterval);
     return Plugin.request('passbolt.plugin.auth.logout');
+  }
+
+  /**
+   * Start an invertval to check if the user is authenticated.
+   * - In the case the user is logged out, trigger a passbolt.auth.logged-out event.
+   */
+  static startCheckAuthStatusLoop() {
+    AuthService.checkAuthStatusLoopInterval = setInterval(async () => {
+      const isAuthenticated = await AuthService.isAuthenticated({ requestApi: false });
+      if (!isAuthenticated) {
+        clearInterval(AuthService.checkAuthStatusLoopInterval);
+        MadBus.trigger('auth_auto_logged_out');
+      }
+    }, 1000);
   }
 }

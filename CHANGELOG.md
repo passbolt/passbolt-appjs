@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.11.3] - 2019-08-07
+### Fixed
+- Don't display the session expired popup when the user clicks on logout
+
 ## [2.11.2] - 2019-08-04
 ### Fixed
 - PB-611: Fix tags autocomplete can trigger XSS
@@ -211,7 +215,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.11.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.11.3...HEAD
+[2.11.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.2...v2.11.3
+[2.11.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.1...v2.11.2
 [2.11.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.4...v2.11.0
 [2.10.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.10.3...v2.10.4

@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import Action from 'passbolt-mad/model/map/action';
+import AuthService from '../../model/service/plugin/auth';
 import ButtonDropdown from 'passbolt-mad/component/button_dropdown';
 import Config from 'passbolt-mad/config/config';
 // eslint-disable-next-line no-unused-vars
@@ -98,8 +99,13 @@ const HeaderProfileDropdownComponent = ButtonDropdown.extend('passbolt.component
   /**
    * Logout the user
    */
-  _logout: function() {
-    document.location.href = `${APP_URL}/auth/logout`;
+  _logout: async function() {
+    try {
+      await AuthService.logout();
+      location.href = APP_URL;
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   /**
