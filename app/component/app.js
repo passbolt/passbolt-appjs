@@ -128,13 +128,7 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
    * @private
    */
   _startCheckIsAuthenticatedLoop: function() {
-    const interval = setInterval(async () => {
-      const isAuthenticated = await AuthService.isAuthenticated({ requestApi: false });
-      if (!isAuthenticated) {
-        clearInterval(interval);
-        this._displaySessionExpiredDialog();
-      }
-    }, 1000);
+    AuthService.startCheckAuthStatusLoop();
   },
 
   /**
@@ -251,6 +245,13 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
   /* ************************************************************** */
   /* LISTEN TO THE APP EVENTS */
   /* ************************************************************** */
+
+  /**
+   * Observe when the user is logged out
+   */
+  '{mad.bus.element} auth_auto_logged_out': function() {
+    this._displaySessionExpiredDialog();
+  },
 
   /**
    * Observe when the user wants to switch to another workspace
