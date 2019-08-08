@@ -100,6 +100,12 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
           return __('never');
         }
       },
+      is_mfa_enabled: {
+        key: 'is_mfa_enabled',
+        func: function(value) {
+            return  (value) ? __('Enabled') : __('Disabled');
+        }
+      },
       active: 'active',
       group: 'group',
       profile: 'profile'
@@ -174,6 +180,16 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
       sortable: true
     });
     columns.push(loggedInColumn);
+
+    // Is MFA enabled in column
+    const isMfaEnabledColumn = new GridColumn({
+      name: 'is_mfa_enabled',
+      index: 'is_mfa_enabled',
+      css: ['m-cell'],
+      label: __('MFA'),
+      sortable: true
+    });
+    columns.push(isMfaEnabledColumn);
 
     return columns;
   },
@@ -316,7 +332,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
       filter: filter.getRules(['keywords']), // All rules except keywords that is filtered on the browser.
       order: filter.getOrders(),
       contain: {
-        LastLoggedIn: 1
+        LastLoggedIn: 1,
+        is_mfa_enabled: 1
       }
     };
     return User.findAll(findOptions);
