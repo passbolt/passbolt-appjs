@@ -120,6 +120,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
   _getGridColumns: function() {
     const columns = [];
     const plugins = Config.read('server.passbolt.plugins');
+    const isAdmin = User.getCurrent().isAdmin();
 
     // Select column
     const selectColumn = new GridColumn({
@@ -184,7 +185,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
     columns.push(loggedInColumn);
 
     // Is MFA enabled in column
-    if (plugins && plugins.multiFactorAuthentication) {
+    if (isAdmin && plugins && plugins.multiFactorAuthentication) {
       const isMfaEnabledColumn = new GridColumn({
         name: 'is_mfa_enabled',
         index: 'is_mfa_enabled',
