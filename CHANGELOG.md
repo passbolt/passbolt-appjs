@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.11.4] - 2019-10-10
+### Added
+- PB-575: As AD I can see the MFA status of each user in the users grid
+
 ## [2.11.3] - 2019-08-07
 ### Fixed
 - Don't display the session expired popup when the user clicks on logout
