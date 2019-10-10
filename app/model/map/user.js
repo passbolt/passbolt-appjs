@@ -34,6 +34,7 @@ const User = DefineMap.extend('passbolt.model.User', {
   last_logged_in: 'string',
   profile: Profile,
   role: Role,
+  is_mfa_enabled: 'boolean',
 
   /**
    * Is the user an admin.

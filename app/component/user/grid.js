@@ -14,6 +14,7 @@
 import $ from 'jquery';
 import CheckboxComponent from 'passbolt-mad/form/element/checkbox';
 import ComponentHelper from 'passbolt-mad/helper/component';
+import Config from 'passbolt-mad/config/config';
 import getTimeAgo from 'passbolt-mad/util/time/get_time_ago';
 import GridColumn from 'passbolt-mad/model/map/grid_column';
 import GridComponent from 'passbolt-mad/component/grid';
@@ -100,6 +101,12 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
           return __('never');
         }
       },
+      is_mfa_enabled: {
+        key: 'is_mfa_enabled',
+        func: function(value) {
+          return  (value) ? __('Enabled') : __('Disabled');
+        }
+      },
       active: 'active',
       group: 'group',
       profile: 'profile'
@@ -112,6 +119,7 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
    */
   _getGridColumns: function() {
     const columns = [];
+    const plugins = Config.read('server.passbolt.plugins');
 
     // Select column
     const selectColumn = new GridColumn({
@@ -174,6 +182,18 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
       sortable: true
     });
     columns.push(loggedInColumn);
+
+    // Is MFA enabled in column
+    if (plugins && plugins.multiFactorAuthentication) {
+      const isMfaEnabledColumn = new GridColumn({
+        name: 'is_mfa_enabled',
+        index: 'is_mfa_enabled',
+        css: ['m-cell'],
+        label: __('MFA'),
+        sortable: true
+      });
+      columns.push(isMfaEnabledColumn);
+    }
 
     return columns;
   },
@@ -316,7 +336,8 @@ const UserGridComponent = GridComponent.extend('passbolt.component.user.Grid', /
       filter: filter.getRules(['keywords']), // All rules except keywords that is filtered on the browser.
       order: filter.getOrders(),
       contain: {
-        LastLoggedIn: 1
+        LastLoggedIn: 1,
+        is_mfa_enabled: 1
       }
     };
     return User.findAll(findOptions);
