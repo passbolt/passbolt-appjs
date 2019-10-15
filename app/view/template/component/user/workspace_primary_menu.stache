@@ -11,5 +11,10 @@
 		<span>{{ __('delete') }}</span>
 	</a>
 </li>
-
+<li>
+	<a id="js_user_wk_menu_resend_invite_button" class="button">
+		<i class="fa fa-paper-plane-o"></i>
+		<span>{{ __('resend invite') }}</span>
+	</a>
+</li>
 {{/if}}

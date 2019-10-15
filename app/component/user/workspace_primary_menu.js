@@ -67,6 +67,19 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
       });
       deleteButton.start();
       this.deleteButton = deleteButton;
+
+      // Resend invite
+      const resendInviteButton = new ButtonComponent('#js_user_wk_menu_resend_invite_button', {
+        state: {
+          disabled: true
+        },
+        events: {
+          click: () => this._resendInvite()
+        }
+      });
+
+      resendInviteButton.start();
+      this.resendInviteButton = resendInviteButton;
     }
 
     this.on();
@@ -88,6 +101,13 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     MadBus.trigger('request_user_edition', {user: user});
   },
 
+  /**
+   * Resend Invitation
+   */
+  _resendInvite: function() {
+    const user = this.options.selectedUsers[0];
+    MadBus.trigger('request_resend_invitation', {user: user});
+  },
 
   /**
    * Observe when a user is selected
@@ -121,6 +141,11 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
         this.deleteButton.state.disabled = false;
       }
       this.editButton.state.disabled = false;
+      this.resendInviteButton.state.disabled = true;
+      const userActiveState = this.options.selectedUsers[0].active;
+      if (!userActiveState) {
+        this.resendInviteButton.state.disabled = false;
+      }
     }
   },
 
@@ -132,6 +157,7 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     if (isAdmin) {
       this.deleteButton.state.disabled = true;
       this.editButton.state.disabled = true;
+      this.resendInviteButton.state.disabled = true;
     }
   }
 
