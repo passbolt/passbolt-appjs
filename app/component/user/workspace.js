@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
+import Ajax from '../../net/ajax';
 import $ from 'jquery';
 import Action from 'passbolt-mad/model/map/action';
 import BreadcrumbComponent from '../user/workspace_breadcrumb';
@@ -74,7 +75,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Return the default filter used to filter the workspace
    * @return {Filter}
    */
-  getDefaultFilterSettings: function() {
+  getDefaultFilterSettings: function () {
     return new Filter({
       id: 'default',
       type: 'default',
@@ -88,7 +89,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /**
    * @inheritdoc
    */
-  init: function(el, options) {
+  init: function (el, options) {
     this._super(el, options);
     this._firstLoad = true;
   },
@@ -97,12 +98,12 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Dispatch route
    * @private
    */
-  _dispatchRoute: function() {
+  _dispatchRoute: function () {
     const action = route.data.action;
     switch (action) {
       case 'view': {
         const id = route.data.id;
-        const user = this.options.grid.options.items.filter({id: id}).pop();
+        const user = this.options.grid.options.items.filter({ id: id }).pop();
         if (user) {
           this.options.selectedUsers.push(user);
         } else {
@@ -115,7 +116,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       }
       case 'delete': {
         const id = route.data.id;
-        const user = this.options.grid.options.items.filter({id: id}).pop();
+        const user = this.options.grid.options.items.filter({ id: id }).pop();
         if (user) {
           this.deleteUser(user);
         } else {
@@ -129,7 +130,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       case 'groupDelete': {
         const id = route.data.id;
         // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
-        Group.findOne({id: id})
+        Group.findOne({ id: id })
           .then(group => {
             this.deleteGroup(group);
           });
@@ -138,7 +139,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       case 'groupEdit': {
         const id = route.data.id;
         // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
-        Group.findOne({id: id})
+        Group.findOne({ id: id })
           .then(group => {
             this.openEditGroupDialog(group);
           });
@@ -148,7 +149,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       case 'groupView': {
         const id = route.data.id;
         // Cannot use the local store to retrieve the group because of a Canjs issue, see model/map/group for more details.
-        Group.findOne({id: id})
+        Group.findOne({ id: id })
           .then(group => {
             this.options.selectedGroups.splice(0, this.options.selectedGroups.length, group);
           });
@@ -171,7 +172,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       }
       case 'edit': {
         const id = route.data.id;
-        const user = this.options.grid.options.items.filter({id: id}).pop();
+        const user = this.options.grid.options.items.filter({ id: id }).pop();
         if (user) {
           const data = {};
           const firstName = route.data.first_name;
@@ -198,7 +199,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /**
    * @inheritdoc
    */
-  afterStart: function() {
+  afterStart: function () {
     const primaryMenu = this._initPrimaryMenu();
     const secondaryMenu = this._initSecondaryMenu();
     const mainActionButton = this._initMainActionButton();
@@ -224,7 +225,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     }
 
     // Filter the workspace
-    MadBus.trigger('filter_workspace', {filter: filter});
+    MadBus.trigger('filter_workspace', { filter: filter });
 
     this.on();
     this._super();
@@ -234,7 +235,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Observer when the component is loaded / loading
    * @param {boolean} loaded True if loaded, false otherwise
    */
-  onLoadedChange: function(loaded) {
+  onLoadedChange: function (loaded) {
     if (loaded) {
       if (this._firstLoad) {
         this._firstLoad = false;
@@ -251,7 +252,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @see destroy()
    * @return {Component}
    */
-  _initPrimaryMenu: function() {
+  _initPrimaryMenu: function () {
     const component = ComponentHelper.create(
       $('#js_wsp_primary_menu_wrapper'),
       'last',
@@ -271,7 +272,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @see destroy()
    * @return {Component}
    */
-  _initSecondaryMenu: function() {
+  _initSecondaryMenu: function () {
     const component = ComponentHelper.create(
       $('#js_wsp_secondary_menu_wrapper'),
       'last',
@@ -287,7 +288,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Initialize the workspace main action button.
    * @return {Component}
    */
-  _initMainActionButton: function() {
+  _initMainActionButton: function () {
     const role = User.getCurrent().role.name;
 
     // Create user / group capability is only available to admin user.
@@ -297,7 +298,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
           id: uuid(),
           label: __('New user'),
           cssClasses: ['create-user'],
-          action: function() {
+          action: function () {
             button.view.close();
             MadBus.trigger('request_user_creation');
           }
@@ -306,7 +307,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
           id: uuid(),
           label: __('New group'),
           cssClasses: ['create-group'],
-          action: function() {
+          action: function () {
             button.view.close();
             MadBus.trigger('request_group_creation');
           }
@@ -336,7 +337,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Initialize the workspace breadcrumb
    * @return {Component}
    */
-  _initBreadcrumb: function() {
+  _initBreadcrumb: function () {
     const component = new BreadcrumbComponent('#js_wsp_users_breadcrumb', {
       rootFilter: UserWorkspaceComponent.getDefaultFilterSettings(),
       silentLoading: false
@@ -350,7 +351,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Initialize the primary sidebar component
    * @return {Component}
    */
-  _initPrimarySidebar: function() {
+  _initPrimarySidebar: function () {
     const component = new PrimarySidebarComponent('#js_user_workspace_primary_sidebar', {
       defaultFilter: UserWorkspaceComponent.getDefaultFilterSettings(),
       selectedUsers: this.options.selectedUsers,
@@ -366,7 +367,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Initialize the grid component
    * @return {Component}
    */
-  _initGrid: function() {
+  _initGrid: function () {
     const component = new GridComponent('#js_wsp_users_browser', {
       selectedUsers: this.options.selectedUsers,
       silentLoading: false
@@ -380,7 +381,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Open the group edit dialog.
    * @param {Group} group The target group entity.
    */
-  openEditGroupDialog: function(group) {
+  openEditGroupDialog: function (group) {
     const dialog = DialogComponent.instantiate({
       label: group.isNew() ? __('Create group') : __('Edit group'),
       cssClasses: ['edit-group-dialog', 'dialog-wrapper']
@@ -393,7 +394,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         Group: group
       },
       callbacks: {
-        saved: function() {
+        saved: function () {
           dialog.remove();
         }
       }
@@ -404,7 +405,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Open the user create dialog.
    * @param {User} user The target user entity.
    */
-  openCreateUserDialog: function(user) {
+  openCreateUserDialog: function (user) {
     const self = this;
     const dialog = DialogComponent.instantiate({
       label: __('Add User'),
@@ -433,7 +434,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Open the user edit dialog.
    * @param {User} user The target user entity.
    */
-  openEditUserDialog: function(user) {
+  openEditUserDialog: function (user) {
     const self = this;
     const dialog = DialogComponent.instantiate({
       label: __('Edit User'),
@@ -444,7 +445,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       data: user,
       action: 'edit',
       callbacks: {
-        submit: function(formData) {
+        submit: function (formData) {
           const userToUpdate = new User(formData['User']);
           self._saveUser(userToUpdate, form, dialog);
         }
@@ -460,13 +461,13 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {Dialog} dialog The dialog object
    * @return {Promise}
    */
-  _saveUser: function(user, form, dialog) {
+  _saveUser: function (user, form, dialog) {
     return user.save()
       .then(savedUser => {
         user.assign(savedUser);
         dialog.remove();
       }, response => {
-        form.showErrors({User: response.body});
+        form.showErrors({ User: response.body });
         return Promise.reject();
       });
   },
@@ -475,7 +476,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Perform a group deletion.
    * @param {Group} group
    */
-  deleteGroup: function(group) {
+  deleteGroup: function (group) {
     group.deleteDryRun()
       .then(resources => {
         this._deleteGroupConfirm(group, resources);
@@ -492,7 +493,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {Group} group The target group
    * @param {array<Resource>} resources The resources that are shared with
    */
-  _deleteGroupConfirm: function(group, resources) {
+  _deleteGroupConfirm: function (group, resources) {
     const dialog = ConfirmDialogComponent.instantiate({
       label: __('Are you sure ?'),
       subtitle: __('You are about to delete the group "%s"!', group.name),
@@ -505,7 +506,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         group: group,
         resources: resources
       },
-      action: function() {
+      action: function () {
         group.delete();
       }
     });
@@ -517,7 +518,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {Group} group The group to delete.
    * @param {GroupDelete} groupDelete An object containing the error target
    */
-  _openDeleteGroupTransferPermissionsDialog: function(group, groupDelete) {
+  _openDeleteGroupTransferPermissionsDialog: function (group, groupDelete) {
     const dialog = DialogComponent.instantiate({
       label: __('You cannot delete this group!'),
       cssClasses: ['delete-group-dialog', 'dialog-wrapper']
@@ -538,13 +539,31 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   },
 
   /**
+   * Resend invitation to the user that didn't complete the setup.
+   * @param {User} user The user to resnd the invitation.
+   */
+  resendInvitation: async function (user) {
+    await Ajax.request({
+      url: 'users/recover.json?api-version=v2',
+      type: 'POST',
+      params: {
+        'username': user.username
+      }
+    });
+    MadBus.trigger('passbolt_notify', {
+      title: 'app_notificationresendinvitation_success',
+      status: 'success'
+    });
+  },
+
+  /**
    * Delete a user.
    * Request a dry-run delete on the API.
    * - If the dry-run is a success, ask the user to confirm the deletion;
    * - If the dry-run failed, notify the user about the reasons.
    * @param {User} user The user to delete.
    */
-  deleteUser: function(user) {
+  deleteUser: function (user) {
     user.deleteDryRun()
       .then(() => {
         this._deleteUserConfirm(user);
@@ -563,7 +582,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Request the user to confirm the user delete operation.
    * @param {User} user The user to delete.
    */
-  _deleteUserConfirm: function(user) {
+  _deleteUserConfirm: function (user) {
     const dialog = ConfirmDialogComponent.instantiate({
       label: __('Delete user?'),
       content: userDeleteConfirmTemplate,
@@ -582,7 +601,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {User} user The user to delete.
    * @param {array} data An object containing the error target
    */
-  _openDeleteUserTransferPermissionsDialog: function(user, userDelete) {
+  _openDeleteUserTransferPermissionsDialog: function (user, userDelete) {
     const dialog = DialogComponent.instantiate({
       label: __('You cannot delete this user!'),
       cssClasses: ['delete-user-dialog', 'dialog-wrapper']
@@ -606,17 +625,17 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Reset the workspace filter
    * @private
    */
-  _resetFilter: function() {
+  _resetFilter: function () {
     const filter = UserWorkspaceComponent.getDefaultFilterSettings();
     filter.forceReload = true;
-    MadBus.trigger('filter_workspace', {filter: filter});
+    MadBus.trigger('filter_workspace', { filter: filter });
   },
 
   /**
    * Init the user secondary sidebar.
    * @private
    */
-  _initUserSecondarySidebar: function() {
+  _initUserSecondarySidebar: function () {
     const showSidebar = Config.read('ui.workspace.showSidebar');
     if (!showSidebar) {
       return;
@@ -641,7 +660,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Init the group secondary sidebar.
    * @private
    */
-  _initGroupSecondarySidebar: function() {
+  _initGroupSecondarySidebar: function () {
     const showSidebar = Config.read('ui.workspace.showSidebar');
     if (!showSidebar) {
       return;
@@ -666,7 +685,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Destroy the user secondary sidebar
    * @private
    */
-  _destroyUserSecondarySidebar: function() {
+  _destroyUserSecondarySidebar: function () {
     if (this.options.userSecondarySidebar) {
       this.options.userSecondarySidebar.destroyAndRemove();
       this.options.userSecondarySidebar = null;
@@ -677,7 +696,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * Destroy the group secondary sidebar
    * @private
    */
-  _destroyGroupSecondarySidebar: function() {
+  _destroyGroupSecondarySidebar: function () {
     if (this.options.groupSecondarySidebar) {
       this.options.groupSecondarySidebar.destroyAndRemove();
       this.options.groupSecondarySidebar = null;
@@ -687,28 +706,28 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /**
    * Observe when users are selected
    */
-  '{selectedUsers} add': function() {
+  '{selectedUsers} add': function () {
     this._initUserSecondarySidebar();
   },
 
   /**
    * Observe when users are selected
    */
-  '{selectedUsers} remove': function() {
+  '{selectedUsers} remove': function () {
     this._destroyUserSecondarySidebar();
   },
 
   /**
    * Observe when groups are selected
    */
-  '{selectedGroups} add': function() {
+  '{selectedGroups} add': function () {
     this._initGroupSecondarySidebar();
   },
 
   /**
    * Observe when users are selected
    */
-  '{selectedGroups} remove': function() {
+  '{selectedGroups} remove': function () {
     this._destroyGroupSecondarySidebar();
   },
 
@@ -719,7 +738,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLEvent} ev The event which occurred
    * @param {User} user The updated user
    */
-  '{User} updated': function(model, ev, user) {
+  '{User} updated': function (model, ev, user) {
     const userSelectedIndex = this.options.selectedUsers.indexOf(user);
     if (userSelectedIndex != -1) {
       this.options.selectedUsers[userSelectedIndex].assign(user);
@@ -733,7 +752,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {Event} event The even
    * @param {User} user The destroyed item
    */
-  '{User} destroyed': function(model, event, user) {
+  '{User} destroyed': function (model, event, user) {
     const selectedUsers = this.options.selectedUsers;
     selectedUsers.remove(user);
   },
@@ -745,9 +764,9 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLEvent} ev The event which occurred
    * @param {Group} group The destroyed group
    */
-  '{Group} destroyed': function(el, ev, group) {
+  '{Group} destroyed': function (el, ev, group) {
     const selectedGroups = this.options.selectedGroups;
-    if (selectedGroups.indexOf({id: group.id}) != -1) {
+    if (selectedGroups.indexOf({ id: group.id }) != -1) {
       selectedGroups.remove(group);
       this._resetFilter();
     }
@@ -762,7 +781,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} filter_workspace': function(el, ev) {
+  '{mad.bus.element} filter_workspace': function (el, ev) {
     const filter = ev.data.filter;
     // Unselect all group if the filter does not target a group (dirty).
     if (!filter.rules['has-groups']) {
@@ -775,7 +794,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /**
    * Observe when the user requests a group creation
    */
-  '{mad.bus.element} request_group_creation': function() {
+  '{mad.bus.element} request_group_creation': function () {
     const group = new Group({});
     this.openEditGroupDialog(group);
   },
@@ -785,7 +804,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_group_edition': function(el, ev) {
+  '{mad.bus.element} request_group_edition': function (el, ev) {
     const group = ev.data.group;
     this.openEditGroupDialog(group);
   },
@@ -795,7 +814,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_group_deletion': function(el, ev) {
+  '{mad.bus.element} request_group_deletion': function (el, ev) {
     const group = ev.data.group;
     this.deleteGroup(group);
   },
@@ -803,7 +822,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   /**
    * Observe when the user requests a user creation
    */
-  '{mad.bus.element} request_user_creation': function() {
+  '{mad.bus.element} request_user_creation': function () {
     const user = new User({});
     this.openCreateUserDialog(user);
   },
@@ -813,7 +832,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_user_edition': function(el, ev) {
+  '{mad.bus.element} request_user_edition': function (el, ev) {
     const user = ev.data.user;
     this.openEditUserDialog(user);
   },
@@ -823,15 +842,25 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_user_deletion': function(el, ev) {
+  '{mad.bus.element} request_user_deletion': function (el, ev) {
     const user = ev.data.user;
     this.deleteUser(user);
   },
 
   /**
+     * Observe when the admin requests to resend the invitation
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+  '{mad.bus.element} request_resend_invitation': function (el, ev) {
+    const user = ev.data.user;
+    this.resendInvitation(user);
+  },
+
+  /**
    * Observe when the workspace sidebar setting change.
    */
-  '{mad.bus.element} workspace_sidebar_state_change': function() {
+  '{mad.bus.element} workspace_sidebar_state_change': function () {
     const user = this.options.selectedUsers[0];
     const group = this.options.selectedGroups[0];
     if (user) {

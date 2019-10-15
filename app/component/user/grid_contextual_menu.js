@@ -34,6 +34,8 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     // Is the user an admin.
     const isAdmin = User.getCurrent().isAdmin();
 
+    const isActiveUser = user.active;
+
     // Is the selected user same as the current user.
     const isSelf = User.getCurrent().id == user.id;
 
@@ -65,6 +67,20 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
         action: () => this._edit()
       });
       this.insertItem(editItem);
+    }
+
+    /*
+     * Resend invitation
+     * Only admin can send
+     */
+    if (isAdmin) {
+      const resendInviteItem = new Action({
+        id: 'js_user_browser_menu_resend_invite',
+        label: 'Resend invite',
+        enabled: !isActiveUser,
+        action: () => this._resendInvite()
+      });
+      this.insertItem(resendInviteItem);
     }
 
     /*
@@ -110,13 +126,21 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     this.remove();
   },
 
-
   /**
    * Delete the user
    */
   _delete: function() {
     const user = this.options.user;
     MadBus.trigger('request_user_deletion', {user: user});
+    this.remove();
+  },
+
+  /**
+   * Resend invitation the user that didn't complete the setup
+   */
+  _resendInvite: function() {
+    const user = this.options.user;
+    MadBus.trigger('request_resend_invitation', {user: user});
     this.remove();
   }
 
