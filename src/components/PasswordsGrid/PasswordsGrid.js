@@ -37,6 +37,7 @@ export default class PasswordsGrid extends React.Component {
     this.handleCopyUsernameClick = this.handleCopyUsernameClick.bind(this);
     this.handleFavoriteClick = this.handleFavoriteClick.bind(this);
     this.handleSortByColumnClick = this.handleSortByColumnClick.bind(this);
+    this.handleGoToUrlClick = this.handleGoToUrlClick.bind(this);
   }
 
   defaultState() {
@@ -343,10 +344,44 @@ export default class PasswordsGrid extends React.Component {
     return 0;
   }
 
+  sanitizeResourceUrl(resource) {
+    let uri = resource.uri;
+
+    // Wrong format.
+    if (uri == undefined || typeof uri != "string" || !uri.length) {
+      return false;
+    }
+
+    // Absolute url are not valid url.
+    if (uri[0] == "/") {
+      return false;
+    }
+
+    // If no protocol defined, use http.
+    if (!/^((?!:\/\/).)*:\/\//.test(uri)) {
+      uri = `http://${uri}`;
+    }
+
+    try {
+      let url = new URL(uri);
+      if (url.protocol == "javascript") {
+        throw Exception("The protocol javascript is forbidden.");
+      }
+      return url.href;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  handleGoToUrlClick(event) {
+    event.stopPropagation();
+  }
+
   renderItem(index, key) {
     const resource = this.filteredResources[index];
     const isSelected = this.state.selectedResources.some(resourceId => resource.id === resourceId);
     const isFavorite = resource.favorite !== null && resource.favorite !== undefined;
+    const safeUri = this.sanitizeResourceUrl(resource) || "#";
 
     return (
       <tr id={`resource_${resource.id}`} key={key} className={isSelected ? "selected" : ""} unselectable={this.state.selectStrategy == "range" ? "on" : ""}
@@ -387,7 +422,7 @@ export default class PasswordsGrid extends React.Component {
         </td>
         <td className="cell_uri l-cell">
           <div title={resource.uri}>
-            <a target="_blank" rel="noopener" href="SAFE_URI">{resource.uri}</a>
+            <a href={safeUri} onClick={this.handleGoToUrlClick} target="_blank" rel="noopener noreferrer">{resource.uri}</a>
           </div>
         </td>
         <td className="cell_modified m-cell">
