@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-639: As LU I can delete a personal tag
 - PB-687: As an admin I can resend an invitation for a user that didn't complete the setup
 
+### Fixed
+- GITHUB-16: Opening an URI in a new tab leads to /SAFE_URI
+
 ## [2.11.3] - 2019-08-07
 ### Fixed
 - Don't display the session expired popup when the user clicks on logout
