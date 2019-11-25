@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - GITHUB-16: Opening an URI in a new tab leads to /SAFE_URI
+- PB-883: Fix dependencies vulnerabilities
 
 ## [2.11.3] - 2019-08-07
 ### Fixed
