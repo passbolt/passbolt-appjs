@@ -77,9 +77,20 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
           click: () => this._resendInvite()
         }
       });
-
       resendInviteButton.start();
       this.resendInviteButton = resendInviteButton;
+
+      const removeMfaSettingsButton = new ButtonComponent('#js_user_wk_menu_remove_mfa_settings_button', {
+        state: {
+          disabled: true
+        },
+        events: {
+          click: () => this._removeMfaSettings()
+        }
+      });
+
+      removeMfaSettingsButton.start();
+      this.removeMfaSettingsButton = removeMfaSettingsButton;
     }
 
     this.on();
@@ -110,6 +121,14 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
   },
 
   /**
+   * Resend Invitation
+   */
+  _removeMfaSettings: function() {
+    const user = this.options.selectedUsers[0];
+    MadBus.trigger('request_remove_mfa_settings', {user: user});
+  },
+
+  /**
    * Observe when a user is selected
    */
   '{selectedUsers} add': function() {
@@ -128,6 +147,10 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     this.reset();
   },
 
+  '{mad.bus.element} action_remove_mfa_settings_completed': function (el, ev) {
+    this.userSelected();
+  },
+
   /**
    * A user is selected, adapt the buttons states.
    */
@@ -142,9 +165,16 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
       }
       this.editButton.state.disabled = false;
       this.resendInviteButton.state.disabled = true;
+      this.removeMfaSettingsButton.state.disabled = true;
+
       const userActiveState = this.options.selectedUsers[0].active;
       if (!userActiveState) {
         this.resendInviteButton.state.disabled = false;
+      }
+
+      const isMfaEnabled = this.options.selectedUsers[0].is_mfa_enabled;
+      if (isMfaEnabled) {
+        this.removeMfaSettingsButton.state.disabled = false;
       }
     }
   },
@@ -158,6 +188,7 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
       this.deleteButton.state.disabled = true;
       this.editButton.state.disabled = true;
       this.resendInviteButton.state.disabled = true;
+      this.removeMfaSettingsButton.state.disabled = true;
     }
   }
 

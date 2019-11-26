@@ -557,6 +557,21 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   },
 
   /**
+   * Remove the MFA settings for the given user.
+   * @param {User} user The user to remove the MFA settings for.
+   */
+  removeMfaSettings: async function (user) {
+    await Ajax.request({
+      url: `mfa/setup/${user.id}.json?api-version=v2`,
+      type: 'DELETE'
+    });
+    MadBus.trigger('passbolt_notify', {
+      title: 'app_usersettings_delete_success',
+      status: 'success'
+    });
+  },
+
+  /**
    * Delete a user.
    * Request a dry-run delete on the API.
    * - If the dry-run is a success, ask the user to confirm the deletion;
@@ -855,6 +870,25 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   '{mad.bus.element} request_resend_invitation': function (el, ev) {
     const user = ev.data.user;
     this.resendInvitation(user);
+  },
+
+  '{mad.bus.element} request_remove_mfa_settings': function (el, ev) {
+    const user = ev.data.user;
+    this.removeMfaSettings(user);
+
+    User.findOne({
+      id: user.id
+    }).then(savedUser => {
+      user.assign(savedUser);
+      this.options.grid.refreshItem(user);
+      MadBus.trigger('action_remove_mfa_settings_completed', {user: user});
+    }, response => {
+      MadBus.trigger('passbolt_notify', {
+        status: 'error',
+        title: `app_users_view_error_not_found`
+      });
+      return Promise.reject();
+    });
   },
 
   /**

@@ -36,6 +36,8 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
 
     const isActiveUser = user.active;
 
+    const isMfaEnabledUser = user.is_mfa_enabled;
+
     // Is the selected user same as the current user.
     const isSelf = User.getCurrent().id == user.id;
 
@@ -81,6 +83,21 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
         action: () => this._resendInvite()
       });
       this.insertItem(resendInviteItem);
+    }
+
+    /*
+     * Resend invitation
+     * Only admin can send
+     */
+    if (isAdmin) {
+      const removeMfaSettings = new Action({
+        id: 'js_user_browser_menu_remove_mfa_settings',
+        label: 'Remove MFA settings',
+        enabled: isMfaEnabledUser,
+        action: () => this._removeMfaSettings()
+      });
+
+      this.insertItem(removeMfaSettings);
     }
 
     /*
@@ -142,8 +159,14 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const user = this.options.user;
     MadBus.trigger('request_resend_invitation', {user: user});
     this.remove();
-  }
+  },
 
+
+  _removeMfaSettings: function() {
+    const user = this.options.user;
+    MadBus.trigger('request_remove_mfa_settings', {user: user});
+    this.remove();
+  },
 });
 
 export default GridContextualMenuComponent;
