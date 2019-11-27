@@ -125,6 +125,19 @@ MfaSettings.mapToApi = function(data) {
   return result;
 };
 
+/**
+ * Delete MFA user settings.
+ * @param {User} user The target user
+ * @returns {Promise}
+ * @inherits
+ */
+MfaSettings.deleteUserSettings = function(user) {
+  return Ajax.request({
+    url: `mfa/setup/${user.id}.json?api-version=v2`,
+    type: 'DELETE'
+  });
+};
+
 MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: MfaSettings,
   url: {

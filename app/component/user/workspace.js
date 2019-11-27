@@ -47,6 +47,7 @@ import createButtonTemplate from '../../view/template/component/workspace/create
 import groupDeleteConfirmTemplate from '../../view/template/component/group/delete_confirm.stache';
 import template from '../../view/template/component/user/workspace.stache';
 import userDeleteConfirmTemplate from '../../view/template/component/user/delete_confirm.stache';
+import MfaSettings from "../../model/map/mfa_settings";
 
 const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace', /** @static */ {
 
@@ -514,6 +515,32 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   },
 
   /**
+   * Request the user to confirm the delete user MFA settings operation.
+   * @param {User} user The target user
+   */
+  _removeMfaSettingsConfirm: function (user) {
+    const dialog = ConfirmDialogComponent.instantiate({
+      label: __('Are you sure?'),
+      submitButton: {
+        label: __('delete'),
+        cssClasses: ['warning']
+      },
+      content: __('You are about to disable second-factor authentication (MFA) for the user "%s". Existing settings will be lost. This action cannot be undone.', user.username),
+      viewData: {
+        user: user,
+      },
+      action: function () {
+        MfaSettings.deleteUserSettings(user);
+        MadBus.trigger('passbolt_notify', {
+          title: 'app_usersettings_delete_success',
+          status: 'success'
+        });
+      }
+    });
+    dialog.start();
+  },
+
+  /**
    * Display the group transfer permissions dialog.
    * @param {Group} group The group to delete.
    * @param {GroupDelete} groupDelete An object containing the error target
@@ -552,21 +579,6 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
     });
     MadBus.trigger('passbolt_notify', {
       title: 'app_notificationresendinvitation_success',
-      status: 'success'
-    });
-  },
-
-  /**
-   * Remove the MFA settings for the given user.
-   * @param {User} user The user to remove the MFA settings for.
-   */
-  removeMfaSettings: async function (user) {
-    await Ajax.request({
-      url: `mfa/setup/${user.id}.json?api-version=v2`,
-      type: 'DELETE'
-    });
-    MadBus.trigger('passbolt_notify', {
-      title: 'app_usersettings_delete_success',
       status: 'success'
     });
   },
@@ -874,7 +886,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
 
   '{mad.bus.element} request_remove_mfa_settings': function (el, ev) {
     const user = ev.data.user;
-    this.removeMfaSettings(user);
+    this._removeMfaSettingsConfirm(user);
 
     User.findOne({
       id: user.id
