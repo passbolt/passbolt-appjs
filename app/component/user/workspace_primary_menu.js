@@ -17,6 +17,9 @@ import MadBus from 'passbolt-mad/control/bus';
 import User from '../../model/map/user';
 
 import template from '../../view/template/component/user/workspace_primary_menu.stache';
+import Config from "passbolt-mad/config/config";
+import Action from "passbolt-mad/model/map/action";
+import ButtonDropdownComponent from "passbolt-mad/component/button_dropdown";
 
 const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.WorkspacePrimaryMenu', /** @static */ {
 
@@ -42,6 +45,9 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
    */
   afterStart: function() {
     const isAdmin = User.getCurrent().isAdmin();
+    const plugins = Config.read('server.passbolt.plugins');
+    this.isMfaEnabled = plugins && plugins.multiFactorAuthentication;
+    const moreButtonMenuItems = [];
     // Only admin can edit/delete users
     if (isAdmin) {
       // Edit user
@@ -68,29 +74,31 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
       deleteButton.start();
       this.deleteButton = deleteButton;
 
-      // Resend invite
-      const resendInviteButton = new ButtonComponent('#js_user_wk_menu_resend_invite_button', {
-        state: {
-          disabled: true
-        },
-        events: {
-          click: () => this._resendInvite()
-        }
+      const resendInviteAction = new Action({
+        id: 'js_wk_menu_resend_invite_button',
+        label: __('resend invite'),
+        cssClasses: [],
+        action: () => this._resendInvite()
       });
-      resendInviteButton.start();
-      this.resendInviteButton = resendInviteButton;
+      moreButtonMenuItems.push(resendInviteAction);
 
-      const removeMfaSettingsButton = new ButtonComponent('#js_user_wk_menu_remove_mfa_settings_button', {
-        state: {
-          disabled: true
-        },
-        events: {
-          click: () => this._removeMfaSettings()
-        }
+      if (this.isMfaEnabled) {
+        const removeMfaSettingsAction = new Action({
+          id: 'js_wk_menu_remove_mfa_settings_action',
+          label: __('remove mfa'),
+          cssClasses: [],
+          action: () => this._removeMfaSettings()
+        });
+        moreButtonMenuItems.push(removeMfaSettingsAction);
+      }
+
+      const moreButton = new ButtonDropdownComponent('#js_wk_menu_more_button', {
+        state: {disabled: true},
+        items: moreButtonMenuItems,
+        template: null
       });
-
-      removeMfaSettingsButton.start();
-      this.removeMfaSettingsButton = removeMfaSettingsButton;
+      moreButton.start();
+      this.moreButton = moreButton;
     }
 
     this.on();
@@ -147,7 +155,7 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     this.reset();
   },
 
-  '{mad.bus.element} action_remove_mfa_settings_completed': function (el, ev) {
+  '{mad.bus.element} action_remove_mfa_settings_completed': function () {
     this.userSelected();
   },
 
@@ -157,6 +165,8 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
   userSelected: function() {
     const currentUser = User.getCurrent();
     const isAdmin = currentUser.role.name == 'admin';
+    const plugins = Config.read('server.passbolt.plugins');
+
     if (isAdmin) {
       const user = this.options.selectedUsers[0];
       const isSelf = currentUser.id == user.id;
@@ -164,18 +174,29 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
         this.deleteButton.state.disabled = false;
       }
       this.editButton.state.disabled = false;
-      this.resendInviteButton.state.disabled = true;
-      this.removeMfaSettingsButton.state.disabled = true;
+      const moreButtonResendInvite = 'js_wk_menu_resend_invite_button';
+      this.moreButton.disableItem(moreButtonResendInvite);
 
       const userActiveState = this.options.selectedUsers[0].active;
       if (!userActiveState) {
-        this.resendInviteButton.state.disabled = false;
+        this.moreButton.enableItem(moreButtonResendInvite);
       }
 
-      const isMfaEnabled = this.options.selectedUsers[0].is_mfa_enabled;
-      if (isMfaEnabled) {
-        this.removeMfaSettingsButton.state.disabled = false;
+      if (this.isMfaEnabled) {
+        const isMfaEnabled = this.options.selectedUsers[0].is_mfa_enabled;
+        const moreButtonRemoveUserMfaSettings = 'js_wk_menu_remove_mfa_settings_action';
+        this.moreButton.disableItem(moreButtonRemoveUserMfaSettings);
+        if (isMfaEnabled) {
+          this.moreButton.enableItem(moreButtonRemoveUserMfaSettings);
+        }
       }
+
+      // Disable the more button if there is no enabled action.
+      const enableMoreButtons = this.moreButton.options.items.reduce((carry, item) => {
+        carry = item.enabled || carry;
+        return carry;
+      }, false);
+      this.moreButton.state.disabled = !enableMoreButtons;
     }
   },
 
@@ -187,8 +208,15 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     if (isAdmin) {
       this.deleteButton.state.disabled = true;
       this.editButton.state.disabled = true;
-      this.resendInviteButton.state.disabled = true;
-      this.removeMfaSettingsButton.state.disabled = true;
+
+      const moreButtonResendInvite = 'js_wk_menu_resend_invite_button';
+      this.moreButton.disableItem(moreButtonResendInvite);
+
+      if (this.isMfaEnabled) {
+        this.moreButton.state.disabled = true;
+        const moreButtonRemoveUserMfaSettings = 'js_wk_menu_remove_mfa_settings_action';
+        this.moreButton.disableItem(moreButtonRemoveUserMfaSettings);
+      }
     }
   }
 

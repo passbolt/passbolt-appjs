@@ -12,15 +12,11 @@
 	</a>
 </li>
 <li>
-	<a id="js_user_wk_menu_resend_invite_button" class="button">
-		<i class="fa fa-paper-plane-o"></i>
-		<span>{{ __('resend invite') }}</span>
-	</a>
-</li>
-<li>
-	<a id="js_user_wk_menu_remove_mfa_settings_button" class="button">
-		<i class="fa fa-paper-plane-o"></i>
-		<span>{{ __('remove mfa settings') }}</span>
-	</a>
+	<div class="dropdown">
+		<a id="js_wk_menu_more_button" class="button">
+			<span>{{ __('more') }}</span>
+			<i class="fa fa-fw fa-caret-down"></i>
+		</a>
+	</div>
 </li>
 {{/if}}

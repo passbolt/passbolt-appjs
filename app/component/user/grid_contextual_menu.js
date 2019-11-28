@@ -16,6 +16,7 @@ import Clipboard from '../../util/clipboard';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import MadBus from 'passbolt-mad/control/bus';
 import User from '../../model/map/user';
+import Config from "passbolt-mad/config/config";
 
 const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.component.user.GridContextualMenu', /** @static */ {
 
@@ -35,8 +36,6 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const isAdmin = User.getCurrent().isAdmin();
 
     const isActiveUser = user.active;
-
-    const isMfaEnabledUser = user.is_mfa_enabled;
 
     // Is the selected user same as the current user.
     const isSelf = User.getCurrent().id == user.id;
@@ -86,14 +85,14 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     }
 
     /*
-     * Resend invitation
+     * Remove mfa user settings
      * Only admin can send
      */
-    if (isAdmin) {
+    if (isAdmin && this.isMfaPluginEnabled()) {
       const removeMfaSettings = new Action({
         id: 'js_user_browser_menu_remove_mfa_settings',
         label: 'Remove MFA settings',
-        enabled: isMfaEnabledUser,
+        enabled: user.is_mfa_enabled,
         action: () => this._removeMfaSettings()
       });
 
@@ -114,6 +113,16 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     }
 
     this._super();
+  },
+
+  /**
+   * Check if MFA plugin is enabled
+   * @returns {boolean|*|mixed}
+   */
+  isMfaPluginEnabled() {
+    const plugins = Config.read('server.passbolt.plugins');
+
+    return plugins && plugins.multiFactorAuthentication;
   },
 
   /**
