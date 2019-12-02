@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-575: As AD I can see the MFA status of each user in the users grid
 - PB-639: As LU I can delete a personal tag
 - PB-687: As an admin I can resend an invitation for a user that didn't complete the setup
+- PB-698: As an admin I can disable MFA for a user
 
 ### Fixed
 - GITHUB-16: Opening an URI in a new tab leads to /SAFE_URI

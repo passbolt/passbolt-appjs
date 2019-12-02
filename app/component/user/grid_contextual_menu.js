@@ -16,6 +16,7 @@ import Clipboard from '../../util/clipboard';
 import ContextualMenuComponent from 'passbolt-mad/component/contextual_menu';
 import MadBus from 'passbolt-mad/control/bus';
 import User from '../../model/map/user';
+import Config from "passbolt-mad/config/config";
 
 const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.component.user.GridContextualMenu', /** @static */ {
 
@@ -84,6 +85,21 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     }
 
     /*
+     * Remove mfa user settings
+     * Only admin can send
+     */
+    if (isAdmin && this.isMfaPluginEnabled()) {
+      const removeMfaSettings = new Action({
+        id: 'js_user_browser_menu_remove_mfa_settings',
+        label: 'Disable MFA',
+        enabled: user.is_mfa_enabled,
+        action: () => this._removeMfaSettings()
+      });
+
+      this.insertItem(removeMfaSettings);
+    }
+
+    /*
      * Delete
      * Only admin can delete, but admin cannot delete its own account
      */
@@ -97,6 +113,16 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     }
 
     this._super();
+  },
+
+  /**
+   * Check if MFA plugin is enabled
+   * @returns {boolean|*|mixed}
+   */
+  isMfaPluginEnabled() {
+    const plugins = Config.read('server.passbolt.plugins');
+
+    return plugins && plugins.multiFactorAuthentication;
   },
 
   /**
@@ -142,8 +168,14 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     const user = this.options.user;
     MadBus.trigger('request_resend_invitation', {user: user});
     this.remove();
-  }
+  },
 
+
+  _removeMfaSettings: function() {
+    const user = this.options.user;
+    MadBus.trigger('request_remove_mfa_settings', {user: user});
+    this.remove();
+  },
 });
 
 export default GridContextualMenuComponent;

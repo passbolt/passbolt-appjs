@@ -20,7 +20,6 @@ import connectMap from 'can-connect/can/map/map';
 import DefineMap from 'passbolt-mad/model/map/map';
 import getObject from 'can-util/js/get/get';
 // eslint-disable-next-line no-unused-vars
-import I18n from 'passbolt-mad/util/lang/i18n';
 import 'urijs/src/punycode';
 import 'urijs/src/SecondLevelDomains';
 import 'urijs/src/IPv6';
@@ -123,6 +122,19 @@ MfaSettings.mapToApi = function(data) {
     };
   }
   return result;
+};
+
+/**
+ * Delete MFA user settings.
+ * @param {User} user The target user
+ * @returns {Promise}
+ * @inherits
+ */
+MfaSettings.deleteUserSettings = function(user) {
+  return Ajax.request({
+    url: `mfa/setup/${user.id}.json?api-version=v2`,
+    type: 'DELETE'
+  });
 };
 
 MfaSettings.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {

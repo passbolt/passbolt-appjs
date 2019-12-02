@@ -47,6 +47,8 @@ import createButtonTemplate from '../../view/template/component/workspace/create
 import groupDeleteConfirmTemplate from '../../view/template/component/group/delete_confirm.stache';
 import template from '../../view/template/component/user/workspace.stache';
 import userDeleteConfirmTemplate from '../../view/template/component/user/delete_confirm.stache';
+import userDisableMfaConfirmTemplate from '../../view/template/component/user/disable_mfa_confirm.stache';
+import MfaSettings from "../../model/map/mfa_settings";
 
 const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace', /** @static */ {
 
@@ -514,6 +516,47 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   },
 
   /**
+   * Request the user to confirm the delete user MFA settings operation.
+   * @param {User} user The target user
+   */
+  _removeMfaSettingsConfirm: function (user) {
+    const dialog = ConfirmDialogComponent.instantiate({
+      label: __('Are you sure?'),
+      submitButton: {
+        label: __('delete'),
+        cssClasses: ['warning']
+      },
+      content: userDisableMfaConfirmTemplate,
+      viewData: {
+        user: user,
+      },
+      action: () => this.removeMfaSettings(user)
+    }).start();
+  },
+
+  /**
+   * Remove MFA settings for a user and fetch user from database
+   * @param {User} user The target user
+   */
+  removeMfaSettings: async function (user) {
+    await MfaSettings.deleteUserSettings(user);
+    const grid = this.options.grid;
+    await User.findOne({
+      id: user.id
+    }).then(savedUser => {
+      user.assign(savedUser);
+      grid.refreshItem(user);
+      MadBus.trigger('action_remove_mfa_settings_completed', {user: user});
+    }, response => {
+      MadBus.trigger('passbolt_notify', {
+        status: 'error',
+        title: `app_users_view_error_not_found`
+      });
+      return Promise.reject();
+    });
+  },
+
+  /**
    * Display the group transfer permissions dialog.
    * @param {Group} group The group to delete.
    * @param {GroupDelete} groupDelete An object containing the error target
@@ -855,6 +898,11 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
   '{mad.bus.element} request_resend_invitation': function (el, ev) {
     const user = ev.data.user;
     this.resendInvitation(user);
+  },
+
+  '{mad.bus.element} request_remove_mfa_settings': function (el, ev) {
+    const user = ev.data.user;
+    this._removeMfaSettingsConfirm(user);
   },
 
   /**

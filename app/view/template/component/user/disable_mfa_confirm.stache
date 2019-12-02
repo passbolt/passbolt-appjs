@@ -1,0 +1,5 @@
+<p>
+    {{ __('You are about to disable second-factor authentication (MFA) for the user') }} <strong>{{ user.profile.fullName() }} ({{ user.username }})</strong>.
+</p>
+
+<p> {{ __('Warning: Existing settings will be lost. This action cannot be undone.') }} </p>
