@@ -85,7 +85,7 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
       if (this.isMfaEnabled) {
         const removeMfaSettingsAction = new Action({
           id: 'js_wk_menu_remove_mfa_settings_action',
-          label: __('remove mfa'),
+          label: __('disable MFA'),
           cssClasses: [],
           action: () => this._removeMfaSettings()
         });
@@ -165,7 +165,6 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
   userSelected: function() {
     const currentUser = User.getCurrent();
     const isAdmin = currentUser.role.name == 'admin';
-    const plugins = Config.read('server.passbolt.plugins');
 
     if (isAdmin) {
       const user = this.options.selectedUsers[0];
@@ -174,9 +173,11 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
         this.deleteButton.state.disabled = false;
       }
       this.editButton.state.disabled = false;
+
+      this.moreButton.state.disabled = false;
+
       const moreButtonResendInvite = 'js_wk_menu_resend_invite_button';
       this.moreButton.disableItem(moreButtonResendInvite);
-
       const userActiveState = this.options.selectedUsers[0].active;
       if (!userActiveState) {
         this.moreButton.enableItem(moreButtonResendInvite);
@@ -190,13 +191,6 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
           this.moreButton.enableItem(moreButtonRemoveUserMfaSettings);
         }
       }
-
-      // Disable the more button if there is no enabled action.
-      const enableMoreButtons = this.moreButton.options.items.reduce((carry, item) => {
-        carry = item.enabled || carry;
-        return carry;
-      }, false);
-      this.moreButton.state.disabled = !enableMoreButtons;
     }
   },
 
@@ -208,6 +202,7 @@ const WorkspacePrimaryMenu = Component.extend('passbolt.component.user.Workspace
     if (isAdmin) {
       this.deleteButton.state.disabled = true;
       this.editButton.state.disabled = true;
+      this.moreButton.state.disabled = true;
 
       const moreButtonResendInvite = 'js_wk_menu_resend_invite_button';
       this.moreButton.disableItem(moreButtonResendInvite);

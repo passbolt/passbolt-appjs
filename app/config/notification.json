@@ -116,7 +116,7 @@
                 "msg": "The invitation has been resent successfully."
             },
             "app_usersettings_delete_success": {
-                "msg": "Multi-factor authentication settings were removed successfully."
+                "msg": "Multi-factor authentication has been disabled successfully."
             }
         }
     }

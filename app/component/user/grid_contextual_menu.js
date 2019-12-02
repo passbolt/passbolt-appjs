@@ -91,7 +91,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
     if (isAdmin && this.isMfaPluginEnabled()) {
       const removeMfaSettings = new Action({
         id: 'js_user_browser_menu_remove_mfa_settings',
-        label: 'Remove MFA settings',
+        label: 'Disable MFA',
         enabled: user.is_mfa_enabled,
         action: () => this._removeMfaSettings()
       });

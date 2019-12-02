@@ -47,6 +47,7 @@ import createButtonTemplate from '../../view/template/component/workspace/create
 import groupDeleteConfirmTemplate from '../../view/template/component/group/delete_confirm.stache';
 import template from '../../view/template/component/user/workspace.stache';
 import userDeleteConfirmTemplate from '../../view/template/component/user/delete_confirm.stache';
+import userDisableMfaConfirmTemplate from '../../view/template/component/user/disable_mfa_confirm.stache';
 import MfaSettings from "../../model/map/mfa_settings";
 
 const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace', /** @static */ {
@@ -525,7 +526,7 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         label: __('delete'),
         cssClasses: ['warning']
       },
-      content: __('You are about to disable second-factor authentication (MFA) for the user "%s". Existing settings will be lost. This action cannot be undone.', user.username),
+      content: userDisableMfaConfirmTemplate,
       viewData: {
         user: user,
       },
