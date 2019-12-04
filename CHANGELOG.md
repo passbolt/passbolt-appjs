@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.12.3] - 2019-12-04
+### Fixed
+- Update the passbolt-mad dependency 
+
 ## [2.12.2] - 2019-12-04
 ### Fixed
 - Add noreferrer to the password link from the information sidebar and grid contextual menu 
