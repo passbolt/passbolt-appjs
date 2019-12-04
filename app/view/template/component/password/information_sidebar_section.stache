@@ -22,7 +22,7 @@
         <span class="label">{{ __('URL') }}</span>
         <span class="value">
             {{#if(resource.safeUrl() != '')}}
-            <a href="{{ resource.safeUrl() }}" target="_blank" rel="noopener">{{ resource.uri }}</a>
+            <a href="{{ resource.safeUrl() }}" target="_blank" rel="noopener noreferrer">{{ resource.uri }}</a>
             {{#else}}
             {{ resource.uri }}
             {{/if}}

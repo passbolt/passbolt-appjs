@@ -151,7 +151,7 @@ const GridContextualMenuComponent = ContextualMenuComponent.extend('passbolt.com
    */
   _openUri: function() {
     const uri = this.options.resource.safeUrl();
-    window.open(uri, '_blank', 'noopener');
+    window.open(uri, '_blank', 'noopener,noreferrer');
     this.remove();
   },
 
