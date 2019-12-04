@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.12.1] - 2019-12-04
+### Fixed
+- Replace profile dropdown fontawesome icon with a svg
+
 ## [2.12.0] - 2019-12-02
 ### Added
 - PB-575: As AD I can see the MFA status of each user in the users grid
@@ -226,7 +230,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.12.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.12.1...HEAD
+[2.12.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.3...v2.12.0
 [2.11.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.2...v2.11.3
 [2.11.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.1...v2.11.2
