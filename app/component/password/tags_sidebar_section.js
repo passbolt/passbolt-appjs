@@ -20,6 +20,7 @@ import MadBus from 'passbolt-mad/control/bus';
 import MadMap from 'passbolt-mad/util/map/map';
 import PermissionType from '../../model/map/permission_type';
 import SecondarySidebarSectionComponent from '../workspace/secondary_sidebar_section';
+import Resource from '../../model/map/resource';
 import Tag from '../../model/map/tag';
 import User from '../../model/map/user';
 import TreeComponent from 'passbolt-mad/component/tree';
@@ -38,6 +39,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     template: template,
     resource: null,
     formError: null,
+    Tag: Tag
   }
 
 }, /** @prototype */ {
@@ -57,7 +59,10 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
   afterStart: function() {
     const tree = this._initTree();
     this.options.tree = tree;
-    this._loadTags(this.options.resource.tags);
+    if (this.state.opened) {
+      this.open();
+    }
+    this._super();
   },
 
   /**
@@ -77,6 +82,31 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     tree.start();
 
     return tree;
+  },
+
+  /**
+   * @inheritdoc
+   */
+  open: function() {
+    $('.processing-wrapper', this.element).show();
+    this.options.tree.reset();
+    this._findResourceTags()
+      .then(tags => this._loadTags(tags));
+
+    this._super();
+  },
+
+  /**
+   * Find the resource tags.
+   * @returns {Promise<tags>}
+   */
+  _findResourceTags: async function() {
+    const id = this.options.resource.id;
+    const contain = { tag: 1 };
+    const resource = await Resource.findOne({ id, contain });
+    $('.processing-wrapper', this.element).hide();
+
+    return resource.tags;
   },
 
   /**
@@ -100,7 +130,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     this.options.tree.state.hidden = true;
     this._hideEmptyMessage();
 
-    const slugs = this.options.resource.tags.attr()
+    const slugs = this.options.tags.attr()
       .reduce((accumulator, currentValue) => [...accumulator, currentValue.slug], []);
     const formHtml = View.render(tagUpdateFormTemplate);
     $('.accordion-content', this.element).append(formHtml);
@@ -138,7 +168,9 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     const tagEditorSelector = '#js_edit_tags_form';
     $(tagEditorSelector).remove();
     this.options.tree.state.hidden = false;
-    this._showEmptyMessage();
+    if (!this.options.tags.length) {
+      this._showEmptyMessage();
+    }
   },
 
   /**
@@ -152,9 +184,7 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * Show the empty message if required.
    */
   _showEmptyMessage: function() {
-    if (!this.options.resource.tags.length) {
-      $('.empty-content', this.element).removeClass('hidden');
-    }
+    $('.empty-content', this.element).removeClass('hidden');
   },
 
   /**
@@ -203,16 +233,11 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * When the form is updated
    * @param {array} slugs The list of tags slugs.
    */
-  _onFormSave: function(slugs) {
-    const tree = this.options.tree;
-    return Tag.updateResourceTags(this.options.resource.id, slugs)
-      .then(tags => {
-        this.options.resource.tags = tags;
-        this.disableEditMode();
-        tree.reset();
-        this._loadTags(tags);
-        MadBus.trigger('resource_tags_updated', [this.options.resource]);
-      });
+  _onFormSave: async function(slugs) {
+    const tags = await Tag.updateResourceTags(this.options.resource.id, slugs);
+    this.disableEditMode();
+    this._loadTags(tags);
+    MadBus.trigger('resource_tags_updated', [this.options.resource]);
   },
 
   /**
@@ -220,8 +245,12 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
    * @param {can.List} tags The list of tags
    */
   _loadTags: function(tags) {
-    this._showEmptyMessage();
-    if (tags.length) {
+    this.options.tags = tags;
+    this.options.tree.reset();
+    if (!tags.length) {
+      this._showEmptyMessage();
+    } else {
+      this._hideEmptyMessage();
       this.options.tree.load(tags);
     }
   },
@@ -338,7 +367,6 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     }
   },
 
-
   /**
    * Listens to the tageditor change event
    * Used to reset the form error status
@@ -380,19 +408,15 @@ const TagSidebarSectionComponent = SecondarySidebarSectionComponent.extend('pass
     }
   },
 
-
-
   /**
    * Observe when a tag is deleted
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} tag_deleted': function(el, ev) {
-    const deletedTag = ev.data.tag;
-    const tags = this.options.tree.options.items.filter(item => item.id !== deletedTag.id);
-    this.options.resource.tags = tags;
-    this.options.tree.reset();
-    this._loadTags(tags);
+  '{Tag} destroyed': function(el, ev) {
+    if (this.state.opened) {
+      this.open();
+    }
   },
 
 });

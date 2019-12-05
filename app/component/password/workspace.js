@@ -38,6 +38,7 @@ import Filter from '../../model/filter';
 import Group from '../../model/map/group';
 import Resource from '../../model/map/resource';
 import ResourceService from '../../model/service/plugin/resource';
+import Tag from '../../model/map/tag';
 
 import commentDeleteConfirmTemplate from '../../view/template/component/comment/delete_confirm.stache';
 import createButtonTemplate from '../../view/template/component/workspace/create_button.stache';
@@ -54,8 +55,10 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     loadedOnStart: false,
     selectedResources: new Resource.List(),
     selectedGroups: new Group.List(),
+    selectedTags: new Tag.List(),
     filter: null,
-    Resource: Resource
+    Resource: Resource,
+    Tag: Tag
   },
 
   /**
@@ -215,7 +218,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     const component = new PrimarySidebarComponent('#js_password_workspace_primary_sidebar', {
       defaultFilter: PasswordWorkspaceComponent.getDefaultFilterSettings(),
       selectedResources: this.options.selectedResources,
-      selectedGroups: this.options.selectedGroups
+      selectedGroups: this.options.selectedGroups,
+      selectedTags: this.options.selectedTags
     });
     this.addLoadedDependency(component);
     return component;
@@ -452,6 +456,20 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{Resource} destroyed': function(model, event, destroyedItem) {
     this.options.selectedResources.remove(destroyedItem);
+  },
+
+  /**
+   * Observe when a tag is destroyed.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Group} tag The destroyed tag
+   */
+  '{Tag} destroyed': function (el, ev, tag) {
+    const selectedTags = this.options.selectedTags;
+    if (selectedTags.indexOf({ id: tag.id }) != -1) {
+      const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+      MadBus.trigger('filter_workspace', {filter: filter});
+    }
   },
 
   /**

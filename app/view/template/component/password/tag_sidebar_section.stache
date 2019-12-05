@@ -8,6 +8,9 @@
 		<span class="visuallyhidden">{{ __('edit') }}</span>
 	</a>
 	<em class="empty-content hidden">{{ __('There is no tag, click edit to add one') }}</em>
+    <div class="processing-wrapper">
+        <span class="processing-text">Retrieving tags </span>
+    </div>
 	<ul id="js_rs_details_tags_list" class="tags tags-list">
 	</ul>
 </div>

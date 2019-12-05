@@ -25,7 +25,8 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
     label: 'Password Workspace Primary Sidebar',
     template: template,
     defaultFilter: null,
-    selectedGroups: null
+    selectedGroups: null,
+    selectedTags: null
   }
 
 }, /** @prototype */ {
@@ -66,7 +67,9 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
   _initTagsFilterSection: function() {
     const plugins = Config.read('server.passbolt.plugins');
     if (plugins && plugins.tags) {
-      const component = new TagsFilterSidebarSectionComponent('#js_wsp_pwd_filter_tags_section');
+      const component = new TagsFilterSidebarSectionComponent('#js_wsp_pwd_filter_tags_section', {
+        selectedTags: this.options.selectedTags
+      });
       component.start();
     }
   }

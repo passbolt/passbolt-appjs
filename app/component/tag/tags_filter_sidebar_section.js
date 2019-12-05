@@ -36,7 +36,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
 
   defaults: {
     template: template,
-    selectedTags: new TagMap.List(),
+    selectedTags: null,
     silentLoading: false,
     loadedOnStart: false,
     tree: null,
@@ -44,7 +44,8 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     treeFilter: 'all_tags',
     state: {
       disabled: true
-    }
+    },
+    TagMap: TagMap
   }
 },
   /** @prototype */ {
@@ -208,11 +209,11 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   /**
    * Show the tag contextual menu.
    *
-   * @param {Tag} Tag tag model of the li element.
+   * @param {Tag} tag The selected tag.
    * @param {float} x x coordinate where the menu should be shown.
    * @param {float} y y coordinate where the menu should be shown.
    */
-  _showTagContextualMenu: function(Tag, x, y) {
+  _showTagContextualMenu: function(tag, x, y) {
     // Instantiate the contextual menu.
     const contextualMenu = ContextualMenuComponent.instantiate({
       coordinates: {
@@ -223,7 +224,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     contextualMenu.start();
 
     // Edit a Tag action
-    const tagEditAction = this._createEditTagAction(Tag, () => {
+    const tagEditAction = this._createEditTagAction(tag, () => {
       contextualMenu.destroyAndRemove();
     });
 
@@ -231,12 +232,15 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
     contextualMenu.insertItem(tagEditAction);
 
     // Delete a Tag action
-    const tagDeleteAction = this._createDeleteTagAction(Tag, () => {
-      contextualMenu.destroyAndRemove();
+    const deleteAction = new Action({
+      id: 'js_tag_operation_delete_trigger',
+      label: __('Delete Tag'),
+      action: () => {
+        this.displayDeleteTagDialog(tag);
+        contextualMenu.destroyAndRemove();
+      }
     });
-
-      // Add 'Delete Tag' action to contextual menu.
-    contextualMenu.insertItem(tagDeleteAction);
+    contextualMenu.insertItem(deleteAction);
   },
 
   /**
@@ -248,73 +252,37 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   },
 
   /**
-   * Delete a Tag
-   * @param {TagMap} Tag The Tag to delete
+   * Display the delete tag dialog
+   * @param {Tag} Tag The tag to delete
    */
-  _deleteTag: function(Tag, callback) {
-    Tag.destroy().then(() => {
-      $(`#js_wsp_password_filter_tags_list li#${Tag.id}`).hide('fast', function() {
-        $(this).remove();
-        callback(Tag);
-      });
-    });
-  },
-
-  /**
-   * Create Delete Tag Action
-   * @param {TagMap} Tag Tag to delete
-   * @param {function} callback to run after delete
-   */
-  _createDeleteTagAction: function(Tag, callback) {
-    return new Action({
-      id: 'js_tag_operation_delete_trigger',
-      label: __('Delete Tag'),
-      cssClasses: [],
-      action: () => {
-        const dialog = this._createDeleteTagConfirmationDialog(Tag);
-        dialog.start();
-        callback();
-      }
-    })},
-
-  /**
-   * Create the 'Delete Tag' confirmation dialog
-   * @param {TagMap} Tag
-   */
-  _createDeleteTagConfirmationDialog: function(Tag) {
-    const that = this;
-    return ConfirmDialogComponent.instantiate({
-      label: __('Do you really want to delete tag?'),
-      subtitle: __(`You are about to delete the tag '${Tag.slug}'`),
+  displayDeleteTagDialog: function(tag) {
+    const dialog = ConfirmDialogComponent.instantiate({
+      label: __('Delete tag?'),
       cssClasses: ['delete-tag-dialog', 'dialog-wrapper'],
       content: templateTagDeleteConfirmationDialog,
       submitButton: {
         label: 'Delete tag',
         cssClasses: ['primary warning']
       },
-      action: () => {
-        that._deleteTag(Tag, deletedTag => {
-          if (this.options.filter && this.options.filter.tag.id === deletedTag.id) {
-            // If the previously selected tag is deleted, reset the workspace.
-            const filter = new Filter({
-              id: 'default',
-              type: 'default',
-              label: __('All items'),
-              order: ['Resource.modified DESC']
-            });
-            MadBus.trigger('filter_workspace', {filter: filter});
-          }
-
-          // Remove the deleted item from tag tree and update the tree
-          const items = that.options.tree.options.items.filter(item => item.id !== deletedTag.id);
-          that.options.tree.options.items = items;
-          that.options.tree.state.empty = !items.length;
-
-          // Broadcast the "tag_deleted" event
-          MadBus.trigger('tag_deleted', {tag: deletedTag});
-        });
-      }
+      action: () => this.deleteTag(tag)
     });
+    dialog.setViewData('tag', tag);
+    dialog.start();
+
+    return dialog;
+  },
+
+  /**
+   * Delete a Tag
+   * @param {TagMap} tag The Tag to delete
+   */
+  deleteTag: async function(tag) {
+    try {
+      await tag.destroy();
+    } catch (error) {
+      // The error should be treated by the network Ajax service.
+      // Nothing to do from here.
+    }
   },
 
   /**
@@ -522,6 +490,18 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
   },
 
   /**
+   * Observe when a tag is destroyed.
+   * - Remove it from the list of selected resources;
+   * @param {DefineMap} model The target model
+   * @param {Event} event The even
+   * @param {DefineMap} destroyedItem The destroyed item
+   */
+  '{TagMap} destroyed': function(model, event, destroyedItem) {
+    const tree = this.options.tree;
+    tree.removeItem(destroyedItem);
+  },
+
+  /**
    * Observe when the tree filter button launcher is clicked.
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
@@ -542,10 +522,7 @@ const TagsFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend(
    * @param {HTMLElement} el The element the event occurred on
    * @param {HTMLEvent} ev The event which occurred
    */
-  '{element} #js_wsp_password_filter_tags_list li .right-cell.more-ctrl click': function(
-    el,
-    ev
-  ) {
+  '{element} #js_wsp_password_filter_tags_list li .right-cell.more-ctrl click': function(el, ev) {
     ev.stopPropagation();
     ev.stopImmediatePropagation();
     ev.preventDefault();

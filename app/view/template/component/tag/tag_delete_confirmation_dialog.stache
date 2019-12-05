@@ -1,3 +1,2 @@
-<p>
-  Please confirm you really want to delete the tag. After confirming, the tag will be <strong>deleted permanently</strong>.
-</p>
+<p>Are you sure you want to delete the tag <strong>{{tag.slug}}</strong>?</p>
+<p>Warning: Once the tag is deleted, it’ll be removed permanently and will not be recoverable.</p>

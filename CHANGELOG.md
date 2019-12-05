@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.12.4] - 2019-12-05
+### Fixed
+- Fix update/delete tags
+
 ## [2.12.3] - 2019-12-04
 ### Fixed
 - Update the passbolt-mad dependency 
@@ -238,7 +242,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.12.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.12.4...HEAD
+[2.12.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.3...v2.12.4
+[2.12.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.2...v2.12.3
+[2.12.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.1...v2.12.2
 [2.12.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.3...v2.12.0
 [2.11.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.11.2...v2.11.3
