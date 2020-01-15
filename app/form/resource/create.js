@@ -152,7 +152,6 @@ const CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
    * Encrypt the secret.
    */
   encrypt: function() {
-    const usersIds = [];
     if (this.options.action == 'edit') {
       /*
        * Get the users to encrypt the resource for.
@@ -175,13 +174,6 @@ const CreateForm = Form.extend('passbolt.form.resource.Create', /** @static */ {
            */
           MadBus.triggerPlugin('passbolt.secret_edition.encrypt', usersIds);
         });
-    } else {
-      usersIds.push(User.getCurrent().id);
-      /*
-       * Request the plugin to encrypt the secrets.
-       * When the secrets are encrypted the plugin will trigger the event secret_edition_secret_encrypted.
-       */
-      MadBus.triggerPlugin('passbolt.secret_edition.encrypt', usersIds);
     }
   },
 

@@ -67,6 +67,13 @@ export default class ResourceService {
   }
 
   /**
+   * Request the plugin to insert the resource create dialog.
+   */
+  static openCreateDialog() {
+    return Plugin.send('passbolt.plugin.resources.open-create-dialog', {  });
+  }
+
+  /**
    * Request the plugin to insert the bulk share iframe
    * @param {array} resourcesIds The list of resources ids to share
    */

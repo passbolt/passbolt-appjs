@@ -273,53 +273,24 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Open the resource create dialog.
-   * @param {Resource} resource The target resource entity.
    */
-  openCreateResourceDialog: function(resource) {
-    const dialog = DialogComponent.instantiate({
-      label: __('Create Password'),
-      cssClasses: ['create-password-dialog', 'dialog-wrapper']
-    }).start();
-
-    // Attach the form to the dialog
-    const form = dialog.add(ResourceCreateForm, {
-      data: resource,
-      callbacks: {
-        submit: data => {
-          delete data['Resource']['id'];
-          const resourceToSave = new Resource(data['Resource']);
-          this._saveResource(resourceToSave, form, dialog);
-        }
-      }
-    });
-    form.load(resource);
+  openCreateResourceDialog: function() {
+    ResourceService.openCreateDialog();
   },
 
   /**
-   * Save a resource after creating/editing it with the create/edit forms.
-   * @param {Resource} resource The target resource
-   * @param {Form} form The form object
-   * @param {Dialog} dialog The dialog object
+   * Observer when the plugin requests the appjs to select and scroll to a resource.
+   * @param {string} id The resource id.
    */
-  _saveResource: async function(resource, form, dialog) {
-    this.state.loaded = false;
-    dialog.remove();
-    try {
-      const resourceCreated = await resource.save();
-      // If the workspace is not filter by all items, recently modified or items I own.
-      // Filter the workspace by all items
-      if (!["default", "modified", "owner"].includes(this.filter.type)) {
-        const filter = this.getFilter();
-        MadBus.trigger('filter_workspace', {filter: filter, selectAndScrollTo: resourceCreated});
-      } else {
-        this.grid.selectAndScrollTo(resourceCreated);
-      }
+  '{mad.bus.element} passbolt.plugin.resources.select-and-scroll-to': function(el, ev) {
+    const data = ev.data;
 
-      MadBus.trigger('passbolt_notify', { status: 'success', title: "app_resources_add_success" });
-    } catch (error) {
-      MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
+    if (!["default", "modified", "owner"].includes(this.filter.type)) {
+      const filter = this.getFilter();
+      MadBus.trigger('filter_workspace', {filter: filter, selectAndScrollTo: data});
+    } else {
+      this.grid.selectAndScrollTo(data);
     }
-    this.state.loaded = true;
   },
 
   /**
@@ -352,7 +323,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
           dialog.remove();
           try {
             const resourceUpdated = await resourceToUpdate.save();
-            this.grid.selectAndScrollTo(resourceUpdated);
+            this.grid.selectAndScrollTo(resourceUpdated.id);
             MadBus.trigger('passbolt_notify', { status: 'success', title: "app_resources_update_success" });
           } catch (error) {
             MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
@@ -540,8 +511,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * Observe when the user requests a resource creation
    */
   '{mad.bus.element} request_resource_create': function() {
-    const resource = new Resource({});
-    this.openCreateResourceDialog(resource);
+    this.openCreateResourceDialog();
   },
 
   /**

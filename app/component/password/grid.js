@@ -121,14 +121,14 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
     /**
      * Select and scroll to a given a resource
-     * @param {Resource} resource
+     * @param {string} id The resource id
      */
-    selectAndScrollTo: async function(resource) {
-      this.gridRef.current.updateState({ selectedResources: [resource.id] });
+    selectAndScrollTo: async function(id) {
+      this.gridRef.current.updateState({ selectedResources: [id] });
       // Force the local storage update, so the resource is in its final position.
       await this.handleResourcesLocalStorageUpdated();
-      const resourceIndex = this.resources.indexOf(resource);
-      this.gridRef.current.scrollTo(resource.id);
+      const resourceIndex = this.resources.indexOf({id});
+      this.gridRef.current.scrollTo(id);
       this.options.selectedResources.splice(0, this.options.selectedResources.length, this.resources[resourceIndex]);
     },
 
