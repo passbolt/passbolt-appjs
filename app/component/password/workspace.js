@@ -38,6 +38,7 @@ import Filter from '../../model/filter';
 import Group from '../../model/map/group';
 import Resource from '../../model/map/resource';
 import ResourceService from '../../model/service/plugin/resource';
+import FolderService from '../../model/service/plugin/folder';
 import Tag from '../../model/map/tag';
 
 import commentDeleteConfirmTemplate from '../../view/template/component/comment/delete_confirm.stache';
@@ -45,6 +46,10 @@ import createButtonTemplate from '../../view/template/component/workspace/create
 import importButtonTemplate from '../../view/template/component/workspace/import_button.stache';
 import resourcesDeleteConfirmTemplate from '../../view/template/component/password/delete_confirm.stache';
 import template from '../../view/template/component/password/workspace.stache';
+import Action from "passbolt-mad/model/map/action";
+import uuid from "uuid/v4";
+import ButtonDropdownComponent from "passbolt-mad/component/button_dropdown";
+import User from "../../model/map/user";
 
 const PasswordWorkspaceComponent = Component.extend('passbolt.component.password.Workspace', /** @static */ {
 
@@ -165,17 +170,55 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Component}
    */
   _initMainActionButton: function() {
-    const selector = $('.main-action-wrapper');
-    const options = {
-      id: 'js_wsp_create_button',
-      template: createButtonTemplate,
-      tag: 'button',
-      cssClasses: ['button', 'primary']
-    };
-    const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
-    this.options.mainButton = component;
-    this.addLoadedDependency(component);
-    return component;
+    // const selector = $('.main-action-wrapper');
+    // const options = {
+    //   id: 'js_wsp_create_button',
+    //   template: createButtonTemplate,
+    //   tag: 'button',
+    //   cssClasses: ['button', 'primary']
+    // };
+    // const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
+    // this.options.mainButton = component;
+    // this.addLoadedDependency(component);
+    // return component;
+
+    const items = [
+      new Action({
+        id: uuid(),
+        label: __('New password'),
+        cssClasses: ['create-resource'],
+        action: function () {
+          button.view.close();
+          MadBus.trigger('request_resource_create');
+        }
+      }),
+      new Action({
+        id: uuid(),
+        label: __('New folder'),
+        cssClasses: ['create-folder'],
+        action: function () {
+          button.view.close();
+          MadBus.trigger('request_folder_create');
+        }
+      })
+    ];
+
+    const button = ComponentHelper.create(
+      $('.main-action-wrapper'),
+      'last',
+      ButtonDropdownComponent, {
+        id: 'js_wsp_create_button',
+        template: createButtonTemplate,
+        tag: 'a',
+        cssClasses: ['button', 'primary'],
+        silentLoading: false,
+        items: items
+      }
+    );
+
+    this.options.mainButton = button;
+    this.addLoadedDependency(button);
+    return button;
   },
 
   /**
@@ -276,6 +319,13 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   openCreateResourceDialog: function() {
     ResourceService.openCreateDialog();
+  },
+
+  /**
+   * Open the resource create dialog.
+   */
+  openCreateFolderDialog: function() {
+    FolderService.openCreateDialog();
   },
 
   /**
@@ -479,13 +529,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   },
 
   /**
-   * Observe when the user wants to create a new instance
-   */
-  '{mainButton.element} click': function() {
-    MadBus.trigger('request_resource_create');
-  },
-
-  /**
    * Observe when the user wants to import a password
    */
   '{importButton.element} click': function() {
@@ -512,6 +555,13 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} request_resource_create': function() {
     this.openCreateResourceDialog();
+  },
+
+  /**
+   * Observe when the user requests a folder creation
+   */
+  '{mad.bus.element} request_folder_create': function() {
+    this.openCreateFolderDialog();
   },
 
   /**
