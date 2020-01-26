@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 import Config from 'passbolt-mad/config/config';
+import FoldersFilterSidebarSectionComponent from '../password/folders_filter_sidebar_section';
 import GroupsFilterSidebarSectionComponent from '../password/groups_filter_sidebar_section';
 import PrimarySidebarAbstractComponent from '../workspace/primary_sidebar';
 import ShortcutsFilterSidebarSectionComponent from '../password/shortcuts_filter_sidebar_section';
@@ -36,6 +37,7 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
    */
   afterStart: function() {
     this._initShortcutsFilterSection();
+    this._initFoldersFilterSection();
     this._initGroupsFilterSection();
     this._initTagsFilterSection();
     this._super();
@@ -47,6 +49,16 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
   _initShortcutsFilterSection: function() {
     const component = new ShortcutsFilterSidebarSectionComponent('#js_wsp_pwd_filter_shortcuts', {
       allFilter: this.options.defaultFilter
+    });
+    component.start();
+  },
+
+  /**
+   * Initialize the groups filter section
+   */
+  _initFoldersFilterSection: function() {
+    const component = new FoldersFilterSidebarSectionComponent('#js_wsp_pwd_filter_folders_section', {
+      selectedGroups: this.options.selectedFolders
     });
     component.start();
   },

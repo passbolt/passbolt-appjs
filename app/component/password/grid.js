@@ -95,6 +95,13 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
     /**
      * Handle the resources local storage update.
      */
+    handleFoldersLocalStorageUpdated: async function () {
+      // TODO update grid
+    },
+
+    /**
+     * Handle the resources local storage update.
+     */
     handleResourcesLocalStorageUpdated: async function () {
       if (this.options.isFirstLoad) {
         return;
@@ -144,9 +151,16 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
         return Resource.findAll({ contain, filter });
       }
       if (this.filter.type === "tag") {
-        const groupId = this.filter.rules['has-tag'];
+        const tagId = this.filter.rules['has-tag'];
         const contain = { favorite: 1, permission: 1, tag: 1 };
-        const filter = { 'has-tag': groupId };
+        const filter = { 'has-tag': tagId };
+        return Resource.findAll({ contain, filter });
+      }
+      // TODO filter for folder
+      if (this.filter.type === "folder") {
+        const folderId = this.filter.rules['has-parent-id'];
+        const contain = { favorite: 1, permission: 1, tag: 1 };
+        const filter = { 'has-tag': folderId };
         return Resource.findAll({ contain, filter });
       }
 
@@ -176,6 +190,15 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       }
 
       return updatedResources;
+    },
+
+    /**
+     * Get the resources after a local storage update
+     * @return {Resource.List}
+     */
+    getUpdateFolders: async function () {
+      const updatedFolders = await Folder.findAll({ source: 'storage' });
+      return updatedFolders;
     },
 
     /**
@@ -290,6 +313,20 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       }
 
       this.handleResourcesLocalStorageUpdated();
+    },
+
+    /**
+     * The folders local storate has been updated.
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{document} passbolt.storage.folders.updated': async function (el, ev) {
+      if (!Array.isArray(ev.data)) {
+        console.warn('The local storage has been flushed by the addon. The view is not in sync anymore');
+        return;
+      }
+
+      this.handleFoldersLocalStorageUpdated();
     },
 
     /**

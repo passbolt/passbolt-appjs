@@ -14,34 +14,6 @@
 import Plugin from '../../../util/plugin';
 
 export default class FolderService {
-
-  /**
-   * Request the plugin to unmark a folder as favorite
-   * @param {string} folderId The target folder id
-   * @return {Promise}
-   */
-  static deleteAllByIds(foldersIds) {
-    return Plugin.request('passbolt.plugin.folders.delete-all', [foldersIds]);
-  }
-
-  /**
-   * Request the plugin to save a folder
-   * @param {string} folder The folder to save
-   * @return {Promise}
-   */
-  static save(folder) {
-    return Plugin.request('passbolt.plugin.folders.save', [folder]);
-  }
-
-  /**
-   * Request the plugin to update a folder
-   * @param {string} folder The folder to update
-   * @return {Promise}
-   */
-  static update(folder) {
-    return Plugin.request('passbolt.plugin.folders.update', [folder]);
-  }
-
   /**
    * Request the plugin to update the folders local storage.
    * @return {Promise}
@@ -51,18 +23,31 @@ export default class FolderService {
   }
 
   /**
-   * Request the plugin to insert the folder edit iframe
-   * @param {string} folder The target folder id
-   */
-  static insertEditframe(folderId) {
-    return Plugin.send('passbolt.plugin.folder_edit', folderId);
+  * Request the plugin to insert the folder create dialog.
+  */
+  static openCreateDialog() {
+    return Plugin.send('passbolt.plugin.folders.open-create-dialog', {  });
   }
 
   /**
-   * Request the plugin to insert the folder create dialog.
+   * Request the plugin to insert the folder rename dialog.
    */
-  static openCreateDialog() {
-    return Plugin.send('passbolt.plugin.folders.open-create-dialog', {  });
+  static openRenameDialog(folder) {
+    return Plugin.send('passbolt.plugin.folders.open-rename-dialog', {folderId: folder.id});
+  }
+
+  /**
+   * Request the plugin to insert the folder delete dialog.
+   */
+  static openDeleteDialog(folder) {
+    return Plugin.send('passbolt.plugin.folders.open-delete-dialog', {folderId: folder.id});
+  }
+
+  /**
+   * Request the plugin to insert the folder move dialog.
+   */
+  static openMoveDialog(folder) {
+    return Plugin.send('passbolt.plugin.folders.open-move-dialog', {folderId: folder.id});
   }
 
   /**

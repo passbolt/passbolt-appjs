@@ -1,0 +1,12 @@
+<ul id="js_wsp_pwd_password_filter_folder_selector" class="accordion-header">
+    <li class="open node root">
+        <div class="row title">
+            <div class="main-cell-wrapper">
+                <div class="main-cell">
+                    <h3><a class="accordion-trigger">{{ __('Filter by Folders') }}</a></h3>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>
+<ul class="accordion-content" id="js_wsp_password_categories_folders_list"></ul>
