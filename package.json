@@ -117,11 +117,11 @@
     "eslint-config-airbnb-base": "13.2.0",
     "eslint-plugin-import": "2.18.2",
     "grunt": "1.0.4",
-    "grunt-testee": "github:passbolt/grunt-testee#master",
+    "grunt-testee": "^1.1.1",
     "mocha": "5.2.0",
     "sinon": "1.17.7",
     "steal-tools": "2.2.2",
-    "testee": "github:passbolt/testee#master"
+    "testee": "^0.9.1"
   },
   "keywords": [
     "passbolt",
