@@ -43,6 +43,15 @@ export default class ResourceService {
   }
 
   /**
+   * Request the plugin to move a resource.
+   * @param {string} resourceId The resource to move.
+   * @param {string} folderParentId The parent folder.
+   */
+  static move(resourceId, folderParentId) {
+    return Plugin.send('passbolt.plugin.resources.move', {resourceId, folderParentId});
+  }
+
+  /**
    * Request the plugin to update the resources local storage.
    * @return {Promise}
    */

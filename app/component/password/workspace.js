@@ -63,7 +63,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     selectedTags: new Tag.List(),
     filter: null,
     Resource: Resource,
-    Tag: Tag
+    Tag: Tag,
+    document: document
   },
 
   /**
@@ -325,8 +326,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   /**
    * Open the folder create dialog.
    */
-  openCreateFolderDialog: function() {
-    FolderService.openCreateDialog();
+  openCreateFolderDialog: function(folderParentId) {
+    FolderService.openCreateDialog(folderParentId);
   },
 
   /**
@@ -363,15 +364,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     } else {
       this.grid.selectAndScrollTo(data);
     }
-  },
-
-  /**
-   * Observer when the plugin requests the appjs to select and scroll to a resource.
-   * @param {string} id The resource id.
-   */
-  '{mad.bus.element} passbolt.plugin.folders.select-and-scroll-to': async function(el, ev) {
-    const data = ev.data;
-    await this.grid.handleFoldersLocalStorageUpdated();
   },
 
   /**
@@ -525,6 +517,23 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   },
 
   /**
+   * Observe when a tag is destroyed.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   * @param {Group} tag The destroyed tag
+   */
+  '{document} passbolt.storage.folders.updated': function (el, ev) {
+    if (this.filter.type === 'folder') {
+      const folders = ev.data;
+      const foldersIds = folders.map(folder => folder.id);
+      if (!foldersIds.includes(this.filter.folder.id)) {
+        const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+        MadBus.trigger('filter_workspace', {filter: filter});
+      }
+    }
+  },
+
+  /**
    * Observe when resources are selected
    * @param {HTMLElement} el The element the event occurred on
    */
@@ -651,9 +660,15 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Observe when the user requests a folder creation
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_folder_create': function() {
-    this.openCreateFolderDialog();
+  '{mad.bus.element} request_folder_create': function(el, ev) {
+    let folderParentId = null;
+    if (ev.detail && ev.detail.folderParentId !== null) {
+      folderParentId = ev.detail.folderParentId;
+    }
+    this.openCreateFolderDialog(folderParentId);
   },
 
   /**
@@ -662,7 +677,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} request_folder_rename': function(el, ev) {
-    const folder = ev.data.folder;
+    const folder = ev.detail.folder;
     this.openRenameFolderDialog(folder);
   },
 
@@ -672,7 +687,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} request_folder_move': function(el, ev) {
-    const folder = ev.data.folder;
+    const folder = ev.detail.folder;
     this.openMoveFolderDialog(folder);
   },
 
@@ -682,7 +697,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} request_folder_delete': function(el, ev) {
-    const folder = ev.data.folder;
+    const folder = ev.detail.folder;
     this.openDeleteFolderDialog(folder);
   },
 
@@ -705,7 +720,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} passbolt.share.complete': async function(el, ev) {
-    // Update the resource local storage.
     await ResourceService.updateLocalStorage();
     MadBus.trigger('permissions_updated', this.options.selectedResources);
   },

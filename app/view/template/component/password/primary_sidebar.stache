@@ -1,7 +1,7 @@
 <div class="navigation first shortcuts" id="js_wsp_pwd_filter_shortcuts"></div>
 
-<div class="navigation accordion" id="js_wsp_pwd_password_categories"></div>
+<div id="js_wsp_pwd_filter_folders_section"></div>
 
-<div class="navigation accordion" id="js_wsp_pwd_filter_folders_section"></div>
+<div class="navigation accordion" id="js_wsp_pwd_password_categories"></div>
 
 <div class="navigation accordion" id="js_wsp_pwd_filter_tags_section"></div>

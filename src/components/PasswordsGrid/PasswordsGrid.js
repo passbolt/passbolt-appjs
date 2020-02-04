@@ -25,7 +25,7 @@ export default class PasswordsGrid extends React.Component {
     super(props);
     this.initEventHandlers();
     this.initState();
-    this.listRef = React.createRef();
+    this.createRefs();
   }
 
   initEventHandlers() {
@@ -52,6 +52,14 @@ export default class PasswordsGrid extends React.Component {
       sortProperty: "modified",
       sortASC: false
     }
+  }
+
+  /**
+   * Create DOM nodes or React elements references in order to be able to access them programmatically.
+   */
+  createRefs() {
+    this.listRef = React.createRef();
+    this.dragFeedbackElement = React.createRef();
   }
 
   initState() {
@@ -90,27 +98,17 @@ export default class PasswordsGrid extends React.Component {
   handleResourceClick(ev, resource) {
     ev.preventDefault();
     ev.stopPropagation();
-    let selectedResources, selectStrategy;
+    let selectStrategy;
 
     if (ev.metaKey) {
-      selectedResources = this.getSelectedResourcesMultipleClickStrategy(resource);
       selectStrategy = "multiple";
     } else if (ev.shiftKey) {
-      selectedResources = this.getSelectedResourcesRangeClickStrategy(resource);
       selectStrategy = "range";
     } else {
-      selectedResources = this.getSelectedResourcesSingleClickStrategy(resource);
       selectStrategy = "single";
     }
 
-    const selectAll = selectedResources.length === this.filteredResources.length;
-    this.setState({ selectAll, selectedResources, selectStrategy });
-
-    // Notify the rest of the application regarding this selection
-    const bus = document.querySelector("#bus");
-    const event = document.createEvent("CustomEvent");
-    event.initCustomEvent("grid_resources_selected", true, true, selectedResources);
-    bus.dispatchEvent(event);
+    this.selectResource(resource, selectStrategy);
   }
 
   handleResourceRightClick(ev, resource) {
@@ -134,6 +132,32 @@ export default class PasswordsGrid extends React.Component {
     const selectedResources = this.getSelectedResourcesMultipleClickStrategy(resource);
     const selectAll = this.filteredResources.length === selectedResources.length;
     this.setState({ selectAll, selectedResources });
+
+    // Notify the rest of the application regarding this selection
+    const bus = document.querySelector("#bus");
+    const event = document.createEvent("CustomEvent");
+    event.initCustomEvent("grid_resources_selected", true, true, selectedResources);
+    bus.dispatchEvent(event);
+  }
+
+  selectResource(resource, selectStrategy) {
+    let selectedResources;
+    selectStrategy = selectStrategy || "single";
+
+    switch (selectStrategy) {
+      case "multiple":
+        selectedResources = this.getSelectedResourcesMultipleClickStrategy(resource);
+        break;
+      case "range":
+        selectedResources = this.getSelectedResourcesRangeClickStrategy(resource);
+        break;
+      case "single":
+        selectedResources = this.getSelectedResourcesSingleClickStrategy(resource);
+        break;
+    }
+
+    const selectAll = selectedResources.length === this.filteredResources.length;
+    this.setState({ selectAll, selectedResources, selectStrategy });
 
     // Notify the rest of the application regarding this selection
     const bus = document.querySelector("#bus");
@@ -183,6 +207,10 @@ export default class PasswordsGrid extends React.Component {
     return selectedResourcesIds;
   }
 
+  isResourceSelected(resource) {
+    return this.state.selectedResources.some(resourceId => resource.id === resourceId)
+  }
+
   handleCopyUsernameClick(ev, resource) {
     ev.stopPropagation();
     Clipboard.copy(resource.username, 'username');
@@ -208,6 +236,24 @@ export default class PasswordsGrid extends React.Component {
     } else {
       this.setState({ sortProperty: sortProperty, sortASC: true });
     }
+  }
+
+  handleDragStartEvent(event, resource) {
+    if (!this.isResourceSelected(resource)) {
+      this.selectResource(resource);
+    }
+    event.dataTransfer.setDragImage(this.dragFeedbackElement.current, 5, 5);
+    const bus = document.querySelector("#bus");
+    const trigerEvent = document.createEvent("CustomEvent");
+    trigerEvent.initCustomEvent("passbolt.resources.drag-start", true, true, {resource});
+    bus.dispatchEvent(trigerEvent);
+  }
+
+  handleDragEndEvent(event, resource) {
+    const bus = document.querySelector("#bus");
+    const trigerEvent = document.createEvent("CustomEvent");
+    trigerEvent.initCustomEvent("passbolt.resources.drag-end", true, true, {resource});
+    bus.dispatchEvent(trigerEvent);
   }
 
   async favoriteResource(resource) {
@@ -379,15 +425,19 @@ export default class PasswordsGrid extends React.Component {
 
   renderItem(index, key) {
     const resource = this.filteredResources[index];
-    const isSelected = this.state.selectedResources.some(resourceId => resource.id === resourceId);
+    const isSelected = this.isResourceSelected(resource);
     const isFavorite = resource.favorite !== null && resource.favorite !== undefined;
     const safeUri = this.sanitizeResourceUrl(resource) || "#";
 
     return (
-      <tr id={`resource_${resource.id}`} key={key} className={isSelected ? "selected" : ""} unselectable={this.state.selectStrategy == "range" ? "on" : ""}
+      <tr id={`resource_${resource.id}`} key={key} draggable="true" className={isSelected ? "selected" : ""}
+        unselectable={this.state.selectStrategy == "range" ? "on" : ""}
         onClick={(ev) => this.handleResourceClick(ev, resource)}
-        onContextMenu={(ev) => this.handleResourceRightClick(ev, resource)}>
-        <td className="cell_multipleSelect selections s-cell" onClick={(ev) => this.handleCheckboxWrapperClick(ev, resource)} >
+        onContextMenu={(ev) => this.handleResourceRightClick(ev, resource)}
+        onDragStart={event => this.handleDragStartEvent(event, resource)}
+        onDragEnd={event => this.handleDragEndEvent(event, resource)}>
+        <td className="cell_multipleSelect selections s-cell"
+          onClick={(ev) => this.handleCheckboxWrapperClick(ev, resource)} >
           <div className="ready">
             <div className="input checkbox">
               <input type="checkbox" id={`checkbox_multiple_select_checkbox_${resource.id}`} checked={isSelected} readOnly={true} />
@@ -434,6 +484,30 @@ export default class PasswordsGrid extends React.Component {
     );
   }
 
+  renderDragFeedback() {
+    const isSelected =  this.state.selectedResources.length > 0;
+    const isMultipleSelected  = this.state.selectedResources.length > 1;
+    let dragFeedbackText = "";
+    let dragElementClassname = "";
+
+    if (isSelected) {
+      const firstSelectedResource = this.state.resources.find(resource => resource.id === this.state.selectedResources[0]);
+      dragElementClassname = isMultipleSelected ? "drag-and-drop-multiple" : "drag-and-drop";
+      dragFeedbackText = firstSelectedResource.name;
+    }
+
+    return (
+      <div ref={this.dragFeedbackElement} className={dragElementClassname}>
+        {dragFeedbackText}
+        {isMultipleSelected &&
+        <span className="count">
+          {this.state.selectedResources.length}
+        </span>
+        }
+      </div>
+    );
+  }
+
   render() {
     const isReady = this.isReady();
     let isEmpty, isSearching, initialIndex;
@@ -471,6 +545,12 @@ export default class PasswordsGrid extends React.Component {
                 <p>Share a password with this group or wait for a team member to share one with this group.</p>
               </div>
             }
+            {isEmpty && !isSearching && this.state.filterType == "folder" &&
+              <div className="empty-content">
+                <h2>No passwords in this folder yet.</h2>
+                <p>It does feel a bit empty here.</p>
+              </div>
+            }
             {isEmpty && !isSearching && this.state.filterType == "shared_with_me" &&
               <div className="empty-content">
                 <h2>No passwords are shared with you yet.</h2>
@@ -488,6 +568,7 @@ export default class PasswordsGrid extends React.Component {
             }
             {!isEmpty &&
               <React.Fragment>
+                {this.renderDragFeedback()}
                 <div className="tableview-header">
                   <table>
                     <thead>

@@ -25,8 +25,8 @@ export default class FolderService {
   /**
   * Request the plugin to insert the folder create dialog.
   */
-  static openCreateDialog() {
-    return Plugin.send('passbolt.plugin.folders.open-create-dialog', {  });
+  static openCreateDialog(folderParentId) {
+    return Plugin.send('passbolt.plugin.folders.open-create-dialog', { folderParentId });
   }
 
   /**
@@ -48,6 +48,15 @@ export default class FolderService {
    */
   static openMoveDialog(folder) {
     return Plugin.send('passbolt.plugin.folders.open-move-dialog', {folderId: folder.id});
+  }
+
+  /**
+   * Request the plugin to move a folder.
+   * @param {string} folderId The folder to move.
+   * @param {string} folderParentId The parent folder.
+   */
+  static move(folderId, folderParentId) {
+    return Plugin.send('passbolt.plugin.folders.move', {folderId, folderParentId});
   }
 
   /**

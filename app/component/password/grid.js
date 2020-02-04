@@ -156,11 +156,10 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
         const filter = { 'has-tag': tagId };
         return Resource.findAll({ contain, filter });
       }
-      // TODO filter for folder
       if (this.filter.type === "folder") {
-        const folderId = this.filter.rules['has-parent-id'];
+        const folderId = this.filter.rules['has-parent'];
         const contain = { favorite: 1, permission: 1, tag: 1 };
-        const filter = { 'has-tag': folderId };
+        const filter = { 'has-parent': [folderId] };
         return Resource.findAll({ contain, filter });
       }
 
@@ -176,7 +175,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
       // Filtering by tags and groups doesn't yet benefit from the local storage.
       // Update the resources local variable with the one returned by the cache.
-      if (this.filter.type === "group" || this.filter.type === "tag") {
+      if (this.filter.type === "group" || this.filter.type === "tag" || this.filter.type === "folder") {
         for (let i = this.resources.length - 1; i >= 0; i--) {
           const updatedResourceIndex = updatedResources.indexOf(this.resources[i]);
           if (updatedResourceIndex === -1) {
@@ -190,15 +189,6 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       }
 
       return updatedResources;
-    },
-
-    /**
-     * Get the resources after a local storage update
-     * @return {Resource.List}
-     */
-    getUpdateFolders: async function () {
-      const updatedFolders = await Folder.findAll({ source: 'storage' });
-      return updatedFolders;
     },
 
     /**

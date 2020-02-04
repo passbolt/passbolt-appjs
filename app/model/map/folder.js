@@ -28,87 +28,13 @@ import FolderService from '../service/plugin/folder';
 const Folder = DefineMap.extend('passbolt.model.Folder', {
   id: 'string',
   name: 'string',
-  parent_id: 'string',
+  folder_parent_id: 'string',
   created: 'string',
   modified: 'string',
   permission: Permission,
 });
 DefineMap.setReference('Folder', Folder);
 Folder.List = DefineList.extend({'#': {Type: Folder}});
-
-/**
- * Sort the folder alphabetically.
- */
-Folder.List.prototype.sortAlphabetically = function() {
-  this.sort((a, b) => {
-    if (a.name < b.name) {
-      return -1;
-    } else if (a.name > b.name) {
-      return 1;
-    }
-    return 0;
-  });
-};
-
-/*
- * Default validation rules.
- * Keep these rules in sync with the passbolt API.
- */
-Folder.validationRules = {
-  id: [
-    {rule: 'uuid'}
-  ],
-  parent_id: [
-    {rule: 'uuid'}
-  ],
-  name: [
-    {rule: 'required', message: __('A name is required.')},
-    {rule: ['maxLength', 255], message: __('The name length should be maximum %s characters.', 255)},
-    {rule: 'utf8Extended', message: __('The name should be a valid utf8 string.')}
-  ],
-};
-
-/**
- * @inherited-doc
- */
-Folder.getFilteredFields = function(filteredCase) {
-  let filteredFields = false;
-
-  switch (filteredCase) {
-    case 'edit':
-      filteredFields = [
-        'id',
-        'name',
-        'parent_id'
-      ];
-      break;
-  }
-
-  return filteredFields;
-};
-
-/**
- * Update folders after they have been shared.
- * @param foldersIds
- * @return {Promise}
- */
-Folder.findAllByIds = function(foldersIds) {
-  // Retrieve the folder by batch of 100 to avoid any 414 response.
-  const batchSize = 100;
-  if (foldersIds.length > batchSize) {
-    const foldersIdsPart = chunk(foldersIds, batchSize);
-    return foldersIdsPart.reduce((promise, foldersIdsPart) => promise.then(carry => Folder.findAllByIds(foldersIdsPart)
-      .then(folders => carry.concat(folders))), Promise.resolve(new Folder.List()));
-  }
-
-  const findOptions = {
-    // contain: {favorite: 1, permission: 1, tag: 1},
-    // filter: {
-    //   'has-id': resourcesIds
-    // }
-  };
-  return Resource.findAll(findOptions);
-};
 
 Folder.connection = connect([connectParse, connectDataUrl, connectConstructor, connectMap], {
   Map: Folder,
@@ -136,14 +62,7 @@ Folder.connection = connect([connectParse, connectDataUrl, connectConstructor, c
           params: params
         });
       }
-    },
-    // createData: function(params) {
-    //   return FolderService.save(params);
-    // },
-    // updateData: function(params) {
-    //   const _params = Folder.filterAttributes(params);
-    //   return FolderService.update(_params);
-    // }
+    }
   }
 });
 
