@@ -157,7 +157,10 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
         return Resource.findAll({ contain, filter });
       }
       if (this.filter.type === "folder") {
-        const folderId = this.filter.rules['has-parent'];
+        let folderId = this.filter.rules['has-parent'];
+        if (folderId === null) {
+          folderId = false;
+        }
         const contain = { favorite: 1, permission: 1, tag: 1 };
         const filter = { 'has-parent': [folderId] };
         return Resource.findAll({ contain, filter });
