@@ -83,6 +83,14 @@ export default class ResourceService {
   }
 
   /**
+   * Request the plugin to insert the resource edit dialog.
+   * @param {string} id The resource id to edit
+   */
+  static openEditDialog(id) {
+    return Plugin.send('passbolt.plugin.resources.open-edit-dialog', { id });
+  }
+
+  /**
    * Request the plugin to insert the bulk share iframe
    * @param {array} resourcesIds The list of resources ids to share
    */

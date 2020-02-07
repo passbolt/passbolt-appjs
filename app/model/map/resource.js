@@ -165,27 +165,6 @@ Resource.getFilteredFields = function(filteredCase) {
   let filteredFields = false;
 
   switch (filteredCase) {
-    case 'edit':
-      filteredFields = [
-        'id',
-        'name',
-        'username',
-        'expiry_date',
-        'uri',
-        'description'
-      ];
-      break;
-    case 'edit_with_secrets':
-      filteredFields = [
-        'id',
-        'name',
-        'username',
-        'expiry_date',
-        'uri',
-        'description',
-        'secrets'
-      ];
-      break;
     case 'edit_description':
       filteredFields = [
         'id',
@@ -246,9 +225,6 @@ Resource.connection = connect([connectParse, connectDataUrl, connectConstructor,
           params: params
         });
       }
-    },
-    createData: function(params) {
-      return ResourceService.save(params);
     },
     updateData: function(params) {
       const _params = Resource.filterAttributes(params);

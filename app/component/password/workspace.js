@@ -371,40 +371,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Resource} resource The target user entity.
    */
   openEditResourceDialog: function(resource) {
-    const dialog = DialogComponent.instantiate({
-      label: __('Edit'),
-      subtitle: resource.name,
-      cssClasses: ['edit-password-dialog', 'dialog-wrapper']
-    }).start();
-
-      // Attach the form to the dialog
-    dialog.add(ResourceEditForm, {
-      id: 'js_rs_edit',
-      label: __('Edit'),
-      action: 'edit',
-      data: resource,
-      callbacks: {
-        submit: async(data) => {
-          this.state.loaded = false;
-          const resourceToUpdate = new Resource(data['Resource']);
-          // If not secrets present, no need to add them to the API request.
-          if (data['Resource'].secrets.length > 0) {
-            resourceToUpdate['__FILTER_CASE__'] = 'edit_with_secrets';
-          } else {
-            resourceToUpdate['__FILTER_CASE__'] = 'edit';
-          }
-          dialog.remove();
-          try {
-            const resourceUpdated = await resourceToUpdate.save();
-            this.grid.selectAndScrollTo(resourceUpdated.id);
-            MadBus.trigger('passbolt_notify', { status: 'success', title: "app_resources_update_success" });
-          } catch (error) {
-            MadBus.trigger('passbolt_notify', { status: 'error', message: error.message, force: true });
-          }
-          this.state.loaded = true;
-        }
-      }
-    });
+    ResourceService.openEditDialog(resource.id);
   },
 
   /**
