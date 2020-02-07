@@ -164,6 +164,8 @@ export default class PasswordsGrid extends React.Component {
     const event = document.createEvent("CustomEvent");
     event.initCustomEvent("grid_resources_selected", true, true, selectedResources);
     bus.dispatchEvent(event);
+
+    return selectedResources;
   }
 
   getSelectedResourcesSingleClickStrategy(resource) {
@@ -239,8 +241,10 @@ export default class PasswordsGrid extends React.Component {
   }
 
   handleDragStartEvent(event, resource) {
+    let selectedResources = this.state.selectedResources;
+
     if (!this.isResourceSelected(resource)) {
-      this.selectResource(resource);
+      selectedResources = this.selectResource(resource);
     }
     event.dataTransfer.setDragImage(this.dragFeedbackElement.current, 5, 5);
     const bus = document.querySelector("#bus");
@@ -249,10 +253,10 @@ export default class PasswordsGrid extends React.Component {
     bus.dispatchEvent(trigerEvent);
   }
 
-  handleDragEndEvent(event, resource) {
+  handleDragEndEvent() {
     const bus = document.querySelector("#bus");
     const trigerEvent = document.createEvent("CustomEvent");
-    trigerEvent.initCustomEvent("passbolt.resources.drag-end", true, true, {resource});
+    trigerEvent.initCustomEvent("passbolt.resources.drag-end", true, true);
     bus.dispatchEvent(trigerEvent);
   }
 
@@ -485,7 +489,7 @@ export default class PasswordsGrid extends React.Component {
   }
 
   renderDragFeedback() {
-    const isSelected =  this.state.selectedResources.length > 0;
+    const isSelected = this.state.selectedResources.length > 0;
     const isMultipleSelected  = this.state.selectedResources.length > 1;
     let dragFeedbackText = "";
     let dragElementClassname = "";

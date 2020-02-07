@@ -77,9 +77,10 @@ export default class ResourceService {
 
   /**
    * Request the plugin to insert the resource create dialog.
+   * @param {string} folderParentId The folder parent id.
    */
-  static openCreateDialog() {
-    return Plugin.send('passbolt.plugin.resources.open-create-dialog', {  });
+  static openCreateDialog(folderParentId) {
+    return Plugin.send('passbolt.plugin.resources.open-create-dialog', { folderParentId });
   }
 
   /**

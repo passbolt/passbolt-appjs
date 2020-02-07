@@ -76,7 +76,7 @@ export default class ContextualMenu extends React.Component {
   handleCreateFolderItemClickEvent(event) {
     const bus = document.querySelector("#bus");
     const contextualMenuEvent = document.createEvent("CustomEvent");
-    contextualMenuEvent.initCustomEvent("request_folder_create", true, true, {folder: this.state.folder, srcEv: event});
+    contextualMenuEvent.initCustomEvent("request_folder_create", true, true, {folderParentId: this.state.folder.id, srcEv: event});
     bus.dispatchEvent(contextualMenuEvent);
     this.hide();
   }

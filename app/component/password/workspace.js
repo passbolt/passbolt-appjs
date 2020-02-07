@@ -171,35 +171,58 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Component}
    */
   _initMainActionButton: function() {
-    // const selector = $('.main-action-wrapper');
-    // const options = {
-    //   id: 'js_wsp_create_button',
-    //   template: createButtonTemplate,
-    //   tag: 'button',
-    //   cssClasses: ['button', 'primary']
-    // };
-    // const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
-    // this.options.mainButton = component;
-    // this.addLoadedDependency(component);
-    // return component;
+    const plugins = Config.read('server.passbolt.plugins');
+    if (plugins.folders) {
+      return this._initProMainActionButton();
+    } else {
+      return this._iniCeMainActionButton();
+    }
+  },
 
+  /**
+   * Init the main action button for the CE.
+   * @returns {*|mad.Component}
+   * @private
+   */
+  _iniCeMainActionButton: function() {
+    const selector = $('.main-action-wrapper');
+    const options = {
+      id: 'js_wsp_create_button',
+      template: createButtonTemplate,
+      tag: 'button',
+      cssClasses: ['button', 'primary']
+    };
+    const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
+    this.options.mainButton = component;
+    this.addLoadedDependency(component);
+    return component;
+  },
+
+  /**
+   * Init the main action button for the Pro.
+   * @returns {*|mad.Component}
+   * @private
+   */
+  _initProMainActionButton: function() {
     const items = [
       new Action({
         id: uuid(),
         label: __('New password'),
         cssClasses: ['create-resource'],
-        action: function () {
+        action: () => {
           button.view.close();
-          MadBus.trigger('request_resource_create');
+          const folderParentId = this.filter.folder ? this.filter.folder.id : null;
+          MadBus.trigger('request_resource_create', {folderParentId});
         }
       }),
       new Action({
         id: uuid(),
         label: __('New folder'),
         cssClasses: ['create-folder'],
-        action: function () {
+        action: () => {
           button.view.close();
-          MadBus.trigger('request_folder_create');
+          const folderParentId = this.filter.folder ? this.filter.folder.id : null;
+          MadBus.trigger('request_folder_create', {folderParentId});
         }
       })
     ];
@@ -263,7 +286,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       defaultFilter: PasswordWorkspaceComponent.getDefaultFilterSettings(),
       selectedResources: this.options.selectedResources,
       selectedGroups: this.options.selectedGroups,
-      selectedFolders: this.options.selectedFolders,
       selectedTags: this.options.selectedTags
     });
     this.addLoadedDependency(component);
@@ -318,13 +340,15 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Open the resource create dialog.
+   * @param {string} folderParentId The parent folder id
    */
-  openCreateResourceDialog: function() {
-    ResourceService.openCreateDialog();
+  openCreateResourceDialog: function(folderParentId) {
+    ResourceService.openCreateDialog(folderParentId);
   },
 
   /**
    * Open the folder create dialog.
+   * @param {string} folderParentId The parent folder id
    */
   openCreateFolderDialog: function(folderParentId) {
     FolderService.openCreateDialog(folderParentId);
@@ -358,11 +382,13 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   '{mad.bus.element} passbolt.plugin.resources.select-and-scroll-to': function(el, ev) {
     const data = ev.data;
 
-    if (!["default", "modified", "owner"].includes(this.filter.type)) {
+    if (["default", "modified", "owner"].includes(this.filter.type)) {
+      this.grid.selectAndScrollTo(data);
+    } else if (this.filter.type === "folder") {
+      MadBus.trigger('filter_workspace', {filter: this.filter, selectAndScrollTo: data});
+    } else {
       const filter = this.getFilter();
       MadBus.trigger('filter_workspace', {filter: filter, selectAndScrollTo: data});
-    } else {
-      this.grid.selectAndScrollTo(data);
     }
   },
 
@@ -559,9 +585,19 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
   /**
    * Observe when the user requests a resource creation
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
    */
-  '{mad.bus.element} request_resource_create': function() {
-    this.openCreateResourceDialog();
+  '{mad.bus.element} request_resource_create': function(el, ev) {
+    let folderParentId = null;
+    if (ev.data && ev.data.folderParentId !== null) {
+      folderParentId = ev.data.folderParentId;
+    }
+    // Can be an event coming from a React component.
+    if (ev.detail && ev.detail.folderParentId !== null) {
+      folderParentId = ev.detail.folderParentId;
+    }
+    this.openCreateResourceDialog(folderParentId);
   },
 
   /**
@@ -632,6 +668,10 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{mad.bus.element} request_folder_create': function(el, ev) {
     let folderParentId = null;
+    if (ev.data && ev.data.folderParentId !== null) {
+      folderParentId = ev.data.folderParentId;
+    }
+    // Can be an event coming from a React component.
     if (ev.detail && ev.detail.folderParentId !== null) {
       folderParentId = ev.detail.folderParentId;
     }
