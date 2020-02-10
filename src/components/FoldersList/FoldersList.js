@@ -17,7 +17,6 @@ import SvgFolderIcon from "../../img/svg/folder";
 import SvgSharedFolderIcon from "../../img/svg/shared-folder";
 import Folder from "../../../app/model/map/folder";
 import FolderService from "../../../app/model/service/plugin/folder";
-import ResourceService from "../../../app/model/service/plugin/resource";
 
 const rootFolder = {
   id: null,
@@ -52,8 +51,10 @@ export default class FoldersList extends React.Component {
       isDragging: false,
       isDraggingOverRoot: false,
       dragOverFolder: null,
-      draggedModel: "",
-      draggedSource: null,
+      draggedSources: {
+        folders: [],
+        resources: []
+      },
     };
   }
 
@@ -149,18 +150,19 @@ export default class FoldersList extends React.Component {
    * @param {ReactEvent} event The event
    */
   handleGridDragStartEvent(event) {
-    const draggedSource = event.detail.resource;
-    const draggedModel = "Resource";
-    this.setState({draggedSource, draggedModel});
+    const draggedSources = event.detail;
+    this.setState({draggedSources});
   }
 
   /**
    * Handle grid stop dragging event.
    */
   handleGridDragEndEvent() {
-    const draggedSource = null;
-    const draggedModel = "";
-    this.setState({draggedSource, draggedModel});
+    const draggedSources = {
+      folders: [],
+      resources: []
+    };
+    this.setState({draggedSources});
   }
 
   /**
@@ -181,8 +183,9 @@ export default class FoldersList extends React.Component {
   handleFoldersListDragStartEvent(event, folder) {
     const state = {
       isDragging: true,
-      draggedModel: "Folder",
-      draggedSource: folder
+      draggedSources: {
+        folders: [folder.id]
+      }
     };
     this.setState(state);
     event.dataTransfer.setDragImage(this.dragFeedbackElement.current, 5, 5);
@@ -228,14 +231,12 @@ export default class FoldersList extends React.Component {
   /**
    * Handle dropping on an element of the list.
    * @param {ReactEvent} event The event
-   * @param {Object} folder The folder
+   * @param {Object} folder The folder the drop happened
    */
   handleFoldersListDropEvent(event, folder) {
-    if (this.state.draggedModel === "Folder") {
-      FolderService.move(this.state.draggedSource.id, folder.id);
-    } else {
-      ResourceService.move(this.state.draggedSource.id, folder.id);
-    }
+    const folders = this.state.draggedSources.folders;
+    const resources = this.state.draggedSources.resources;
+    FolderService.move(folders, resources, folder.id);
     this.resetDragState();
   }
 
@@ -363,8 +364,10 @@ export default class FoldersList extends React.Component {
   resetDragState() {
     const state = {
       isDragging: false,
-      draggedModel: null,
-      draggedSource: null,
+      draggedSources: {
+        folders: [],
+        resources: []
+      },
       dragOverFolder: null
     };
     this.setState(state);
@@ -420,11 +423,7 @@ export default class FoldersList extends React.Component {
    * @returns {boolean}
    */
   isFolderDragged(folder) {
-    if (!this.state.draggedSource) {
-      return;
-    }
-
-    return this.state.draggedSource.id === folder.id;
+    return this.state.draggedSources.folders.some(source => source === folder.id);
   }
 
   /**

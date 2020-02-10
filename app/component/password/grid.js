@@ -208,6 +208,9 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       if (this.filter.type == "owner") {
         return resources.filter(resource => resource.permission.type === PermissionType.ADMIN);
       }
+      if (this.filter.type == "folder") {
+        return resources.filter(resource => resource.folder_parent_id === this.filter.folder.id);
+      }
 
       return resources;
     },

@@ -52,11 +52,12 @@ export default class FolderService {
 
   /**
    * Request the plugin to move a folder.
-   * @param {string} folderId The folder to move.
+   * @param {array} folders The folders to move.
+   * @param {array} resources The resources to move.
    * @param {string} folderParentId The parent folder.
    */
-  static move(folderId, folderParentId) {
-    return Plugin.send('passbolt.plugin.folders.move', {folderId, folderParentId});
+  static move(folders, resources, folderParentId) {
+    return Plugin.send('passbolt.plugin.folders.bulk-move', {folders, resources, folderParentId});
   }
 
   /**

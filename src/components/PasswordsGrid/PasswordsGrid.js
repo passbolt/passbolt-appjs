@@ -249,7 +249,7 @@ export default class PasswordsGrid extends React.Component {
     event.dataTransfer.setDragImage(this.dragFeedbackElement.current, 5, 5);
     const bus = document.querySelector("#bus");
     const trigerEvent = document.createEvent("CustomEvent");
-    trigerEvent.initCustomEvent("passbolt.resources.drag-start", true, true, {resource});
+    trigerEvent.initCustomEvent("passbolt.resources.drag-start", true, true, {resources: selectedResources});
     bus.dispatchEvent(trigerEvent);
   }
 
@@ -496,8 +496,10 @@ export default class PasswordsGrid extends React.Component {
 
     if (isSelected) {
       const firstSelectedResource = this.state.resources.find(resource => resource.id === this.state.selectedResources[0]);
-      dragElementClassname = isMultipleSelected ? "drag-and-drop-multiple" : "drag-and-drop";
-      dragFeedbackText = firstSelectedResource.name;
+      if (firstSelectedResource) {
+        dragElementClassname = isMultipleSelected ? "drag-and-drop-multiple" : "drag-and-drop";
+        dragFeedbackText = firstSelectedResource.name;
+      }
     }
 
     return (
