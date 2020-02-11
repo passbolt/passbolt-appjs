@@ -15,6 +15,7 @@ import React from "react";
 import SvgCaretDownIcon from "../../img/svg/caret-down";
 import SvgFolderIcon from "../../img/svg/folder";
 import SvgSharedFolderIcon from "../../img/svg/shared-folder";
+import SvgSpinnerIcon from "../../img/svg/spinner";
 import Folder from "../../../app/model/map/folder";
 import FolderService from "../../../app/model/service/plugin/folder";
 
@@ -44,6 +45,7 @@ export default class FoldersList extends React.Component {
    */
   getDefaultState() {
     return {
+      loading: true,
       folders: [],
       selectedFolder: null,
       rootFolderOpened: true,
@@ -276,7 +278,8 @@ export default class FoldersList extends React.Component {
    * @param {Array} folders The list of folders.
    */
   loadFolders(folders) {
-    const state = {folders};
+    const loading = false;
+    const state = {folders, loading};
     const foldersIds = folders.map(folder => folder.id);
 
     // Cleanup the selected folder. Unselect removed folder.
@@ -508,6 +511,7 @@ export default class FoldersList extends React.Component {
     const dragFeedbackText = this.state.draggedSource ? this.state.draggedSource.name : "";
     const isRootFolderOpened = this.isRootFolderOpened(rootFolder);
     const isDraggingOverRoot = this.isDraggingOverFolder(rootFolder);
+    const empty = this.state.folders.length === 0;
 
     return (
       <div className="folders navigation first accordion">
@@ -521,8 +525,13 @@ export default class FoldersList extends React.Component {
                 <div className="main-cell">
                   <h3>
                     <span className="folders-label">
+                      {this.state.loading &&
+                      <SvgSpinnerIcon/>
+                      }
+                      {!this.state.loading && !empty &&
                       <SvgCaretDownIcon class={isRootFolderOpened ? "" : "rotate-right"}
                         onClick={this.handleRootFolderClickCaretEvent}/>
+                      }
                       <span href="demo/LU_folders.php"
                         onDragOver={(event) => this.handleFoldersListDragOverEvent(event, rootFolder)}
                         onDragLeave={(event) => this.handleFoldersListDragLeaveEvent(event, rootFolder)}

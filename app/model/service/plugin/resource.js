@@ -126,7 +126,7 @@ const retryRequest = function (callback, options) {
             resolve(result);
           } catch (error) {
             reject(error);
-          };
+          }
         }, options.timeout / options.attemptsLimit);
       }
     }
