@@ -27,6 +27,21 @@
 		<span id="js-send-group-manager-update-toggle-button" class="input toggle-switch"></span>
 	</div>
 </div>
+{{#if(foldersPluginEnabled)}}
+<div class="row">
+	<div class="col6">
+		<label>{{__('Folders')}}</label>
+		<span id="js-send-folder-created-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-folder-updated-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-folder-deleted-toggle-button" class="input toggle-switch"></span>
+	</div>
+	<div class="col6 last">
+		<label>{{__('Folders Permissions')}}</label>
+        <span id="js-send-folder-share-dropped-toggle-button" class="input toggle-switch"></span>
+		<span id="js-send-folder-share-created-toggle-button" class="input toggle-switch"></span>
+	</div>
+</div>
+{{/if}}
 <div class="row">
 	<h3>Email content visibility</h3>
 	<p>

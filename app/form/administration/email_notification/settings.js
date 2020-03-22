@@ -14,6 +14,7 @@
 import Form from 'passbolt-mad/form/form';
 import ToggleButtonComponent from 'passbolt-mad/form/element/toggle_button';
 import template from '../../../view/template/form/administration/email_notification/settings.stache';
+import Config from "passbolt-mad/config/config";
 
 const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration.email_notification.Settings', /** @static */ {
 
@@ -34,6 +35,20 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
   },
 
   /**
+   * Check if Folders plugin is enabled
+   * @returns {boolean|*|mixed}
+   */
+  isFoldersPluginEnabled: function () {
+    const plugins = Config.read('server.passbolt.plugins');
+
+    return plugins && plugins.folders;
+  },
+
+  beforeRender: function() {
+    this.setViewData('foldersPluginEnabled', this.isFoldersPluginEnabled());
+  },
+
+  /**
    * @inheritdoc
    */
   afterStart: function() {
@@ -51,6 +66,10 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
     this._initFormCommentSection();
     this._initFormGroupSection();
     this._initFormGroupManagerSection();
+
+    if (this.isFoldersPluginEnabled()) {
+      this._initFormFoldersSection();
+    }
 
     // Show controls
     this._initFormShowSection();
@@ -173,6 +192,51 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
       new ToggleButtonComponent('#js-send-group-manager-update-toggle-button', {
         label: __("When members of a group change, notify the group manager(s)."),
         modelReference: 'EmailNotificationSettings.send_group_manager_update',
+        state: {disabled: true}
+      }).start()
+    );
+  },
+
+  /**
+   * Init the Group Manager section
+   */
+  _initFormFoldersSection: function () {
+    this.addElement(
+      new ToggleButtonComponent('#js-send-folder-created-toggle-button', {
+        label: __("When a folder is created, notify its creator."),
+        modelReference: 'EmailNotificationSettings.send_folder_created',
+        state: {disabled: true}
+      }).start()
+    );
+
+    this.addElement(
+      new ToggleButtonComponent('#js-send-folder-updated-toggle-button', {
+        label: __("When a folder is updated, notify the users who have access to it."),
+        modelReference: 'EmailNotificationSettings.send_folder_updated',
+        state: {disabled: true}
+      }).start()
+    );
+
+    this.addElement(
+      new ToggleButtonComponent('#js-send-folder-deleted-toggle-button', {
+        label: __("When a folder is deleted, notify the users who had access to it."),
+        modelReference: 'EmailNotificationSettings.send_folder_deleted',
+        state: {disabled: true}
+      }).start()
+    );
+
+    this.addElement(
+      new ToggleButtonComponent('#js-send-folder-share-created-toggle-button', {
+        label: __("When a folder is shared, notify the users who gain access to it."),
+        modelReference: 'EmailNotificationSettings.send_folder_share_created',
+        state: {disabled: true}
+      }).start()
+    );
+
+    this.addElement(
+      new ToggleButtonComponent('#js-send-folder-share-dropped-toggle-button', {
+        label: __("When permissions on a folder are removed, notify the users who lost access to it."),
+        modelReference: 'EmailNotificationSettings.send_folder_share_dropped',
         state: {disabled: true}
       }).start()
     );
