@@ -47,6 +47,11 @@ const EmailNotificationSettings = DefineMap.extend('passbolt.model.EmailNotifica
   'send_group_user_delete': 'boolean',
   'send_group_user_update': 'boolean',
   'send_group_manager_update': 'boolean',
+  'send_folder_deleted': 'boolean',
+  'send_folder_created': 'boolean',
+  'send_folder_updated': 'boolean',
+  'send_folder_share_created': 'boolean',
+  'send_folder_share_dropped': 'boolean',
 });
 DefineMap.setReference('EmailNotificationSettings', EmailNotificationSettings);
 
