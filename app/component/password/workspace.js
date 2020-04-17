@@ -369,6 +369,13 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   },
 
   /**
+   * Open the folder rename dialog.
+   */
+  openShareFolderDialog: function(folders) {
+    FolderService.openShareDialog(folders.map(folder => folder.id));
+  },
+
+  /**
    * Open the folder delete dialog.
    */
   openDeleteFolderDialog: function(folder) {
@@ -406,7 +413,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Resource.List} resources The target resources.
    */
   openShareResourcesDialog: function(resources) {
-    ResourceService.insertShareIframe(resources.map(resource => resource.id));
+    ResourceService.openShareDialog(resources.map(resource => resource.id));
   },
 
   /**
@@ -686,6 +693,15 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   '{mad.bus.element} request_folder_rename': function(el, ev) {
     const folder = ev.detail.folder;
     this.openRenameFolderDialog(folder);
+  },
+
+  /**
+   * Observe when the user wants to share a folder
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} request_folder_share': function(el, ev) {
+    this.openShareFolderDialog(ev.details.folders);
   },
 
   /**

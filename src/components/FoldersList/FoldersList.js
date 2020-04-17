@@ -238,7 +238,7 @@ export default class FoldersList extends React.Component {
   handleFoldersListDropEvent(event, folder) {
     const folders = this.state.draggedSources.folders;
     const resources = this.state.draggedSources.resources;
-    FolderService.move(folders, resources, folder.id);
+    FolderService.openMoveConfirmationDialog(folders, resources, folder.id);
     this.resetDragState();
   }
 

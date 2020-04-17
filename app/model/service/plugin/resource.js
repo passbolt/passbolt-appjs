@@ -86,8 +86,8 @@ export default class ResourceService {
    * Request the plugin to insert the bulk share iframe
    * @param {array} resourcesIds The list of resources ids to share
    */
-  static insertShareIframe(resourcesIds) {
-    return Plugin.send('passbolt.plugin.resources_share', { resourcesIds: resourcesIds });
+  static openShareDialog(resourcesIds) {
+    return Plugin.send('passbolt.plugin.resources.open-share-dialog', { resourcesIds: resourcesIds });
   }
 
   /**

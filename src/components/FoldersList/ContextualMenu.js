@@ -110,6 +110,10 @@ export default class ContextualMenu extends React.Component {
    * @param {ReactEvent} event The event
    */
   handleShareFolderItemClickEvent(event) {
+    const bus = document.querySelector("#bus");
+    const contextualMenuEvent = document.createEvent("CustomEvent");
+    contextualMenuEvent.initCustomEvent("request_folder_share", true, true, {folders: [this.state.folder], srcEv: event});
+    bus.dispatchEvent(contextualMenuEvent);
     this.hide();
   }
 
@@ -187,7 +191,7 @@ export default class ContextualMenu extends React.Component {
               </div>
             </div>
           </li>
-          <li className="ready closed">
+          <li className="ready hidden closed">
             <div className="row">
               <div className="main-cell-wrapper">
                 <div className="main-cell">
@@ -196,7 +200,7 @@ export default class ContextualMenu extends React.Component {
               </div>
             </div>
           </li>
-          <li className="ready hidden closed">
+          <li className="ready closed">
             <div className="row">
               <div className="main-cell-wrapper">
                 <div className="main-cell">

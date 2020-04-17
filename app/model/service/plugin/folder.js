@@ -37,6 +37,13 @@ export default class FolderService {
   }
 
   /**
+   * Request the plugin to insert the folder rename dialog.
+   */
+  static openShareDialog(foldersId) {
+    return Plugin.send('passbolt.plugin.folders.open-share-dialog', {foldersId: foldersId});
+  }
+
+  /**
    * Request the plugin to insert the folder delete dialog.
    */
   static openDeleteDialog(folder) {
@@ -56,8 +63,8 @@ export default class FolderService {
    * @param {array} resources The resources to move.
    * @param {string} folderParentId The parent folder.
    */
-  static move(folders, resources, folderParentId) {
-    return Plugin.send('passbolt.plugin.folders.bulk-move', {folders, resources, folderParentId});
+  static openMoveConfirmationDialog(folders, resources, folderParentId) {
+    return Plugin.send('passbolt.plugin.folders.open-move-confirmation-dialog', {folders, resources, folderParentId});
   }
 
   /**
