@@ -701,7 +701,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {HTMLEvent} ev The event which occurred
    */
   '{mad.bus.element} request_folder_share': function(el, ev) {
-    this.openShareFolderDialog(ev.details.folders);
+    this.openShareFolderDialog(ev.detail.folders);
   },
 
   /**

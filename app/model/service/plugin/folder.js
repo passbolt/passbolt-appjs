@@ -40,7 +40,7 @@ export default class FolderService {
    * Request the plugin to insert the folder rename dialog.
    */
   static openShareDialog(foldersId) {
-    return Plugin.send('passbolt.plugin.folders.open-share-dialog', {foldersId: foldersId});
+    return Plugin.send('passbolt.plugin.folders.open-share-dialog', {foldersIds: foldersId});
   }
 
   /**
