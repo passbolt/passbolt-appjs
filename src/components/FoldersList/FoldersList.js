@@ -495,7 +495,7 @@ export default class FoldersList extends React.Component {
    * @returns {Array<JSX>}
    */
   renderChildrenFolders(id, isParentDisabled) {
-    const folders = this.state.folders.filter(folder => folder.folderParentId === id);
+    const folders = this.state.folders.filter(folder => folder.folder_parent_id === id);
 
     return folders.reduce((accumulator, folder) => {
       accumulator.push(this.renderFolder(folder, isParentDisabled));
