@@ -52,7 +52,7 @@ export default class Plugin {
   }
 
   /**
-   * Send a message to the plugin
+   * Request the plugin.
    * @param {string} type The event type
    * @param {mixed} data The data to send with the event
    * @return {Promise}
@@ -80,6 +80,42 @@ export default class Plugin {
 
       // Emit the message to the addon-code.
       this.send(message, requestArgs);
+    });
+  }
+
+  /**
+   * Request the plugin until success or timeout
+   * @param {string} message The event type
+   * @param {mixed} data The data to send with the event
+   * @param {object} options The retry options
+   * @return {Promise}
+   */
+  static requestUntilSuccess(message, data, options) {
+    options = Object.assign({
+      attempt: 0,
+      timeout: 60000,
+      attemptsLimit: 240
+    }, options);
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result = await this.request(message, data);
+        resolve(result);
+      } catch (error) {
+        if (options.attempt > options.attemptsLimit) {
+          reject(error);
+        } else {
+          setTimeout(async () => {
+            try {
+              ++options.attempt;
+              const result = await retryRequest(callback, options);
+              resolve(result);
+            } catch (error) {
+              reject(error);
+            };
+          }, options.timeout / options.attemptsLimit);
+        }
+      }
     });
   }
 }

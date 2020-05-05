@@ -15,16 +15,13 @@ import React from "react";
 import ReactDOM from "react-dom";
 import MadBus from 'passbolt-mad/control/bus';
 import Filter from '../../model/filter';
-import Folder from '../../model/map/folder';
-import FoldersList from "../../../src/components/FoldersList/FoldersList";
 import PrimarySidebarSectionComponent from '../workspace/primary_sidebar_section';
-import ContextualMenu from "../../../src/components/FoldersList/ContextualMenu";
+import Plugin from "../../util/plugin";
+import FoldersTreeItemContextualMenu
+  from "../../../src/components/Workspace/Passwords/FoldersTree/FoldersTreeItemContextualMenu";
+import FoldersTree from "../../../src/components/Workspace/Passwords/FoldersTree/FoldersTree";
 
 const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.password.FoldersFilterSidebarSection', /** @static */ {
-
-  defaults: {
-    selectedFolders: new Folder.List(),
-  }
 
 }, /** @prototype */ {
   /**
@@ -32,42 +29,38 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
    */
   afterStart: function () {
     this._super();
-    this.initFoldersList();
+    this.initFoldersTree();
     this.initContextualMenu();
+    this.loadFolders();
   },
 
-  initFoldersList: function () {
+  loadFolders: async function() {
+    const folders = await Plugin.requestUntilSuccess("passbolt.storage.folders.get");
+    this.renderFoldersTree(this.foldersTreeRef, folders)
+  },
+
+  initFoldersTree: function () {
     const ref = React.createRef();
-    const foldersList = React.createElement(FoldersList, {ref});
-    ReactDOM.render(foldersList, this.element);
+    this.foldersTreeRef = ref;
+    const folders = null;
+    this.renderFoldersTree(ref, folders);
   },
 
-  initContextualMenu: function () {
-    const ref = React.createRef();
-    this.menuRef = ref;
-    const menu = React.createElement(ContextualMenu, {ref});
-    const menuElement = $('<div>').appendTo('body');
-    ReactDOM.render(menu, menuElement[0]);
+  renderFoldersTree:function (ref, folders) {
+    ReactDOM.render(<FoldersTree
+      ref={ref}
+      folders={folders}
+      onContextualMenu={(folder, top, left, foldersTreeElement) => this.onContextualMenu(folder, top, left, foldersTreeElement)}
+      onSelect={folder => this.onSelect(folder)}
+      onSelectRoot={() => this.onSelectRoot()}
+    />, this.element);
   },
 
-  /**
-   * An item has been right selected
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} folders_list_folder_contextual_menu': function (el, ev) {
-    const folder = ev.detail.folder;
-    const top = ev.detail.top;
-    const left = ev.detail.left;
-    this.menuRef.current.show(folder, top, left);
+  onContextualMenu(folder, top, left, foldersTreeElement) {
+    this.renderContextualMenu(folder, top, left, foldersTreeElement)
   },
 
-  /**
-   * Filter the workspace by folder.
-   * @param {passbolt.model.Folder} folder The folder to filter the workspace with
-   */
-  '{mad.bus.element} folders_list_folder_selected': function (el, ev) {
-    const folder = ev.detail.folder;
+  onSelect(folder) {
     const filter = new Filter({
       id: `workspace_filter_folder_${folder.id}`,
       type: 'folder',
@@ -79,6 +72,55 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
       order: ['Resource.modified DESC']
     });
     MadBus.trigger('filter_workspace', {filter});
+  },
+
+  onSelectRoot() {
+    const filter = new Filter({
+      id: `workspace_filter_folder_root`,
+      type: 'folder',
+      folder: {
+        id: null,
+        name: 'root'
+      },
+      label: __('%s (folder)', 'root'),
+      rules: {
+        'has-parent': null
+      },
+      order: ['Resource.modified DESC']
+    });
+    MadBus.trigger('filter_workspace', {filter});
+  },
+
+  initContextualMenu: function () {
+    const ref = React.createRef();
+    this.menuRef = ref;
+    this.menuElement = $('<div>').appendTo('body')[0];
+  },
+
+  renderContextualMenu:function (folder, top, left, foldersTreeElement) {
+    const ref = this.menuRef;
+    ReactDOM.render(<FoldersTreeItemContextualMenu
+      ref={ref}
+      folder={folder}
+      top={top}
+      left={left}
+      foldersTreeElementRef={foldersTreeElement}
+      onDestroy={() => this.hideMenu()}
+    />, this.menuElement);
+  },
+
+  hideMenu() {
+    ReactDOM.unmountComponentAtNode(this.menuElement);
+  },
+
+  /**
+   * Listen when the local storage is updated.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{document} passbolt.storage.folders.updated': function(el, ev) {
+    const folders = ev.data;
+    this.renderFoldersTree(this.foldersTreeRef, folders);
   }
 });
 

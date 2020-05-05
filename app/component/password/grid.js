@@ -19,13 +19,21 @@ import GridContextualMenuComponent from '../password/grid_contextual_menu';
 import I18n from 'passbolt-mad/util/lang/i18n';
 import Lock from '../../util/lock';
 import MadBus from 'passbolt-mad/control/bus';
-import PasswordsGrid from "../../../src/components/PasswordsGrid/PasswordsGrid";
+import PasswordsGrid from "../../../src/components/Workspace/Passwords/Grid/Grid";
 import React from "react";
 import ReactDOM from "react-dom";
 import Resource from '../../model/map/resource';
 import ResourceService from '../../model/service/plugin/resource';
 import PermissionType from '../../model/map/permission_type';
-import route from 'can-route';
+import PasswordWorkspaceComponent from "./workspace";
+
+// Filter stategies
+const FILTER_GROUP = "group";
+const FILTER_TAG = "tag";
+const FILTER_FAVORITE = "favorite";
+const FILTER_SHARED_WITH_ME = "shared_with_me";
+const FILTER_OWNER = "owner";
+const FILTER_FOLDER = "folder";
 
 const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
@@ -34,8 +42,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
     prefixItemId: 'resource_',
     silentLoading: false,
     loadedOnStart: false,
-    isFirstLoad: true,
-    Resource: Resource
+    isFirstLoad: true
   }
 
 }, {
@@ -43,13 +50,114 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
     init: function (el, options) {
       this._super(el, options);
       this._filterLock = new Lock();
+      this.filteredResources = new Resource.List();
+      this.gridRef = React.createRef();
     },
 
     // @inheritdoc
-    afterStart: async function () {
-      this.gridRef = React.createRef();
-      const grid = React.createElement(PasswordsGrid, { ref: this.gridRef });
-      ReactDOM.render(grid, this.element);
+    afterStart: function () {
+      this.renderGrid();
+    },
+
+    /**
+     * Observe when the user filters the workspace
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{mad.bus.element} filter_workspace': async function (el, ev) {
+      const filter = ev.data.filter;
+      await this.filterWorkspace(filter);
+    },
+
+    /**
+     * Observe when the resources local storage is updated.
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{document} passbolt.storage.resources.updated': function (el, ev) {
+      if (!Array.isArray(ev.data)) {
+        console.warn('The local storage has been flushed by the addon. The view is not in sync anymore');
+        return;
+      }
+
+      this.handleResourcesLocalStorageUpdated();
+    },
+
+    /**
+     * Observer when the plugin requests the appjs to select and scroll to a resource.
+     * @param {HTMLElement} el The element the event occurred on
+     * @param {HTMLEvent} ev The event which occurred
+     */
+    '{mad.bus.element} passbolt.plugin.resources.select-and-scroll-to': function(el, ev) {
+      const resourceId = ev.data;
+      const resourceIndex = this.filteredResources.indexOf({id: resourceId});
+
+      // If the resource is filtered with the current filter, select it and scroll to it.
+      if (resourceIndex !== -1) {
+        this.options.selectedResources.splice(0, this.options.selectedResources.length, this.resources[resourceIndex]);
+        this.renderGrid();
+        this.gridRef.current.scrollTo(resourceId);
+      } else {
+        // If not, reset the filter, and try to select it in the all items view.
+        const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+        filter.selectedResourceId = resourceId;
+        MadBus.trigger('filter_workspace', {filter: filter});
+      }
+    },
+
+    /**
+     * Render the grid
+     * @param {array} resources The resources
+     */
+    renderGrid:function () {
+      const resources = this.filteredResources ? this.filteredResources.get() : null;
+      const selectedResources = this.options.selectedResources.get();
+      const filter = this.filter || {};
+      const search = getObject(filter, "rules.keywords") || "";
+      const filterType = getObject(filter, "type") || "default";
+
+      ReactDOM.render(<PasswordsGrid
+        ref={this.gridRef}
+        resources={resources}
+        selectedResources={selectedResources}
+        search={search}
+        filterType={filterType}
+        onRightSelect={(event, resource) => this.onResourceRightSelected(event, resource)}
+        onSelect={(resources) => this.onResourcesSelected(resources)}
+      />, this.element);
+    },
+
+    /**
+     * Handle when the user selects resources.
+     * @param {array} resources The target resources
+     */
+    onResourcesSelected: function(resources) {
+      this.options.selectedResources.splice(0, this.options.selectedResources.length, ...resources);
+      this.renderGrid();
+    },
+
+    /**
+     * Handle when the user right selects a resource.
+     * @param {HtmlEvent} event The right select event
+     * @param {object} resource The target resource
+     */
+    onResourceRightSelected: function(event, resource) {
+      // Select the right selected resource.
+      const selectedResources = this.resources.filter(item => item.id == resource.id);
+      this.options.selectedResources.splice(0, this.options.selectedResources.length, ...selectedResources);
+      this.renderGrid();
+
+      // Get the offset position of the clicked item.
+      const $item = $(`#${this.options.prefixItemId}${resource.id}`);
+      const itemOffset = $item.offset();
+
+      // Show contextual menu.
+      const coordinates = {
+        x: event.pageX - 3,
+        y:  itemOffset.top
+      };
+      const contextualMenu = GridContextualMenuComponent.instantiate({ resource: this.options.selectedResources[0], coordinates: coordinates });
+      contextualMenu.start();
     },
 
     /**
@@ -69,20 +177,12 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       }
 
       this.filter = filter;
-      if (filter.type !== 'search') {
-        this.state.loaded = false;
-        this.gridRef.current.resetState({ resources: null });
-      }
-      this.resources = await this.getResources();
+      this.beforeFilter();
+      this.resources = await this.findResources(filter);
       this.filteredResources = this.filterResources(this.resources);
-      const selectedResourcesIds = this.selectResourcesOnWorkspaceFiltered();
-
-      this.gridRef.current.resetState({
-        resources: this.filteredResources.get(),
-        selectedResources: selectedResourcesIds,
-        search: getObject(filter, "rules.keywords") || "",
-        filterType: this.filter.type
-      });
+      this.afterFilterSelectResource(filter);
+      this.renderGrid();
+      this.afterFilterScrollTo(filter);
 
       if (!this.options.isFirstLoad) {
         ResourceService.updateLocalStorage();
@@ -93,14 +193,22 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
     },
 
     /**
-     * Handle the resources local storage update.
+     * Execute before filter.
      */
-    handleFoldersLocalStorageUpdated: async function () {
-      // TODO update grid
+    beforeFilter: function() {
+      // If the user filters on group or tag. As the resources will be retrieved from the server, empty the grid
+      // and mark the component as loading before the find.
+      if (this.filter.type === FILTER_GROUP || this.filter.type === FILTER_TAG) {
+        this.resources = null;
+        this.filteredResources = null;
+        this.options.selectedResources.splice(0, this.options.selectedResources.length);
+        this.state.loaded = false;
+        this.renderGrid();
+      }
     },
 
     /**
-     * Handle the resources local storage update.
+     * Handle when the resources local storage is udpated.
      */
     handleResourcesLocalStorageUpdated: async function () {
       if (this.options.isFirstLoad) {
@@ -108,69 +216,55 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       }
 
       await this._filterLock.acquire();
+
       this.resources = await this.getUpdatedResources();
       this.filteredResources = this.filterResources(this.resources);
-
-      // Remove from the selected resources the ones which have not filtered anymore.
-      const selectedResources = this.options.selectedResources;
-      const selectedResourcesIds = selectedResources.reduce((carry, resource) => [...carry, resource.id], []);
-      const newSelectedResources = this.filteredResources.filter(resource => selectedResourcesIds.includes(resource.id));
-      if (newSelectedResources.length !== selectedResources.length) {
-        selectedResources.splice(0, selectedResources.length, ...newSelectedResources);
-      }
-
-      this.gridRef.current.updateState({
-        resources: this.filteredResources.get()
-      });
+      this.cleanupSelectedResources();
+      this.renderGrid();
 
       this._filterLock.release();
     },
 
     /**
-     * Select and scroll to a given a resource
-     * @param {string} id The resource id
+     * Cleanup the selected resources:
+     * - Remove the resource that are selected but are deleted or not filtered.
      */
-    selectAndScrollTo: async function(id) {
-      this.gridRef.current.updateState({ selectedResources: [id] });
-      // Force the local storage update, so the resource is in its final position.
-      await this.handleResourcesLocalStorageUpdated();
-      const resourceIndex = this.resources.indexOf({id});
-      this.gridRef.current.scrollTo(id);
-      this.options.selectedResources.splice(0, this.options.selectedResources.length, this.resources[resourceIndex]);
+    cleanupSelectedResources: function() {
+      const selectedResources = this.options.selectedResources;
+      const filteredSelectedResources = selectedResources.filter(selectedResource => {
+        return this.filteredResources.indexOf({id: selectedResource.id}) !== -1;
+      });
+      if (selectedResources.length !== filteredSelectedResources.length) {
+        selectedResources.splice(0, this.options.selectedResources.length, ...filteredSelectedResources);
+      }
     },
 
     /**
-     * Get the resources (in canJS format)
-     * @return {Resource.List}
+     * Find the resources.
+     * @param {Filter} filter The filter to apply
+     * @return {Promise<Resource.List>}
      */
-    getResources: function () {
-      if (this.filter.type === "group") {
-        const groupId = this.filter.rules['is-shared-with-group'];
-        const contain = { favorite: 1, permission: 1, tag: 1 };
-        const filter = { 'is-shared-with-group': groupId };
-        return Resource.findAll({ contain, filter });
-      }
-      if (this.filter.type === "tag") {
-        const tagId = this.filter.rules['has-tag'];
-        const contain = { favorite: 1, permission: 1, tag: 1 };
-        const filter = { 'has-tag': tagId };
-        return Resource.findAll({ contain, filter });
-      }
-      if (this.filter.type === "folder") {
-        let folderId = this.filter.rules['has-parent'];
-        if (folderId === null) {
-          folderId = false;
-        }
-        const contain = { favorite: 1, permission: 1, tag: 1 };
-        const filter = { 'has-parent': [folderId] };
-        return Resource.findAll({ contain, filter });
+    findResources: function (filter) {
+      let promise;
+
+      switch (filter.type) {
+        case FILTER_GROUP:
+          promise = Resource.findByGroup(this.filter.rules['is-shared-with-group']);
+          break;
+        case FILTER_TAG:
+          promise = Resource.findByTag(this.filter.rules['has-tag']);
+          break;
+        default:
+          promise = Resource.findAll({ source: 'storage', retryOnNotInitialized: true });
+          break;
       }
 
-      return Resource.findAll({ source: 'storage', retryOnNotInitialized: true });
+      return promise;
     },
 
     /**
      * Get the resources after a local storage update
+     * @todo do something, can/react it's a bit shit
      * @return {Resource.List}
      */
     getUpdatedResources: async function () {
@@ -178,7 +272,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
 
       // Filtering by tags and groups doesn't yet benefit from the local storage.
       // Update the resources local variable with the one returned by the cache.
-      if (this.filter.type === "group" || this.filter.type === "tag" || this.filter.type === "folder") {
+      if (this.filter.type === FILTER_GROUP || this.filter.type === FILTER_TAG) {
         for (let i = this.resources.length - 1; i >= 0; i--) {
           const updatedResourceIndex = updatedResources.indexOf(this.resources[i]);
           if (updatedResourceIndex === -1) {
@@ -195,156 +289,59 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
     },
 
     /**
-     * Filter the resources
-     * @param {Resources.List} resources
+     * Filter the resources.
+     * @param {Resource.list} resources The list of resource to filter
+     * @return {Resources.List}
      */
     filterResources: function (resources) {
-      if (this.filter.type == "favorite") {
-        return resources.filter(resource => resource.favorite !== null);
+      switch (this.filter.type) {
+        case FILTER_FAVORITE:
+          return resources.filter(resource => resource.favorite !== null);
+        case FILTER_SHARED_WITH_ME:
+          return resources.filter(resource => resource.permission.type !== PermissionType.ADMIN);
+        case FILTER_OWNER:
+          return resources.filter(resource => resource.permission.type === PermissionType.ADMIN);
+        case FILTER_FOLDER:
+          return resources.filter(resource => resource.folder_parent_id === this.filter.folder.id);
+        default:
+          return resources;
       }
-      if (this.filter.type == "shared_with_me") {
-        return resources.filter(resource => resource.permission.type !== PermissionType.ADMIN);
-      }
-      if (this.filter.type == "owner") {
-        return resources.filter(resource => resource.permission.type === PermissionType.ADMIN);
-      }
-      if (this.filter.type == "folder") {
-        return resources.filter(resource => resource.folder_parent_id === this.filter.folder.id);
-      }
-
-      return resources;
     },
 
     /**
-     * Select resources after the workspace is filtered.
-     * @return {array} The selected resource ids.
+     * Select a resource if any passed with the filter.
+     * @param {Filter} The applied filter
      */
-    selectResourcesOnWorkspaceFiltered: function () {
-      const selectedResourcesIds = [];
+    afterFilterSelectResource: function (filter) {
+      const selectedResources = this.options.selectedResources;
 
-      // During the first load, we check if a resource id has been given in parameter.
-      // Otherwise unselect all the resources.
-      if (this.options.isFirstLoad && ["commentsView", "view"].includes(route.data.action)) {
-        const selectedResourceIndex = this.resources.indexOf({ id: route.data.id });
-        if (selectedResourceIndex !== -1) {
-          this.options.selectedResources.push(this.resources[selectedResourceIndex]);
-          selectedResourcesIds.push(route.data.id);
+      if (filter.selectedResourceId) {
+        const resourceIndex = this.resources.indexOf({ id: filter.selectedResourceId });
+        if (resourceIndex !== -1) {
+          selectedResources.push(this.resources[resourceIndex]);
         } else {
-          MadBus.trigger('passbolt_notify', { status: 'error', title: 'app_passwords_edit_error_not_found' });
+          if (this.options.isFirstLoad) {
+            MadBus.trigger('passbolt_notify', { status: 'error', title: 'app_passwords_edit_error_not_found' });
+          }
         }
       } else {
-        const selectedResources = this.options.selectedResources;
         selectedResources.splice(0, selectedResources.length);
       }
-
-      return selectedResourcesIds;
     },
 
     /**
-     * Handle resources selected event.
-     * @param {array} resourcesIds
+     * Scroll to a resource if any given with the filter
+     * @param {Filter} The applied filter
      */
-    selectResources: function (resourcesIds) {
-      const selectedResources = this.resources.reduce((carry, resource) => {
-        if (resourcesIds.includes(resource.id)) {
-          carry = [...carry, resource];
+    afterFilterScrollTo: function (filter) {
+      if (filter.selectedResourceId) {
+        const resourceIndex = this.filteredResources.indexOf({ id: filter.selectedResourceId });
+        if (resourceIndex !== -1) {
+          this.gridRef.current.scrollTo(filter.selectedResourceId);
         }
-        return carry;
-      }, []);
-
-      this.options.selectedResources.splice(0, this.options.selectedResources.length, ...selectedResources);
-    },
-
-    /**
-     * Handle resource right selected event.
-     * @param {strinf} resourceId
-     * @param {HTMLEvent} srcEv The source event
-     */
-    rightSelectResource: function (resourceId, srcEv) {
-      // Find the resource and select it.
-      const selectedResources = this.resources.filter(resource => resource.id == resourceId);
-      this.options.selectedResources.splice(0, this.options.selectedResources.length, ...selectedResources);
-
-      // Get the offset position of the clicked item.
-      const $item = $(`#${this.options.prefixItemId}${resourceId}`);
-      const itemOffset = $item.offset();
-
-      // Show contextual menu.
-      this.showContextualMenu(selectedResources[0], srcEv.pageX - 3, itemOffset.top, srcEv.target);
-    },
-
-    /**
-     * Show the contextual menu
-     * @param {Resource} resource The resource to show the contextual menu for
-     * @param {string} x The x position where the menu will be rendered
-     * @param {string} y The y position where the menu will be rendered
-     */
-    showContextualMenu: function (resource, x, y) {
-      const coordinates = { x: x, y: y };
-      const contextualMenu = GridContextualMenuComponent.instantiate({ resource: resource, coordinates: coordinates });
-      contextualMenu.start();
-    },
-
-    /**
-     * Observe when the workspace has been filtered.
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    '{mad.bus.element} filter_workspace': async function (el, ev) {
-      await this.filterWorkspace(ev.data.filter);
-      if (ev.data.selectAndScrollTo) {
-        this.selectAndScrollTo(ev.data.selectAndScrollTo);
       }
-    },
-
-    /**
-     * The resources local storate has been updated.
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    '{document} passbolt.storage.resources.updated': async function (el, ev) {
-      if (!Array.isArray(ev.data)) {
-        console.warn('The local storage has been flushed by the addon. The view is not in sync anymore');
-        return;
-      }
-
-      this.handleResourcesLocalStorageUpdated();
-    },
-
-    /**
-     * The folders local storate has been updated.
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    '{document} passbolt.storage.folders.updated': async function (el, ev) {
-      if (!Array.isArray(ev.data)) {
-        console.warn('The local storage has been flushed by the addon. The view is not in sync anymore');
-        return;
-      }
-
-      this.handleFoldersLocalStorageUpdated();
-    },
-
-    /**
-     * Items have been selected
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    '{mad.bus.element} grid_resources_selected': function (el, ev) {
-      const resourcesIds = ev.detail;
-      this.selectResources(resourcesIds);
-    },
-
-    /**
-     * An item has been right selected
-     * @param {HTMLElement} el The element the event occurred on
-     * @param {HTMLEvent} ev The event which occurred
-     */
-    '{mad.bus.element} grid_resource_right_selected': function (el, ev) {
-      const resourceId = ev.detail.resource.id;
-      const srcEv = ev.detail.srcEv;
-      this.rightSelectResource(resourceId, srcEv);
     }
+
   });
 
 export default GridComponent;

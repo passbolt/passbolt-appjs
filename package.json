@@ -97,7 +97,6 @@
     "jssha": "2.0.2",
     "moment": "2.24.0",
     "moment-timezone": "0.5.26",
-    "passbolt-mad": "2.11.3",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-list": "0.8.11",
@@ -119,6 +118,7 @@
     "grunt": "1.1.0",
     "grunt-testee": "github:passbolt/grunt-testee#master",
     "mocha": "7.1.1",
+    "passbolt-mad": "^2.11.3",
     "sinon": "1.17.7",
     "steal-tools": "2.2.6",
     "testee": "github:passbolt/testee#master"

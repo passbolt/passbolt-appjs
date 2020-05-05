@@ -24,7 +24,6 @@ import Role from './model/map/role';
 import User from './model/map/user';
 import notificationConfig from './config/notification.json';
 import appConfig from './config/config.json';
-import FolderService from "./model/service/plugin/folder";
 
 const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
 
@@ -44,7 +43,7 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
   _init: async function() {
     await Plugin.isReady();
     ResourceService.updateLocalStorage();
-    FolderService.updateLocalStorage();
+    Plugin.request('passbolt.plugin.folders.update-local-storage');
     this._csrfToken();
     await Promise.all([this._loadSettings(), this._loadUser(), this._loadRoles()]);
     await this._loadAccountSettings();

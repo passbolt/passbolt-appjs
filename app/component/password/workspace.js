@@ -29,8 +29,6 @@ import Plugin from '../../util/plugin';
 
 import PrimaryMenuComponent from '../password/workspace_primary_menu';
 import PrimarySidebarComponent from '../password/primary_sidebar';
-import ResourceCreateForm from '../../form/resource/create';
-import ResourceEditForm from '../../form/resource/edit';
 import route from 'can-route';
 import SecondaryMenuComponent from '../workspace/secondary_menu';
 
@@ -38,7 +36,6 @@ import Filter from '../../model/filter';
 import Group from '../../model/map/group';
 import Resource from '../../model/map/resource';
 import ResourceService from '../../model/service/plugin/resource';
-import FolderService from '../../model/service/plugin/folder';
 import Tag from '../../model/map/tag';
 
 import commentDeleteConfirmTemplate from '../../view/template/component/comment/delete_confirm.stache';
@@ -49,7 +46,7 @@ import template from '../../view/template/component/password/workspace.stache';
 import Action from "passbolt-mad/model/map/action";
 import uuid from "uuid/v4";
 import ButtonDropdownComponent from "passbolt-mad/component/button_dropdown";
-import User from "../../model/map/user";
+import Validation from "passbolt-mad/util/validation";
 
 const PasswordWorkspaceComponent = Component.extend('passbolt.component.password.Workspace', /** @static */ {
 
@@ -125,7 +122,9 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     switch (action) {
       case 'commentsView':
       case 'view': {
-        filter.viewResourceId = route.data.id;
+        if (Validation.uuid(route.data.id)) {
+          filter.selectedResourceId = route.data.id;
+        }
       }
     }
 
@@ -222,7 +221,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
         action: () => {
           button.view.close();
           const folderParentId = this.filter.folder ? this.filter.folder.id : null;
-          MadBus.trigger('request_folder_create', {folderParentId});
+          Plugin.send('passbolt.plugin.folders.open-create-dialog', {folderParentId});
         }
       })
     ];
@@ -344,59 +343,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   openCreateResourceDialog: function(folderParentId) {
     ResourceService.openCreateDialog(folderParentId);
-  },
-
-  /**
-   * Open the folder create dialog.
-   * @param {string} folderParentId The parent folder id
-   */
-  openCreateFolderDialog: function(folderParentId) {
-    FolderService.openCreateDialog(folderParentId);
-  },
-
-  /**
-   * Open the folder rename dialog.
-   */
-  openRenameFolderDialog: function(folder) {
-    FolderService.openRenameDialog(folder);
-  },
-
-  /**
-   * Open the folder move dialog.
-   */
-  openMoveFolderDialog: function(folder) {
-    FolderService.openMoveDialog(folder);
-  },
-
-  /**
-   * Open the folder rename dialog.
-   */
-  openShareFolderDialog: function(folders) {
-    FolderService.openShareDialog(folders.map(folder => folder.id));
-  },
-
-  /**
-   * Open the folder delete dialog.
-   */
-  openDeleteFolderDialog: function(folder) {
-    FolderService.openDeleteDialog(folder);
-  },
-
-  /**
-   * Observer when the plugin requests the appjs to select and scroll to a resource.
-   * @param {string} id The resource id.
-   */
-  '{mad.bus.element} passbolt.plugin.resources.select-and-scroll-to': function(el, ev) {
-    const data = ev.data;
-
-    if (["default", "modified", "owner"].includes(this.filter.type)) {
-      this.grid.selectAndScrollTo(data);
-    } else if (this.filter.type === "folder") {
-      MadBus.trigger('filter_workspace', {filter: this.filter, selectAndScrollTo: data});
-    } else {
-      const filter = this.getFilter();
-      MadBus.trigger('filter_workspace', {filter: filter, selectAndScrollTo: data});
-    }
   },
 
   /**
@@ -666,62 +612,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
   '{mad.bus.element} request_export': function() {
     const resourcesIds = this.options.selectedResources.reduce((carry, resource) => [...carry, resource.id], []);
     Plugin.send('passbolt.plugin.export_resources', resourcesIds);
-  },
-
-  /**
-   * Observe when the user requests a folder creation
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_folder_create': function(el, ev) {
-    let folderParentId = null;
-    if (ev.data && ev.data.folderParentId !== null) {
-      folderParentId = ev.data.folderParentId;
-    }
-    // Can be an event coming from a React component.
-    if (ev.detail && ev.detail.folderParentId !== null) {
-      folderParentId = ev.detail.folderParentId;
-    }
-    this.openCreateFolderDialog(folderParentId);
-  },
-
-  /**
-   * Observe when the user wants to rename a folder
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_folder_rename': function(el, ev) {
-    const folder = ev.detail.folder;
-    this.openRenameFolderDialog(folder);
-  },
-
-  /**
-   * Observe when the user wants to share a folder
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_folder_share': function(el, ev) {
-    this.openShareFolderDialog(ev.detail.folders);
-  },
-
-  /**
-   * Observe when the user wants to move a folder
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_folder_move': function(el, ev) {
-    const folder = ev.detail.folder;
-    this.openMoveFolderDialog(folder);
-  },
-
-  /**
-   * Observe when the user wants to move a folder
-   * @param {HTMLElement} el The element the event occurred on
-   * @param {HTMLEvent} ev The event which occurred
-   */
-  '{mad.bus.element} request_folder_delete': function(el, ev) {
-    const folder = ev.detail.folder;
-    this.openDeleteFolderDialog(folder);
   },
 
   /**
