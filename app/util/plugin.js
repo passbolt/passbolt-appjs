@@ -108,7 +108,7 @@ export default class Plugin {
           setTimeout(async () => {
             try {
               ++options.attempt;
-              const result = await retryRequest(callback, options);
+              const result = await this.request(message, data);
               resolve(result);
             } catch (error) {
               reject(error);
