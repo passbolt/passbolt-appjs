@@ -542,7 +542,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       this.options.mainButton.state.disabled = false;
       this.options.importButton.state.disabled = false;
     }
-
   },
 
   /**

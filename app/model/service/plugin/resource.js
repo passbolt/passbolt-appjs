@@ -92,8 +92,6 @@ export default class ResourceService {
 
   /**
    * Find all the resources from the local storage.
-   * @param {Object} options
-   * - retryOnNotInitialized: @notImplementedYet Retry the request if the resources local storage is not initialized
    * @return {Promise}
    * @static
    */
