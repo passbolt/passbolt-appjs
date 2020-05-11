@@ -18,7 +18,6 @@ import Component from 'passbolt-mad/component/component';
 import ComponentHelper from 'passbolt-mad/helper/component';
 import Config from 'passbolt-mad/config/config';
 import ConfirmDialogComponent from 'passbolt-mad/component/confirm';
-import DialogComponent from 'passbolt-mad/component/dialog';
 import getObject from 'can-util/js/get/get';
 import GridComponent from '../password/grid';
 // eslint-disable-next-line no-unused-vars
@@ -534,6 +533,16 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     if (!filter.rules['is-shared-with-group']) {
       this.options.selectedGroups.splice(0, this.options.selectedGroups.length);
     }
+
+    // Disable the main button, if a folder is selected and the user doesn't have the permission to write into it.
+    if (filter.type === 'folder' && filter.folder.permission.type < 7) {
+      this.options.mainButton.state.disabled = true;
+      this.options.importButton.state.disabled = true;
+    } else {
+      this.options.mainButton.state.disabled = false;
+      this.options.importButton.state.disabled = false;
+    }
+
   },
 
   /**
