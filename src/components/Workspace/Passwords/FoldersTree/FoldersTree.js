@@ -95,7 +95,7 @@ class FoldersTree extends React.Component {
    * @param {ReactEvent} event The event
    */
   handleFilterWorkspaceEvent(event) {
-    if (event.data.filter.type !== "folder") {
+    if (event.data.filter.type !== "folder" || (event.data.filter.type === "folder" && event.data.filter.folder.id === null)) {
       const selectedFolder = null;
       this.setState({selectedFolder});
     }

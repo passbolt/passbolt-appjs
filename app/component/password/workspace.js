@@ -535,7 +535,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     }
 
     // Disable the main button, if a folder is selected and the user doesn't have the permission to write into it.
-    if (filter.type === 'folder' && filter.folder.permission.type < 7) {
+    if (filter.type === 'folder' && filter.folder.id !== null && filter.folder.permission.type < 7) {
       this.options.mainButton.state.disabled = true;
       this.options.importButton.state.disabled = true;
     } else {
