@@ -31,14 +31,12 @@ const UserDelete = DefineMap.extend('passbolt.model.UserDelete', {
       },
       resources: {
         type: {
-          sole_owner: {
-            Type: Resource.List,
-            Value: Resource.List
-          },
-          sole_manager_of_group_sole_owner: {
-            Type: Resource.List,
-            Value: Resource.List
-          }
+          sole_owner: 'array'
+        }
+      },
+      folders: {
+        type: {
+          sole_owner: 'array'
         }
       }
     }
@@ -80,6 +78,26 @@ const UserDelete = DefineMap.extend('passbolt.model.UserDelete', {
     });
 
     return resources;
+  },
+
+  /**
+   * Get the folders to transfer the owner for.
+   * @return {array}
+   */
+  getFoldersToTransferOwner: function() {
+    let folders = getObject(this, 'errors.folders.sole_owner') || [];
+    const groupsToDelete = getObject(this, 'groups_to_delete') || [];
+
+    // The user who is going to be deleted and the groups that are going to be deleted cannot be the owner of the resource.
+    let excludedOwners = [this.user_id];
+    excludedOwners = excludedOwners.concat(groupsToDelete.reduce((carry, group) => carry.concat(group.id), []));
+
+    folders = folders.sort((a, b) => a.name > b.name);
+    folders.forEach(folder => {
+      folder.permissions = folder.permissions.filter(permission => excludedOwners.indexOf(permission.aro_foreign_key) == -1);
+    });
+
+    return folders;
   }
 
 });

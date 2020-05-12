@@ -8,6 +8,19 @@
     </p>
 </div>
 <div class="ownership-transfer scroll">
+{{#if(folders.length)}}
+    <h3>Folders</h3>
+    <ul class="ownership-transfer-items">
+        {{#each(folders)}}
+        <li>
+            <div class="input select required">
+                <label for="transfer_folder_owner_{{id}}">{{name}} ({{__('Folder'}}) {{__('new owner')}}:</label>
+                <select name="data[Folder][{{id}}]" id="transfer_folder_owner_{{id}}" class="fluid"></select>
+            </div>
+        </li>
+        {{/each}}
+    </ul>
+{{/if}}
 {{#if(resources.length)}}
     <h3>Passwords</h3>
     <ul class="ownership-transfer-items">

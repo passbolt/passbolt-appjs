@@ -23,10 +23,12 @@ const GroupDelete = DefineMap.extend('passbolt.model.GroupDelete', {
     type: {
       resources: {
         type: {
-          sole_owner: {
-            Type: Resource.List,
-            Value: Resource.List
-          }
+          sole_owner: "array"
+        }
+      },
+      folders: {
+        type: {
+          sole_owner: "array"
         }
       }
     }
@@ -45,6 +47,20 @@ const GroupDelete = DefineMap.extend('passbolt.model.GroupDelete', {
     });
 
     return resources;
+  },
+
+  /**
+   * Get the folders to transfer the owner for.
+   * @return {array}
+   */
+  getFoldersToTransferOwner: function() {
+    let folders = getObject(this, 'errors.folders.sole_owner') || [];
+    folders = folders.sort((a, b) => a.name > b.name);
+    folders.forEach(folder => {
+      folder.permissions = folder.permissions.filter(permission => permission.aro_foreign_key != this.group_id);
+    });
+
+    return folders;
   }
 
 });

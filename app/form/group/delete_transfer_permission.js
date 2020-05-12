@@ -36,6 +36,7 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.group.DeleteTran
     this.group = this.options.group;
     const groupDelete = this.options.groupDelete;
     this.resources = groupDelete.getResourcesToTransferOwner();
+    this.folders = groupDelete.getFoldersToTransferOwner();
   },
 
   /**
@@ -43,6 +44,7 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.group.DeleteTran
    */
   beforeRender: function() {
     this.setViewData('resources', this.resources);
+    this.setViewData('folders', this.folders);
     this.setViewData('group', this.group);
   },
 
@@ -51,6 +53,7 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.group.DeleteTran
    */
   afterStart: function() {
     this._initResourcesTransferSection();
+    this._initFoldersTransferSection();
   },
 
   /**
@@ -60,7 +63,7 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.group.DeleteTran
     this.resources.forEach(resource => {
       const permissions = new Permission.List(resource.permissions);
       permissions.sortAlphabetically();
-      const aros = this._prepareResourcesTransferArosViewData(permissions);
+      const aros = this._prepareContentTransferArosViewData(permissions);
       const dropdownSelector = `transfer_resource_owner_${resource.id}`;
       const dropdown = new DropdownComponent(`#${dropdownSelector}`, {
         emptyValue: false,
@@ -75,11 +78,32 @@ const DeleteTransferPermissionForm = Form.extend('passbolt.form.group.DeleteTran
   },
 
   /**
+   * Initialize the folders transfer section
+   */
+  _initFoldersTransferSection: function() {
+    this.folders.forEach(folder => {
+      const permissions = new Permission.List(folder.permissions);
+      permissions.sortAlphabetically();
+      const aros = this._prepareContentTransferArosViewData(permissions);
+      const dropdownSelector = `transfer_folder_owner_${folder.id}`;
+      const dropdown = new DropdownComponent(`#${dropdownSelector}`, {
+        emptyValue: false,
+        validate: false,
+        modelReference: `transfer.owners.${folder.id}`,
+        availableValues: aros,
+        value: Object.keys(aros)[0]
+      });
+      dropdown.start();
+      this.addElement(dropdown);
+    });
+  },
+
+  /**
    * Prepare a resource transfer available users or groups for the view.
    * @param {Permission.List} permissions
    * @return {object}
    */
-  _prepareResourcesTransferArosViewData: function(permissions) {
+  _prepareContentTransferArosViewData: function(permissions) {
     return permissions.reduce((carry, permission) => {
       const value = permission.id;
       const label = permission.user ? `${permission.user.profile.first_name} ${permission.user.profile.last_name} (${permission.user.username})` : `${permission.group.name} (Group)`;
