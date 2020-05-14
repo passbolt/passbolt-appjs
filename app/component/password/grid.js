@@ -27,7 +27,7 @@ import ResourceService from '../../model/service/plugin/resource';
 import PermissionType from '../../model/map/permission_type';
 import PasswordWorkspaceComponent from "./workspace";
 
-// Filter stategies
+// Filter strategies
 const FILTER_GROUP = "group";
 const FILTER_TAG = "tag";
 const FILTER_FAVORITE = "favorite";
@@ -176,6 +176,7 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
         return;
       }
 
+      let previousType = this.filter ? this.filter.type : null;
       this.filter = filter;
       this.beforeFilter();
       this.resources = await this.findResources(filter);
@@ -184,7 +185,8 @@ const GridComponent = Component.extend('passbolt.component.password.Grid', {
       this.renderGrid();
       this.afterFilterScrollTo(filter);
 
-      if (!this.options.isFirstLoad) {
+      const isSearching = this.filter.type === "search" && this.filter.type === previousType;
+      if (!this.options.isFirstLoad && !isSearching) {
         ResourceService.updateLocalStorage();
       }
       this.options.isFirstLoad = false;
