@@ -224,7 +224,7 @@ class FoldersTreeItemContextualMenu extends React.Component {
               </div>
             </div>
           </li>
-          <li key="option-export-folder" className={`ready closed ${canShare ? "" : "disabled"}`}>
+          <li key="option-export-folder" className="ready closed">
             <div className="row">
               <div className="main-cell-wrapper">
                 <div className="main-cell">
