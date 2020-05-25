@@ -53,6 +53,7 @@ class FoldersTreeItemContextualMenu extends React.Component {
     this.handleCreateFolderItemClickEvent = this.handleCreateFolderItemClickEvent.bind(this);
     this.handleRenameFolderItemClickEvent = this.handleRenameFolderItemClickEvent.bind(this);
     this.handleShareFolderItemClickEvent = this.handleShareFolderItemClickEvent.bind(this);
+    this.handleExportFolderItemClickEvent = this.handleExportFolderItemClickEvent.bind(this);
     this.handleDeleteFolderItemClickEvent = this.handleDeleteFolderItemClickEvent.bind(this);
   }
 
@@ -140,6 +141,15 @@ class FoldersTreeItemContextualMenu extends React.Component {
   }
 
   /**
+   * Handle click on the export a folder menu option.
+   */
+  handleExportFolderItemClickEvent() {
+    const foldersIds = [this.props.folder.id];
+    Plugin.send("passbolt.plugin.export_resources", {"folders": foldersIds});
+    this.destroy();
+  }
+
+  /**
    * Handle click on the delete a folder menu option.
    */
   handleDeleteFolderItemClickEvent() {
@@ -210,6 +220,15 @@ class FoldersTreeItemContextualMenu extends React.Component {
               <div className="main-cell-wrapper">
                 <div className="main-cell">
                   <a onClick={this.handleShareFolderItemClickEvent}><span>Share</span></a>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li key="option-export-folder" className={`ready closed ${canShare ? "" : "disabled"}`}>
+            <div className="row">
+              <div className="main-cell-wrapper">
+                <div className="main-cell">
+                  <a onClick={this.handleExportFolderItemClickEvent}><span>Export</span></a>
                 </div>
               </div>
             </div>
