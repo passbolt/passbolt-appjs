@@ -169,7 +169,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Component}
    */
   _initMainActionButton: function() {
-    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders.enabled');
+    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders');
     if (pluginFoldersEnabled) {
       return this._initProMainActionButton();
     } else {

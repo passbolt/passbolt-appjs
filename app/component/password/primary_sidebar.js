@@ -57,7 +57,7 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
    * Initialize the groups filter section
    */
   _initFoldersFilterSection: function() {
-    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders.enabled');
+    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders');
     if (!pluginFoldersEnabled) {
       return;
     }

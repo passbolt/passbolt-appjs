@@ -43,12 +43,9 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
   _init: async function() {
     await Plugin.isReady();
     ResourceService.updateLocalStorage();
-    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders.enabled');
-    if (pluginFoldersEnabled) {
-      Plugin.request('passbolt.plugin.folders.update-local-storage');
-    }
     this._csrfToken();
     await Promise.all([this._loadSettings(), this._loadUser(), this._loadRoles()]);
+    await this._loadFolders();
     await this._loadAccountSettings();
     await this._loadApp();
   },
@@ -94,6 +91,16 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
       .then(roles => {
         Role.setCache(roles);
       });
+  },
+
+  /**
+   * Load folders
+   */
+  _loadFolders: function() {
+    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders');
+    if (pluginFoldersEnabled) {
+      Plugin.request('passbolt.plugin.folders.update-local-storage');
+    }
   },
 
   /**
