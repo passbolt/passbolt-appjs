@@ -57,6 +57,10 @@ const PrimarySidebarComponent = PrimarySidebarAbstractComponent.extend('passbolt
    * Initialize the groups filter section
    */
   _initFoldersFilterSection: function() {
+    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders.enabled');
+    if (!pluginFoldersEnabled) {
+      return;
+    }
     const component = new FoldersFilterSidebarSectionComponent('#js_wsp_pwd_filter_folders_section', {
       selectedGroups: this.options.selectedFolders
     });

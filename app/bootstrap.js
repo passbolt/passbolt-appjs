@@ -43,7 +43,10 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
   _init: async function() {
     await Plugin.isReady();
     ResourceService.updateLocalStorage();
-    Plugin.request('passbolt.plugin.folders.update-local-storage');
+    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders.enabled');
+    if (pluginFoldersEnabled) {
+      Plugin.request('passbolt.plugin.folders.update-local-storage');
+    }
     this._csrfToken();
     await Promise.all([this._loadSettings(), this._loadUser(), this._loadRoles()]);
     await this._loadAccountSettings();

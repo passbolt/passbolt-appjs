@@ -169,8 +169,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @return {Component}
    */
   _initMainActionButton: function() {
-    const plugins = Config.read('server.passbolt.plugins');
-    if (plugins.folders) {
+    const pluginFoldersEnabled = Config.read('server.passbolt.plugins.folders.enabled');
+    if (pluginFoldersEnabled) {
       return this._initProMainActionButton();
     } else {
       return this._iniCeMainActionButton();
@@ -188,7 +188,12 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
       id: 'js_wsp_create_button',
       template: createButtonTemplate,
       tag: 'button',
-      cssClasses: ['button', 'primary']
+      cssClasses: ['button', 'primary'],
+      events: {
+        click: function() {
+          MadBus.trigger('request_resource_create');
+        }
+      }
     };
     const component = ComponentHelper.create(selector, 'last', ButtonComponent, options);
     this.options.mainButton = component;
