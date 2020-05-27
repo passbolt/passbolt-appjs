@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [2.13.0] - 2020-05-27
+### Added
+- PB-658: Folders and relative works
+- PB-582: Migrate add and update resource dialog to the extension
+
+### Fixed
+- PB-1222: Fix password details information sidebar look and feel
+
 
 ## [2.12.6] - 2020-04-14
 ### Fixed
