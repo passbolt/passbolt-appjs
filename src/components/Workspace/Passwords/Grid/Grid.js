@@ -525,11 +525,9 @@ class Grid extends React.Component {
           {isEmpty && !isSearching && ["default", "modified", "owned_by_me"].includes(this.props.filterType) &&
           <React.Fragment>
             <div className="empty-content">
-              <h1>Welcome to passbolt!</h1>
-              <p>It does feel a bit empty here. Create your first password or<br/>wait for a team member to share one with you.
-              </p>
+              <h2>Welcome to passbolt!</h2>
+              <p>It does feel a bit empty here. Create your first password or<br/>wait for a team member to share one with you.</p>
             </div>
-            <div className="tableview-content scroll"></div>
           </React.Fragment>
           }
           {!isEmpty &&
