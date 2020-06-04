@@ -29,6 +29,8 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
    */
   afterStart: function () {
     this._super();
+    this.selectedFolder = null;
+    this.folders = null;
     this.initFoldersTree();
     this.initContextualMenu();
     this.loadFolders();
@@ -36,23 +38,24 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
 
   loadFolders: async function() {
     const folders = await Plugin.requestUntilSuccess("passbolt.storage.folders.get");
-    this.renderFoldersTree(this.foldersTreeRef, folders)
+    this.folders = folders;
+    this.renderFoldersTree(this.foldersTreeRef, this.folders, this.selectedFolder)
   },
 
   initFoldersTree: function () {
     const ref = React.createRef();
     this.foldersTreeRef = ref;
-    const folders = null;
-    this.renderFoldersTree(ref, folders);
+    this.renderFoldersTree(this.foldersTreeRef, this.folders, this.selectedFolder);
   },
 
-  renderFoldersTree:function (ref, folders) {
+  renderFoldersTree:function (ref, folders, selectedFolder) {
     ReactDOM.render(<FoldersTree
       ref={ref}
       folders={folders}
       onContextualMenu={(folder, top, left, foldersTreeElement) => this.onContextualMenu(folder, top, left, foldersTreeElement)}
       onSelect={folder => this.onSelect(folder)}
       onSelectRoot={() => this.onSelectRoot()}
+      selectedFolder={selectedFolder}
     />, this.element);
   },
 
@@ -72,6 +75,8 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
       order: ['Resource.modified DESC']
     });
     MadBus.trigger('filter_workspace', {filter});
+    this.selectedFolder = folder;
+    this.renderFoldersTree(this.foldersTreeRef, this.folders, this.selectedFolder);
   },
 
   onSelectRoot() {
@@ -120,7 +125,58 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
    */
   '{document} passbolt.storage.folders.updated': function(el, ev) {
     const folders = ev.data;
-    this.renderFoldersTree(this.foldersTreeRef, folders);
+    this.folders = folders;
+    this.renderFoldersTree(this.foldersTreeRef, this.folders, this.selectedFolder);
+  },
+
+  /**
+   * When a new filter is applied to the workspace.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} filter_workspace': function(el, ev) {
+    const filter = ev.data.filter;
+    let selectedFolder = null;
+
+    if (filter.type === 'folder') {
+      selectedFolder = filter.folder;
+    }
+
+    this.selectedFolder = selectedFolder;
+    this.renderFoldersTree(this.foldersTreeRef, this.folders, this.selectedFolder);
+  },
+
+  /**
+   * When the plugin request the appj to select and scroll to a folder.
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{document} passbolt.plugin.folders.select-and-scroll-to': function(el, ev) {
+    const folderId = ev.data;
+    const folder = this.folders.find(folder => folder.id === folderId);
+
+    const filter = new Filter({
+      id: `workspace_filter_folder_${folder.id}`,
+      type: 'folder',
+      folder: folder,
+      label: __('%s (folder)', folder.name),
+      rules: {
+        'has-parent': folder.id
+      },
+      order: ['Resource.modified DESC']
+    });
+    MadBus.trigger('filter_workspace', {filter});
+    this.foldersTreeRef.current.openFolderTree(folder);
+  },
+
+  /**
+   * Scroll to a folder
+   * @param {HTMLElement} el The element the event occurred on
+   * @param {HTMLEvent} ev The event which occurred
+   */
+  '{mad.bus.element} scroll_to_folder': function(el, ev) {
+    const folder = ev.data;
+    this.foldersTreeRef.current.openFolderTree(folder);
   }
 });
 

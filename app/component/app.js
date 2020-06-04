@@ -178,6 +178,9 @@ const App = Component.extend('passbolt.component.App', /** @static */ {
       case 'administration':
         WorkspaceClass = AdministrationWorkspaceComponent;
         break;
+      case 'folder':
+        WorkspaceClass = PasswordWorkspaceComponent;
+        break;
       case 'password':
         WorkspaceClass = PasswordWorkspaceComponent;
         break;

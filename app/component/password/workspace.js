@@ -25,6 +25,8 @@ import I18n from 'passbolt-mad/util/lang/i18n';
 import MadBus from 'passbolt-mad/control/bus';
 import PasswordSecondarySidebarComponent from '../password/password_secondary_sidebar';
 import Plugin from '../../util/plugin';
+import React from "react";
+import ReactDOM from "react-dom";
 
 import PrimaryMenuComponent from '../password/workspace_primary_menu';
 import PrimarySidebarComponent from '../password/primary_sidebar';
@@ -46,6 +48,8 @@ import Action from "passbolt-mad/model/map/action";
 import uuid from "uuid/v4";
 import ButtonDropdownComponent from "passbolt-mad/component/button_dropdown";
 import Validation from "passbolt-mad/util/validation";
+import HtmlHelper from "passbolt-mad/helper/html";
+import FolderSidebar from "../../../src/components/Workspace/Passwords/FolderSidebar/FolderSidebar";
 
 const PasswordWorkspaceComponent = Component.extend('passbolt.component.password.Workspace', /** @static */ {
 
@@ -101,20 +105,32 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     primarySidebar.start();
     grid.start();
 
-    // Filter the workspace
-    const filter = this.getFilter();
-    MadBus.trigger('filter_workspace', {filter: filter});
+    this.intialFilter();
 
     this.on();
     this._super();
   },
 
   /**
+   * Filter the workspace
+   * @returns {Promise<void>}
+   */
+  intialFilter: async function() {
+    // Filter the workspace
+    const filter = await this.getFilter();
+    MadBus.trigger('filter_workspace', {filter: filter});
+    // If filter on a folder, scroll to this folder.
+    if (filter.type === 'folder' && filter.folder.id !== null) {
+      MadBus.trigger('scroll_to_folder', filter.folder);
+    }
+  },
+
+  /**
    * Get the filter to apply to the workspace.
    * @return {Filter}
    */
-  getFilter: function() {
-    const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
+  getFilter: async function() {
+    let filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
     filter.viewResourceId = null;
 
     const action = route.data.action;
@@ -124,6 +140,27 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
         if (Validation.uuid(route.data.id)) {
           filter.selectedResourceId = route.data.id;
         }
+        break;
+      }
+      case 'viewFolder': {
+        if (Validation.uuid(route.data.id)) {
+          const folderId = route.data.id;
+          const folders = await Plugin.requestUntilSuccess("passbolt.storage.folders.get");
+          const folder = folders.find(item => item.id === folderId);
+          if (folder) {
+            filter = new Filter({
+              id: `workspace_filter_folder_${folderId}`,
+              type: 'folder',
+              folder: folder,
+              label: __('%s (folder)', folder.name),
+              rules: {
+                'has-parent': folder.id
+              },
+              order: ['Resource.modified DESC']
+            });
+          }
+        }
+        break;
       }
     }
 
@@ -314,11 +351,14 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @private
    */
   _initSecondarySidebar: function() {
+    this.latestSelectedSidebar = 'resource';
     this._destroySecondarySidebar();
     const showSidebar = Config.read('ui.workspace.showSidebar');
     if (!showSidebar) {
       return;
     }
+    this.destroyFolderSecondarySidebar();
+
     const resource = this.options.selectedResources[0];
     const options = {
       id: 'js_pwd_details',
@@ -328,6 +368,153 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     const component = ComponentHelper.create(this.element, 'last', PasswordSecondarySidebarComponent, options);
     this.options.passwordSecondarySidebar = component;
     return component;
+  },
+
+  /**
+   * Init the folder secondary sidebar.
+   * @return {Component}
+   * @private
+   */
+  _initFolderSecondarySidebar: async function(folder) {
+    const requestId = uuid();
+    this.folderSecondarySidebarRequestId = requestId;
+    this.folderSecondarySidebarFolder = folder;
+    this.latestSelectedSidebar = 'folder';
+
+    this.destroyFolderSecondarySidebar();
+    const showSidebar = Config.read('ui.workspace.showSidebar');
+    if (!showSidebar) {
+      return;
+    }
+
+    const folderSecondarySidebarElement = HtmlHelper.create(this.element, 'last', '<div id="js_folder_details">test</div>');
+    this.folderSecondarySidebarRef = React.createRef();
+    const folders = await Plugin.requestUntilSuccess("passbolt.storage.folders.get");
+    let groups = [];
+    let users = [];
+    let permissions = [];
+    this.renderFolderSecondarySidebar(folderSecondarySidebarElement[0], folder, folders, groups, users, permissions);
+
+    // Request the folder details from the API.
+    let folderDetails = await this.findFolderForSecondarySidebar(folder);
+    if (this.folderSecondarySidebarRequestId !== requestId) {
+      return;
+    }
+
+    // Update the folder secondary sidebar with the retrieved information.
+    users = [folderDetails.creator, folderDetails.modifier];
+    for (let i in folderDetails.permissions) {
+      const permission = folderDetails.permissions[i];
+      permissions.push(permission);
+      if (permission.user) {
+        users.push(permission.user);
+      } else {
+        groups.push(permissions.group);
+      }
+    }
+    this.renderFolderSecondarySidebar(folderSecondarySidebarElement[0], folder, folders, groups, users, permissions);
+  },
+
+  /**
+   * Find folders details (permissions, creator, modifier)
+   * @param {object} folder The folder to retrieve the detail for
+   * @returns {Promise<object>}
+   */
+  findFolderForSecondarySidebar: async function(folder) {
+    const url = new URL(`${APP_URL}folders/${folder.id}.json?api-version=2&contain[creator.profile]=true&contain[modifier.profile]=true&contain[permissions.user.profile]=true&contain[permission.group]=true`);
+    const fetchOptions = {};
+    const response = await fetch(url, fetchOptions);
+    const responseJson = await response.json();
+
+    return responseJson.body;
+  },
+
+  /**
+   * Destroy the folder secondary sidebar.
+   */
+  destroyFolderSecondarySidebar: function() {
+    $('#js_folder_details').remove();
+    this.folderSecondarySidebarRef = null;
+  },
+
+  /**
+   * Render the folder secondary sidebar
+   * @param element
+   * @param folder
+   * @param folders
+   * @param groups
+   * @param users
+   * @returns {Promise<void>}
+   */
+  renderFolderSecondarySidebar: async function(element, folder, folders, groups, users, permissions) {
+    ReactDOM.render(<FolderSidebar
+      ref={this.folderSecondarySidebarRef}
+      folder={folder}
+      folders={folders}
+      groups={groups}
+      permissions={permissions}
+      onClose={this.handleFolderSecondarySidebarClose}
+      onEditPermissions={this.handleFolderSecondarySidebarOpenShareDialogForFolder}
+      onSelectFolderParent={this.handleFolderSecondarySidebarSelectFolder}
+      onSelectRoot={this.handleFolderSecondarySidebarSelectRootFolder}
+      users={users}
+    />, element);
+  },
+
+  /**
+   * Handle when the user want to close the folder sidebar.
+   */
+  handleFolderSecondarySidebarClose: function() {
+    Config.write('ui.workspace.showSidebar', false);
+    MadBus.trigger('workspace_sidebar_state_change');
+  },
+
+  /**
+   * Handle when the user wants to open the share dialog from the folder secondary sidebar.
+   * @param {object} folder The folder to open the share dialog for
+   */
+  handleFolderSecondarySidebarOpenShareDialogForFolder: function (folder) {
+    const foldersIds = [folder.id];
+    Plugin.send("passbolt.plugin.folders.open-share-dialog", {foldersIds});
+  },
+
+  /**
+   * Handle when the user selects a folder from the folder secondary sidebar.
+   * @param {object} folder The selected folder
+   */
+  handleFolderSecondarySidebarSelectFolder: function(folder) {
+    const filter = new Filter({
+      id: `workspace_filter_folder_${folder.id}`,
+      type: 'folder',
+      folder: folder,
+      label: __('%s (folder)', folder.name),
+      rules: {
+        'has-parent': folder.id
+      },
+      order: ['Resource.modified DESC']
+    });
+    MadBus.trigger('filter_workspace', {filter});
+  },
+
+  /**
+   * Handle when the user selects the root folder from the folder secondary sidebar.
+   * @param {object} folder The selected folder
+   */
+  handleFolderSecondarySidebarSelectRootFolder: function() {
+    const filter = new Filter({
+      id: `workspace_filter_folder_root`,
+      type: 'folder',
+      folder: {
+        id: null,
+        name: 'root'
+      },
+      label: __('%s (folder)', 'root'),
+      rules: {
+        'has-parent': null
+      },
+      order: ['Resource.modified DESC']
+    });
+    MadBus.trigger('filter_workspace', {filter});
   },
 
   /**
@@ -473,8 +660,8 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @param {Group} tag The destroyed tag
    */
   '{document} passbolt.storage.folders.updated': function (el, ev) {
+    const folders = ev.data;
     if (this.filter.type === 'folder') {
-      const folders = ev.data;
       const foldersIds = folders.map(folder => folder.id);
       if (!foldersIds.includes(this.filter.folder.id)) {
         const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();
@@ -509,12 +696,23 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * Observe when the workspace sidebar setting change.
    */
   '{mad.bus.element} workspace_sidebar_state_change': function() {
-    const resource = this.options.selectedResources[0];
-    if (resource) {
-      const component = this._initSecondarySidebar(resource);
-      if (component) {
-        component.start();
+    if (Config.read('ui.workspace.showSidebar')) {
+      if (this.latestSelectedSidebar === 'resource') {
+        const resource = this.options.selectedResources[0];
+        if (resource) {
+          const component = this._initSecondarySidebar(resource);
+          if (component) {
+            component.start();
+          }
+        }
+      } else if (this.latestSelectedSidebar === 'folder') {
+        // @todo if the folder has been unselected then it's not relevant. It can lead to error if the folder has been
+        // deleted in the meantime.
+        this._initFolderSecondarySidebar(this.folderSecondarySidebarFolder);
       }
+    } else {
+      this.destroyFolderSecondarySidebar();
+      this._destroySecondarySidebar();
     }
   },
 
@@ -540,12 +738,20 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
     }
 
     // Disable the main button, if a folder is selected and the user doesn't have the permission to write into it.
-    if (filter.type === 'folder' && filter.folder.id !== null && filter.folder.permission.type < 7) {
-      this.options.mainButton.state.disabled = true;
-      this.options.importButton.state.disabled = true;
+    if (filter.type === 'folder') {
+      this.destroyFolderSecondarySidebar();
+      if (filter.folder.id !== null) {
+        this._initFolderSecondarySidebar(filter.folder);
+        if (filter.folder.permission.type < 7) {
+          this.options.mainButton.state.disabled = true;
+          this.options.importButton.state.disabled = true;
+        } else {
+          this.options.mainButton.state.disabled = false;
+          this.options.importButton.state.disabled = false;
+        }
+      }
     } else {
-      this.options.mainButton.state.disabled = false;
-      this.options.importButton.state.disabled = false;
+      this.destroyFolderSecondarySidebar();
     }
   },
 

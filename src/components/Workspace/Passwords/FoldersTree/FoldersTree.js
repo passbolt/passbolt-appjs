@@ -46,8 +46,7 @@ class FoldersTree extends React.Component {
       dragging: false,
       draggingOverTitle: false,
       open: true,
-      openFolders: [],
-      selectedFolder: null,
+      openFolders: []
     };
   }
 
@@ -68,7 +67,6 @@ class FoldersTree extends React.Component {
     this.handleDragLeaveTitle = this.handleDragLeaveTitle.bind(this);
     this.handleDragOverTitle = this.handleDragOverTitle.bind(this);
     this.handleDropTitle = this.handleDropTitle.bind(this);
-    this.handleFilterWorkspaceEvent = this.handleFilterWorkspaceEvent.bind(this);
     this.handleFolderCloseEvent = this.handleFolderCloseEvent.bind(this);
     this.handleFolderDragEndEvent = this.handleFolderDragEndEvent.bind(this);
     this.handleFolderDragStartEvent = this.handleFolderDragStartEvent.bind(this);
@@ -77,28 +75,14 @@ class FoldersTree extends React.Component {
     this.handleFolderSelectEvent = this.handleFolderSelectEvent.bind(this);
     this.handleGridDragStartEvent = this.handleGridDragStartEvent.bind(this);
     this.handleGridDragEndEvent = this.handleGridDragEndEvent.bind(this);
-    this.handlePluginSelectAndScrollToEvent = this.handlePluginSelectAndScrollToEvent.bind(this);
   }
 
   /**
    * Initialize event listeners.
    */
   initEventHandlers() {
-    document.addEventListener('filter_workspace', this.handleFilterWorkspaceEvent);
     document.addEventListener('passbolt.resources.drag-start', this.handleGridDragStartEvent);
     document.addEventListener('passbolt.resources.drag-end', this.handleGridDragEndEvent);
-    document.addEventListener('passbolt.plugin.folders.select-and-scroll-to', this.handlePluginSelectAndScrollToEvent);
-  }
-
-  /**
-   * Handle workspace filtered event.
-   * @param {ReactEvent} event The event
-   */
-  handleFilterWorkspaceEvent(event) {
-    if (event.data.filter.type !== "folder" || (event.data.filter.type === "folder" && event.data.filter.folder.id === null)) {
-      const selectedFolder = null;
-      this.setState({selectedFolder});
-    }
   }
 
   /**
@@ -234,9 +218,7 @@ class FoldersTree extends React.Component {
    * @param {Object} folder The folder
    */
   handleFolderSelectEvent(event, folder) {
-    const selectedFolder = folder;
-    this.setState({selectedFolder});
-    this.props.onSelect(selectedFolder);
+    this.props.onSelect(folder);
   }
 
   /**
@@ -265,25 +247,20 @@ class FoldersTree extends React.Component {
   }
 
   /**
-   * Handle when the plugin request the appjs to select and scroll to a folder
-   * @param {ReactEvent} event The event
+   * Open the tree until a given folder
+   * @param {object} folder The folder to scroll to
    */
-  handlePluginSelectAndScrollToEvent(event) {
-    const folderId = event.data;
-    const selectedFolder = this.props.folders.find(folder => folder.id === folderId);
-    const openFolders = this.state.openFolders;
+  openFolderTree(folder) {
+    let openFolders = this.state.openFolders;
 
     // If the selected folder has a parent. Open it if not yet open.
-    if (selectedFolder.folder_parent_id) {
-      const isFolderParentOpen = this.state.openFolders.some(item => item.id === selectedFolder.folder_parent_id);
-      if (!isFolderParentOpen) {
-        const folderParent = this.props.folders.find(folder => folder.id === selectedFolder.folder_parent_id);
-        openFolders.push(folderParent);
+    if (folder.folder_parent_id) {
+      const folderParent = this.props.folders.find(item => item.id === folder.folder_parent_id);
+      if (folderParent) {
+        openFolders = Array.from(new Set([...openFolders, folderParent]));
+        this.setState({openFolders}, () => this.openFolderTree(folderParent));
       }
     }
-
-    this.setState({selectedFolder, openFolders});
-    this.props.onSelect(selectedFolder);
   }
 
   /**
@@ -457,7 +434,7 @@ class FoldersTree extends React.Component {
               onOpen={this.handleFolderOpenEvent}
               openFolders={this.state.openFolders}
               onSelect={this.handleFolderSelectEvent}
-              selectedFolder={this.state.selectedFolder}/>;
+              selectedFolder={this.props.selectedFolder}/>;
           })}
         </ul>
         }
@@ -467,6 +444,7 @@ class FoldersTree extends React.Component {
 }
 
 FoldersTree.propTypes = {
+  selectedFolder: PropTypes.object,
   folders: PropTypes.array,
   onContextualMenu: PropTypes.func,
   onSelect: PropTypes.func,
