@@ -149,7 +149,7 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
    * Retrieve and load permissions in the list.
    * @return {promise}
    */
-  _loadPermissions: function() {
+  _loadPermissions: async function() {
     const self = this;
     const aco_name = 'resource';
     const aco_foreign_key = this.options.acoInstance.id;
@@ -157,15 +157,24 @@ const PermissionsSidebarSectionComponent = SecondarySidebarSectionComponent.exte
 
     this.state.loaded = false;
     this.permissionsList.reset();
-    return Permission.findAll({
+    let permissions = await Permission.findAll({
       aco: aco_name,
       aco_foreign_key: aco_foreign_key,
       contain: {group: 1, user: 1, 'user.profile': 1}
-    }).then(permissions => {
-      $('.processing-wrapper', this.element).hide();
-      self.permissionsList.load(permissions);
-      this.state.loaded = true;
     });
+
+    permissions.sort((permission1, permission2) => {
+      console.log(permission1, permission2);
+      const permission1Name = permission1.user ? `${permission1.user.profile.first_name} ${permission1.user.profile.last_name}`.toLowerCase() : permission1.group.name.toLowerCase();
+      const permission2Name = permission2.user ? `${permission2.user.profile.first_name} ${permission2.user.profile.last_name}`.toLowerCase() : permission2.group.name.toLowerCase();
+      if (permission1Name < permission2Name) return -1;
+      if (permission1Name > permission2Name) return 1;
+      return 0;
+    });
+
+    $('.processing-wrapper', this.element).hide();
+    self.permissionsList.load(permissions);
+    this.state.loaded = true;
   },
 
   /**

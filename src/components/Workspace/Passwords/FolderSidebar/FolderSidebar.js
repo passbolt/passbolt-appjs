@@ -95,13 +95,12 @@ class FolderSidebar extends React.Component {
               <Icon name="folder"/>
             </div>
             <h3>
-              <div className="title-wrapper">
-                <span className="name">{this.props.folder.name}</span>
-                <a className="title-link" title="Copy the link to this folder" onClick={this.handlePermalinkClick}>
-                  <Icon name="link"/>
-                  <span className="visuallyhidden">Copy the link to this folder</span>
+              <span className="name">{this.props.folder.name}
+                <a className="title-link" title="Copy the link to this folder"  onClick={this.handlePermalinkClick}>
+                    <i className="fa fa-link"></i>
+                    <span className="visuallyhidden">Copy the link to this folder</span>
                 </a>
-              </div>
+              </span>
               <span className="type">folder</span>
             </h3>
             <a className="dialog-close" onClick={this.handleCloseClick}>

@@ -75,11 +75,31 @@ class FolderSidebarPermissionsSection extends React.Component {
   }
 
   /**
+   * Get the permissions.
+   * @return {array}
+   */
+  getPermissions() {
+    const permissions = this.props.permissions;
+    if (permissions) {
+      permissions.sort((permission1, permission2) => {
+        const permission1Name = permission1.user ? `${permission1.user.profile.first_name} ${permission1.user.profile.last_name}`.toLowerCase() : permission1.group.name.toLowerCase();
+        const permission2Name = permission2.user ? `${permission2.user.profile.first_name} ${permission2.user.profile.last_name}`.toLowerCase() : permission2.group.name.toLowerCase();
+        if (permission1Name < permission2Name) return -1;
+        if (permission1Name > permission2Name) return 1;
+        return 0;
+      });
+    }
+
+    return permissions;
+  }
+
+  /**
    * Render the component
    * @returns {JSX}
    */
   render() {
     const canShare = this.props.folder.permission.type === 15;
+    const permissions = this.getPermissions();
 
     return (
       <div className={`sharedwith accordion sidebar-section ${this.props.open ? "" : "closed"}`}>
@@ -100,7 +120,7 @@ class FolderSidebarPermissionsSection extends React.Component {
                 <span className="processing-text">Retrieving permissions </span>
               </div>
               }
-              {this.props.permissions && this.props.permissions.map(permission => {
+              {permissions && permissions.map(permission => {
                 return (
                   <li key={permission.id} className="usercard-col-2">
                     <div className="content-wrapper">
