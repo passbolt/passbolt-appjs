@@ -45,7 +45,7 @@ const AppBootstrap = Bootstrap.extend('passbolt.Bootstrap', /* @static */ {
     ResourceService.updateLocalStorage();
     this._csrfToken();
     await Promise.all([this._loadSettings(), this._loadUser(), this._loadRoles()]);
-    await this._loadFolders();
+    this._loadFolders();
     await this._loadAccountSettings();
     await this._loadApp();
   },

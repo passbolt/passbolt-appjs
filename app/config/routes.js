@@ -21,18 +21,17 @@ route.register('/app/administration/mfa', {controller: 'Administration', action:
 route.register('/app/administration/email-notification', {controller: 'Administration', action: 'emailNotification'});
 route.register('/app/administration', {controller: 'Administration', action: 'mfa'});
 
+// Folders routes
+route.register('/app/folders/view/{id}', {controller: 'Password', action: 'viewFolder'});
+
 // Groups routes
 route.register('/app/groups/delete/{id}', {controller: 'User', action: 'groupDelete'});
 route.register('/app/groups/edit/{id}', {controller: 'User', action: 'groupEdit'});
 route.register('/app/groups/view/{id}', {controller: 'User', action: 'groupView'});
 route.register('/app/groups/view/{id}/membership', {controller: 'User', action: 'groupViewMembership'});
 
-/*
- * Passwords routes
- *route.register('/app/passwords/view/{id}/comments', {controller: 'Password', action: 'commentsView'});
- */
+// Passwords routes
 route.register('/app/passwords/view/{id}', {controller: 'Password', action: 'view'});
-//route.register('/app/passwords/edit/{id}', {controller: 'Password', action: 'edit'});
 route.register('/app/passwords', {controller: 'Password', action: 'index'});
 
 // Users routes
