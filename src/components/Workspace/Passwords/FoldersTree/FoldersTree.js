@@ -273,9 +273,20 @@ class FoldersTree extends React.Component {
       return true;
     }
 
-    // The user cannot drag an element if the parent folder is in READ.
     const folderParent = this.props.folders.find(folder => folder.id === item.folder_parent_id);
+
+    // The user can always drag content from a personal folder.
+    if (folderParent.personal) {
+      return true;
+    }
+
+    // The user cannot drag an element if the parent folder is in READ.
     if (folderParent.permission.type < 7) {
+      return false;
+    }
+
+    // The user cannot move folder in READ ONLY from a shared folder.
+    if (item.permission.type < 7) {
       return false;
     }
 
@@ -376,6 +387,14 @@ class FoldersTree extends React.Component {
   }
 
   /**
+   * Check if the user is currently dragging content.
+   * @returns {number}
+   */
+  isDragging() {
+    return this.state.draggedItems.folders.length || this.state.draggedItems.resources.length;
+  }
+
+  /**
    * Render the component
    * @returns {JSX}
    */
@@ -383,14 +402,26 @@ class FoldersTree extends React.Component {
     const isLoading = this.isLoading();
     const isOpen = this.state.open;
     const rootFolders = this.getRootFolders();
-    const showDropFocus = this.state.draggingOverTitle && this.canDragItems(this.state.draggedItems);
+    const isDragging = this.isDragging();
+    let showDropFocus = false;
+    let disabled = false;
+
+    if (isDragging && this.state.draggingOverTitle) {
+      const canDragItems = this.canDragItems(this.state.draggedItems);
+      if (canDragItems) {
+        showDropFocus = true;
+      } else {
+        // Disabled the drop area in order to avoid the drop event to be fired when the user cannot drop content on the root.
+        disabled = true;
+      }
+    }
 
     return (
       <div ref={this.elementRef} className="folders navigation first accordion">
         {this.renderDragFeedback()}
         <div className="accordion-header1">
           <div className={`${isOpen ? "open" : "close"} node root`}>
-            <div className={`row title ${showDropFocus ? "drop-focus" : ""}`}>
+            <div className={`row title ${showDropFocus ? "drop-focus" : ""} ${disabled ? "disabled" : ""}`}>
               <div className="main-cell-wrapper">
                 <div className="main-cell">
                   <h3>
@@ -426,6 +457,7 @@ class FoldersTree extends React.Component {
               draggedItems={this.state.draggedItems}
               folder={folder}
               folders={this.props.folders}
+              isDragging={isDragging}
               onClose={this.handleFolderCloseEvent}
               onContextualMenu={this.handleContextualMenuEvent}
               onDragEnd={this.handleFolderDragEndEvent}
