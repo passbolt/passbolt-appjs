@@ -117,6 +117,9 @@ class FoldersTreeItemContextualMenu extends React.Component {
    * Handle click on the create a folder menu option.
    */
   handleCreateFolderItemClickEvent() {
+    if (!this.canUpdate()) {
+      return;
+    }
     const folderParentId = this.props.folder.id;
     Plugin.send('passbolt.plugin.folders.open-create-dialog', {folderParentId});
     this.destroy();
@@ -126,6 +129,9 @@ class FoldersTreeItemContextualMenu extends React.Component {
    * Handle click on the rename a folder menu option.
    */
   handleRenameFolderItemClickEvent() {
+    if (!this.canUpdate()) {
+      return;
+    }
     const folderId = this.props.folder.id;
     Plugin.send('passbolt.plugin.folders.open-rename-dialog', {folderId});
     this.destroy();
@@ -135,6 +141,9 @@ class FoldersTreeItemContextualMenu extends React.Component {
    * Handle click on the share a folder menu option.
    */
   handleShareFolderItemClickEvent() {
+    if (!this.canShare()) {
+      return;
+    }
     const foldersIds = [this.props.folder.id];
     Plugin.send("passbolt.plugin.folders.open-share-dialog", {foldersIds});
     this.destroy();
@@ -153,6 +162,9 @@ class FoldersTreeItemContextualMenu extends React.Component {
    * Handle click on the delete a folder menu option.
    */
   handleDeleteFolderItemClickEvent() {
+    if (!this.canUpdate()) {
+      return;
+    }
     const folderId = this.props.folder.id;
     Plugin.send('passbolt.plugin.folders.open-delete-dialog', {folderId});
     this.destroy();

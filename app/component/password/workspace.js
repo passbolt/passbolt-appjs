@@ -421,7 +421,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @returns {Promise<object>}
    */
   findFolderForSecondarySidebar: async function(folder) {
-    const url = new URL(`${APP_URL}folders/${folder.id}.json?api-version=2&contain[creator.profile]=true&contain[modifier.profile]=true&contain[permissions.user.profile]=true&contain[permission.group]=true`);
+    const url = new URL(`${APP_URL}folders/${folder.id}.json?api-version=2&contain[creator.profile]=true&contain[modifier.profile]=true&contain[permissions.user.profile]=true&contain[permissions.group]=true`);
     const fetchOptions = {};
     const response = await fetch(url, fetchOptions);
     const responseJson = await response.json();
@@ -749,9 +749,14 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
           this.options.mainButton.state.disabled = false;
           this.options.importButton.state.disabled = false;
         }
+      } else {
+        this.options.mainButton.state.disabled = false;
+        this.options.importButton.state.disabled = false;
       }
     } else {
       this.destroyFolderSecondarySidebar();
+      this.options.mainButton.state.disabled = false;
+      this.options.importButton.state.disabled = false;
     }
   },
 
