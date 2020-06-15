@@ -4,6 +4,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.13.4] - 2020-06-15
+### Added
+-  Folders activity sidebar integration
+### Fixed
+-  Update folders & resources local storage after group update/delete
+-  Fix as lu I can search a resource by tag issue 
+
+## [2.13.3] - 2020-06-11
+### Fixed
+- Fix folder sidebar permissions section when a folder is shared with a group
+
+## [2.13.2] - 2020-06-05
+### Added
+- Add location information to the password secondary sidebar. Fix permissions alphabetical order issue in the secondary sidebars sections
+
+### Fixed
+- Fix as LU I should not be able to move a folder in read from a shared folder into a personal folder or the root
+
 ## [2.13.1] - 2020-05-28
 ### Fixed
 - Passwords grid empty state
@@ -262,7 +280,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.3...HEAD
+[2.13.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.2...v2.13.3
+[2.13.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.1...v2.13.2
+[2.13.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.0...v2.13.1
 [2.13.0]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.6...v2.13.0
 [2.12.6]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.5...v2.12.6
 [2.12.5]: https://github.com/passbolt/passbolt-appjs/compare/v2.12.4...v2.12.5

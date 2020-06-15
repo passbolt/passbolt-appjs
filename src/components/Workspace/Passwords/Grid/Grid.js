@@ -265,7 +265,7 @@ class Grid extends React.Component {
    * @return {array} The filtered resources.
    */
   filterResourcesBySearch(resources, needle) {
-    if (needle == '' || !needle) {
+    if (needle === '' || !needle) {
       return resources;
     }
 
@@ -281,7 +281,8 @@ class Grid extends React.Component {
         match &= (regexes[i].test(resource.name)
           || regexes[i].test(resource.username)
           || regexes[i].test(resource.uri)
-          || regexes[i].test(resource.description));
+          || regexes[i].test(resource.description)
+          || resource.tags && resource.tags.some(tag => regexes[i].test(tag.slug)));
       }
 
       return match;
