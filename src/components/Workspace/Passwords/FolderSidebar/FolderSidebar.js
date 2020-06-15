@@ -16,7 +16,8 @@ import Icon from "../../../Common/Icons/Icon";
 import PropTypes from "prop-types";
 import FolderSidebarInformationSection from "./FolderSidebarInformationSection";
 import FolderSidebarPermissionsSection from "./FolderSidebarPermissionsSection";
-import Clipboard from "../../../../../app/util/clipboard";
+import Clipboard from "../../../../legacy/util/clipboard";
+import FolderSidebarActivitySection from "./FolderSidebarActivitySection";
 
 class FolderSidebar extends React.Component {
 
@@ -36,7 +37,11 @@ class FolderSidebar extends React.Component {
    */
   getDefaultState() {
     return {
-      permissions: null,
+      activities: [],
+      activitiesPage: 1,
+      activitySectionMoreProcessing: true,
+      activitySectionOpen: false,
+      permissions: [],
       permissionsSectionOpen: false
     };
   }
@@ -45,10 +50,40 @@ class FolderSidebar extends React.Component {
    * Bind callbacks methods
    */
   bindCallbacks() {
+    this.handleActivitySectionClose = this.handleActivitySectionClose.bind(this);
+    this.handleActivitySectionMore = this.handleActivitySectionMore.bind(this);
+    this.handleActivitySectionOpen = this.handleActivitySectionOpen.bind(this);
     this.handleCloseClick = this.handleCloseClick.bind(this);
     this.handlePermalinkClick = this.handlePermalinkClick.bind(this);
     this.handlePermissionSectionClose = this.handlePermissionSectionClose.bind(this);
     this.handlePermissionSectionOpen = this.handlePermissionSectionOpen.bind(this);
+  }
+
+  /**
+   * Handle when the user closes the activity section.
+   */
+  handleActivitySectionClose() {
+    const activitySectionOpen = false;
+    this.setState({activitySectionOpen});
+  }
+
+  /**
+   * Handle when the user wants to see more activities in the activity section.
+   */
+  handleActivitySectionMore() {
+    const activitiesPage = this.state.activitiesPage + 1;
+    const activitySectionMoreProcessing = true;
+    this.setState({activitiesPage, activitySectionMoreProcessing}, () => this.findFolderActivities());
+  }
+
+  /**
+   * Handle when the user opens the activity section.
+   */
+  handleActivitySectionOpen() {
+    const activitySectionOpen = true;
+    const activities = [];
+    const activitiesPage = 1;
+    this.setState({activities, activitiesPage, activitySectionOpen}, () => this.findFolderActivities());
   }
 
   /**
@@ -79,7 +114,35 @@ class FolderSidebar extends React.Component {
    */
   handlePermissionSectionOpen() {
     const permissionsSectionOpen = true;
-    this.setState({permissionsSectionOpen});
+    this.setState({permissionsSectionOpen}, () => this.findFolderPermission());
+  }
+
+  /**
+   * Find the folder activities
+   * @returns {Promise<void>}
+   */
+  async findFolderActivities() {
+    const url = new URL(`${APP_URL}actionlog/folder/${this.props.folder.id}.json?api-version=v2&foreignModel=Folders&page=${this.state.activitiesPage}&limit=5&contain[creator]=1`);
+    const fetchOptions = {};
+    const response = await fetch(url, fetchOptions);
+    const responseJson = await response.json();
+    const newActivities = responseJson.body;
+    const activities = [...this.state.activities, ...newActivities];
+    const activitySectionMoreProcessing = false;
+    this.setState({activities, activitySectionMoreProcessing});
+  }
+
+  /**
+   * Find the folder permissions
+   * @returns {Promise<void>}
+   */
+  async findFolderPermission() {
+    const url = new URL(`${APP_URL}folders/${this.props.folder.id}.json?api-version=2&contain[permissions.user.profile]=true&contain[permissions.group]=true`);
+    const fetchOptions = {};
+    const response = await fetch(url, fetchOptions);
+    const responseJson = await response.json();
+    const permissions = responseJson.body.permissions;
+    this.setState({permissions});
   }
 
   /**
@@ -96,7 +159,7 @@ class FolderSidebar extends React.Component {
             </div>
             <h3>
               <span className="name">{this.props.folder.name}
-                <a className="title-link" title="Copy the link to this folder"  onClick={this.handlePermalinkClick}>
+                <a className="title-link" title="Copy the link to this folder" onClick={this.handlePermalinkClick}>
                     <i className="fa fa-link"></i>
                     <span className="visuallyhidden">Copy the link to this folder</span>
                 </a>
@@ -120,9 +183,17 @@ class FolderSidebar extends React.Component {
             onClose={this.handlePermissionSectionClose}
             onOpen={this.handlePermissionSectionOpen}
             open={this.state.permissionsSectionOpen}
-            permissions={this.props.permissions}
+            permissions={this.state.permissions}
             groups={this.props.groups}
             users={this.props.users}/>
+          <FolderSidebarActivitySection
+            activities={this.state.activities}
+            folder={this.props.folder}
+            moreProcessing={this.state.activitySectionMoreProcessing}
+            onClose={this.handleActivitySectionClose}
+            onOpen={this.handleActivitySectionOpen}
+            onMore={this.handleActivitySectionMore}
+            open={this.state.activitySectionOpen}/>
         </div>
       </div>
     );
@@ -137,8 +208,7 @@ FolderSidebar.propTypes = {
   onSelectFolderParent: PropTypes.func,
   onSelectRoot: PropTypes.func,
   onEditPermissions: PropTypes.func,
-  users: PropTypes.array,
-  permissions: PropTypes.array
+  users: PropTypes.array
 };
 
 export default FolderSidebar;

@@ -403,15 +403,6 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
 
     // Update the folder secondary sidebar with the retrieved information.
     users = [folderDetails.creator, folderDetails.modifier];
-    for (let i in folderDetails.permissions) {
-      const permission = folderDetails.permissions[i];
-      permissions.push(permission);
-      if (permission.user) {
-        users.push(permission.user);
-      } else {
-        groups.push(permissions.group);
-      }
-    }
     this.renderFolderSecondarySidebar(folderSecondarySidebarElement[0], folder, folders, groups, users, permissions);
   },
 
@@ -421,7 +412,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    * @returns {Promise<object>}
    */
   findFolderForSecondarySidebar: async function(folder) {
-    const url = new URL(`${APP_URL}folders/${folder.id}.json?api-version=2&contain[creator.profile]=true&contain[modifier.profile]=true&contain[permissions.user.profile]=true&contain[permissions.group]=true`);
+    const url = new URL(`${APP_URL}folders/${folder.id}.json?api-version=2&contain[creator.profile]=true&contain[modifier.profile]=true`);
     const fetchOptions = {};
     const response = await fetch(url, fetchOptions);
     const responseJson = await response.json();

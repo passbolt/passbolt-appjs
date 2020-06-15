@@ -49,6 +49,8 @@ import template from '../../view/template/component/user/workspace.stache';
 import userDeleteConfirmTemplate from '../../view/template/component/user/delete_confirm.stache';
 import userDisableMfaConfirmTemplate from '../../view/template/component/user/disable_mfa_confirm.stache';
 import MfaSettings from "../../model/map/mfa_settings";
+import ResourceService from "../../model/service/plugin/resource";
+import Plugin from "../../util/plugin";
 
 const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspace', /** @static */ {
 
@@ -398,6 +400,8 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
       callbacks: {
         saved: function () {
           dialog.remove();
+          ResourceService.updateLocalStorage();
+          Plugin.request('passbolt.plugin.folders.update-local-storage');
         }
       }
     });
@@ -508,8 +512,10 @@ const UserWorkspaceComponent = Component.extend('passbolt.component.user.Workspa
         group: group,
         resources: resources
       },
-      action: function () {
-        group.delete();
+      action: async function () {
+        await group.delete();
+        ResourceService.updateLocalStorage();
+        Plugin.request('passbolt.plugin.folders.update-local-storage');
       }
     });
     dialog.start();
