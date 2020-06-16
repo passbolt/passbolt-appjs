@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.13.5] - 2020-06-16
+### Added
+-  As LU I can export all the folders from the folders tree title contextual menu
+-  As LU I can export create a folder from the folders tree title contextual menu
+
 ## [2.13.4] - 2020-06-15
 ### Added
 -  Folders activity sidebar integration
@@ -280,7 +285,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.5...HEAD
+[2.13.5]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.4...v2.13.5
+[2.13.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.3...v2.13.4
 [2.13.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.2...v2.13.3
 [2.13.2]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.1...v2.13.2
 [2.13.1]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.0...v2.13.1

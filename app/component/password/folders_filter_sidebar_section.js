@@ -20,6 +20,8 @@ import Plugin from "../../util/plugin";
 import FoldersTreeItemContextualMenu
   from "../../../src/components/Workspace/Passwords/FoldersTree/FoldersTreeItemContextualMenu";
 import FoldersTree from "../../../src/components/Workspace/Passwords/FoldersTree/FoldersTree";
+import FoldersTreeRootFolderContextualMenu
+  from "../../../src/components/Workspace/Passwords/FoldersTree/FoldersTreeRootFolderContextualMenu";
 
 const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.extend('passbolt.component.password.FoldersFilterSidebarSection', /** @static */ {
 
@@ -52,16 +54,22 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
     ReactDOM.render(<FoldersTree
       ref={ref}
       folders={folders}
-      onContextualMenu={(folder, top, left, foldersTreeElement) => this.onContextualMenu(folder, top, left, foldersTreeElement)}
+      onFolderContextualMenu={(folder, top, left, foldersTreeListElementRef) => this.onFolderContextualMenu(folder, top, left, foldersTreeListElementRef)}
+      onRootFolderContextualMenu={(top, left, foldersTreeTitleElementRef) => this.onRootFolderContextualMenu(top, left, foldersTreeTitleElementRef)}
       onSelect={folder => this.onSelect(folder)}
       onSelectRoot={() => this.onSelectRoot()}
       selectedFolder={selectedFolder}
     />, this.element);
   },
 
-  onContextualMenu(folder, top, left, foldersTreeElement) {
-    this.renderContextualMenu(folder, top, left, foldersTreeElement)
+  onFolderContextualMenu(folder, top, left, foldersTreeListElementRef) {
+    this.renderFolderContextualMenu(folder, top, left, foldersTreeListElementRef)
   },
+
+  onRootFolderContextualMenu(top, left, foldersTreeTitleElementRef) {
+    this.renderRootFolderContextualMenu(top, left, foldersTreeTitleElementRef)
+  },
+
 
   onSelect(folder) {
     const filter = new Filter({
@@ -102,14 +110,26 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
     this.menuElement = $('<div>').appendTo('body')[0];
   },
 
-  renderContextualMenu:function (folder, top, left, foldersTreeElement) {
+  renderFolderContextualMenu:function (folder, top, left, foldersTreeListElementRef) {
     const ref = this.menuRef;
     ReactDOM.render(<FoldersTreeItemContextualMenu
       ref={ref}
       folder={folder}
       top={top}
       left={left}
-      foldersTreeElementRef={foldersTreeElement}
+      foldersTreeListElementRef={foldersTreeListElementRef}
+      onDestroy={() => this.hideMenu()}
+    />, this.menuElement);
+  },
+
+  renderRootFolderContextualMenu:function (top, left, foldersTreeTitleElementRef) {
+    const ref = this.menuRef;
+    ReactDOM.render(<FoldersTreeRootFolderContextualMenu
+      folders={this.folders}
+      ref={ref}
+      top={top}
+      left={left}
+      foldersTreeTitleElementRef={foldersTreeTitleElementRef}
       onDestroy={() => this.hideMenu()}
     />, this.menuElement);
   },
