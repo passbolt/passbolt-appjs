@@ -652,7 +652,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   '{document} passbolt.storage.folders.updated': function (el, ev) {
     const folders = ev.data;
-    if (this.filter.type === 'folder') {
+    if (this.filter.type === 'folder' && this.filter.folder.id !== null) {
       const foldersIds = folders.map(folder => folder.id);
       if (!foldersIds.includes(this.filter.folder.id)) {
         const filter = PasswordWorkspaceComponent.getDefaultFilterSettings();

@@ -70,7 +70,6 @@ const FoldersFilterSidebarSectionComponent = PrimarySidebarSectionComponent.exte
     this.renderRootFolderContextualMenu(top, left, foldersTreeTitleElementRef)
   },
 
-
   onSelect(folder) {
     const filter = new Filter({
       id: `workspace_filter_folder_${folder.id}`,

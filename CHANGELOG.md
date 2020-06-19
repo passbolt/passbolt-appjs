@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.13.6] - 2020-06-19
+### Fixed
+- Update the folders local storage when a folders is selected or opened
+- Update the folders local storage when the folders tree section is open or the root folder is selected
+- Folder sidebar should highlight if a folder is shared or not
+- Fix padding folders tree section
+
 ## [2.13.5] - 2020-06-16
 ### Added
 -  As LU I can export all the folders from the folders tree title contextual menu
@@ -285,7 +292,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.5...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.6...HEAD
+[2.13.6]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.5...v2.13.6
 [2.13.5]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.4...v2.13.5
 [2.13.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.3...v2.13.4
 [2.13.3]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.2...v2.13.3

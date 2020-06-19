@@ -155,7 +155,12 @@ class FolderSidebar extends React.Component {
         <div className="sidebar resource">
           <div className="sidebar-header">
             <div className="logo">
+              {this.props.folder.personal &&
               <Icon name="folder"/>
+              }
+              {!this.props.folder.personal &&
+              <Icon name="folder-shared"/>
+              }
             </div>
             <h3>
               <span className="name">{this.props.folder.name}

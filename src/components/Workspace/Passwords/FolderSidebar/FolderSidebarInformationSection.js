@@ -116,6 +116,26 @@ class FolderSidebarInformationSection extends React.Component {
   }
 
   /**
+   * Check if a folder is personal. Root is.
+   * @param {string} folderId The target folder id
+   * @return {boolean}
+   */
+  isFolderPersonal(folderId) {
+    if (folderId === null) {
+      return true;
+    }
+
+    if (this.props.folders) {
+      const folder = this.props.folders.find(item => item.id === folderId);
+      if (folder) {
+        return folder.personal;
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * Render the component
    * @returns {JSX}
    */
@@ -125,6 +145,7 @@ class FolderSidebarInformationSection extends React.Component {
     const createdDateTimeAgo = this.formatDateTimeAgo(this.props.folder.created);
     const modifiedDateTimeAgo = this.formatDateTimeAgo(this.props.folder.modified);
     const folderParentName = this.getFolderName(this.props.folder.folder_parent_id);
+    const isFolderParentPersonal = this.isFolderPersonal(this.props.folder.folder_parent_id);
 
     return (
       <div className={`detailed-information accordion sidebar-section ${this.state.open ? "" : "closed"}`}>
@@ -155,9 +176,9 @@ class FolderSidebarInformationSection extends React.Component {
           <li className="location">
             <span className="label">Location</span>
             <span className="value">
-                <a onClick={this.handleFolderParentClickEvent} className={`folder-link ${!this.props.folders ? "disabled" : ""}`}>
-                  <Icon name="folder"/> {folderParentName}
-                </a>
+              <a onClick={this.handleFolderParentClickEvent} className={`folder-link ${!this.props.folders ? "disabled" : ""}`}>
+                <Icon name={isFolderParentPersonal ? "folder" : "folder-shared"}/> {folderParentName}
+              </a>
             </span>
           </li>
         </ul>
