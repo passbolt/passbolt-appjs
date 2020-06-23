@@ -202,41 +202,33 @@ const EmailNotificationsSettingsForm = Form.extend('passbolt.form.administration
    */
   _initFormFoldersSection: function () {
     this.addElement(
-      new ToggleButtonComponent('#js-send-folder-created-toggle-button', {
+      new ToggleButtonComponent('#js-send-folder-create-toggle-button', {
         label: __("When a folder is created, notify its creator."),
-        modelReference: 'EmailNotificationSettings.send_folder_created',
+        modelReference: 'EmailNotificationSettings.send_folder_create',
         state: {disabled: true}
       }).start()
     );
 
     this.addElement(
-      new ToggleButtonComponent('#js-send-folder-updated-toggle-button', {
+      new ToggleButtonComponent('#js-send-folder-update-toggle-button', {
         label: __("When a folder is updated, notify the users who have access to it."),
-        modelReference: 'EmailNotificationSettings.send_folder_updated',
+        modelReference: 'EmailNotificationSettings.send_folder_update',
         state: {disabled: true}
       }).start()
     );
 
     this.addElement(
-      new ToggleButtonComponent('#js-send-folder-deleted-toggle-button', {
+      new ToggleButtonComponent('#js-send-folder-delete-toggle-button', {
         label: __("When a folder is deleted, notify the users who had access to it."),
-        modelReference: 'EmailNotificationSettings.send_folder_deleted',
+        modelReference: 'EmailNotificationSettings.send_folder_delete',
         state: {disabled: true}
       }).start()
     );
 
     this.addElement(
-      new ToggleButtonComponent('#js-send-folder-share-created-toggle-button', {
+      new ToggleButtonComponent('#js-send-folder-share-toggle-button', {
         label: __("When a folder is shared, notify the users who gain access to it."),
-        modelReference: 'EmailNotificationSettings.send_folder_share_created',
-        state: {disabled: true}
-      }).start()
-    );
-
-    this.addElement(
-      new ToggleButtonComponent('#js-send-folder-share-dropped-toggle-button', {
-        label: __("When permissions on a folder are removed, notify the users who lost access to it."),
-        modelReference: 'EmailNotificationSettings.send_folder_share_dropped',
+        modelReference: 'EmailNotificationSettings.send_folder_share',
         state: {disabled: true}
       }).start()
     );
