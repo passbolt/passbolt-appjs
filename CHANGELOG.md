@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [2.13.8] - 2020-08-05
 ### Fixed
 - Update dependencies
 - PB-1419 Unselect resources that are going to be deleted
@@ -299,7 +300,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.6...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.8...HEAD
+[2.13.8]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.7...v2.13.8
+[2.13.7]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.6...v2.13.7
 [2.13.6]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.5...v2.13.6
 [2.13.5]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.4...v2.13.5
 [2.13.4]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.3...v2.13.4
