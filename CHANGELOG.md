@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - Update dependencies
+- PB-1419 Unselect resources that are going to be deleted
 
 ## [2.13.7] - 2020-06-23
 ### Fixed

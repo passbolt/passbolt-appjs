@@ -572,6 +572,7 @@ const PasswordWorkspaceComponent = Component.extend('passbolt.component.password
    */
   _deleteResources: async function(resources) {
     this.state.loaded = false;
+    this.options.selectedResources.splice(0, this.options.selectedResources.length);
     const resourcesIds = resources.reduce((carry, resource) => [...carry, resource.id], []);
     try {
       await ResourceService.deleteAllByIds(resourcesIds);
