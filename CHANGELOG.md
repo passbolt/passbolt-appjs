@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [2.13.9] - 2020-08-06
+### Improved
+- PB-1422 Add more button to the folders tree section title
+
 ### Fixed
 - PB-1421 Fix grid/folders tree drag and drop with FF ESR 68
 
@@ -303,7 +307,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.8...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_api/compare/v2.13.9...HEAD
+[2.13.9]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.8...v2.13.9
 [2.13.8]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.7...v2.13.8
 [2.13.7]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.6...v2.13.7
 [2.13.6]: https://github.com/passbolt/passbolt-appjs/compare/v2.13.5...v2.13.6
