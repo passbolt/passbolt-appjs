@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PB-1421 Fix grid/folders tree drag and drop with FF ESR 68
+
 ## [2.13.8] - 2020-08-05
 ### Fixed
 - Update dependencies
