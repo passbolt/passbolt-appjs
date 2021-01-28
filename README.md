@@ -9,7 +9,12 @@
 	Copyright (c) 2018 Passbolt SARL
 	https://www.passbolt.com
 
-[![Build Status](https://travis-ci.org/passbolt/passbolt-appjs.svg?branch=master)](https://travis-ci.org/passbolt/passbolt-appjs)
+
+## ARCHIVED
+
+This repository is archived and the code will not be updated.
+Use at your own risk.
+
 
 ## License
 
